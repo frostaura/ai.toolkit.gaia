@@ -24,6 +24,33 @@
   "synthwave84.disableGlow": false,
   "synthwave84.brightness": 0.45,
   "chat.tools.autoApprove": true,
+  "chat.tools.terminal.autoApprove": {
+    "rmdir": true,
+    "rm": true,
+    "curl": true,
+    "wget": true,
+    "eval": true,
+    "chmod": true,
+    "dotnet": true,
+    "csharp": true,
+    "bash": true,
+    "sh": true,
+    "powershell": true,
+    "pwsh": true,
+    "node": true,
+    "npm": true,
+    "npx": true,
+    "nuget": true,
+    "python": true,
+    "grep": true,
+    "cd": true,
+    "ls": true,
+    "cat": true,
+    "chown": true,
+    "head": true,
+    "find": true,
+    "xargs": true
+  },
   "chat.agent.enabled": true,
   "chat.extensionTools.enabled": true,
   "chat.mcp.discovery.enabled": true,
@@ -34,5 +61,8 @@
     "explorer.fileNesting.expand": false,
     "explorer.fileNesting.patterns": {
         "*.csproj": "*.config,*.props,*.targets"
-    }
+    },
+    "chat.checkpoints.showFileChanges": true,
+    "chat.editor.wordWrap": "on",
+    "chat.mcp.assisted.nuget.enabled": true
 }
