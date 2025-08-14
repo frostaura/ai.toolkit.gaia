@@ -9,7 +9,7 @@
 - Use the plan to track your progress and plan your next steps.
 - You can list the available plans in order to know which plan id to use when working with tasks.
 - Complete the plan list one-item-at-a-time, sequentially.
-- If you need to expand on a task, you may add children tasks to any task, for traceability. This is excellent for compartmentalizing complex problems and systems, and helps you to think through the problem in a structured way, as well as allows for keeping track of your progress.
+- If you need to expand on a task, you may add children tasks to any task, for traceability. **Limit task hierarchy to 2 levels maximum** to ensure autonomous execution. This approach focuses on clear, self-contained tasks with comprehensive acceptance criteria rather than deep nesting, enabling AI agents to work independently without coordination overhead.
 - After every good milestone, show plan execution progress. Brief and interesting numbers.
 - If you get lost on which task you're on, you can always refer to the plans.
 - Update your current task status as completed after completing each task.

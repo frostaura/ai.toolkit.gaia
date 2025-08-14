@@ -135,26 +135,25 @@ In this case, there is an existing codebase but no design documentation. You wil
 A collection of standards that you must follow when generating the plan. These standards are mandatory and must be followed.
 
 #### Plan Structure
-The planning tools should be heavily leveraged to manage plans and tasks / TOOs. The following is a basic structure that is suggested for capturing plans. If you prefer, you may have as many levels of nested tasks as you like. The plan fully supports nesting tasks to the N-th degree.
+The planning tools should be heavily leveraged to manage plans and tasks. The structure should be **limited to 2 levels maximum** to ensure clear ownership and autonomous execution by the AI agent. This reduces coordination overhead and improves task clarity.
 
-**Plan & Tasks Structure**
+**Plan & Tasks Structure (Maximum 2 Levels):**
 - Project (root-level)
- - Task Phase X (Task, inside of the Tasks property)
-  - Task Y (Task, inside of the above Task's Children property)
-   - Task Z (Task, inside of the above Task's Children property)
-   ...
-  ...
+ - Phase/Epic Task (Level 1: High-level phases or major components)
+  - Specific Implementation Task (Level 2: Concrete, actionable tasks with detailed acceptance criteria)
 
-**More Realistic Partial Example**
+**Focus on Autonomous Execution:**
+- Each Level 2 task must have comprehensive acceptance criteria that enables autonomous completion
+- Tasks should be self-contained with clear definition of done
+- Avoid over-decomposition that creates coordination overhead
+- Prefer fewer, well-defined tasks over many micro-tasks
+
+**More Realistic Example**
 - Gaia Toolkit (root-level)
- - Specification & Design (Task, inside of the Tasks property)
-  - Requirements (Task, inside of the above Task's Children property)
-   - Gather requirements (Task, inside of the above Task's Children property)
-   - Analyze requirements (Task, inside of the above Task's Children property)
-  - Architecture (Task, inside of the above Task's Children property)
-   - Define architecture (Task, inside of the above Task's Children property)
-   - Review architecture (Task, inside of the above Task's Children property)
-  ...
+ - Specification & Design (Level 1: Design phase)
+  - Create comprehensive requirements document with stakeholder input and technical constraints (Level 2: Autonomous task)
+  - Design system architecture with technology stack selection and integration patterns (Level 2: Autonomous task)
+  - Validate design through peer review and technical feasibility assessment (Level 2: Autonomous task)
 
 #### Default Technology Stack
 The default technology stack must be used unless otherwise specified in the problem description or in the case of a pre-existing system, adhere to the existing stack instead. The default technology stack is:
@@ -204,12 +203,18 @@ For any and all changes you make, you must ensure that the following quality sta
 - When external integrations are required, integrate with a well known free API(s) where the external system(s) are not specified.
 
 ### Mandatory Reflection Process
-- Then once you generated a plan that you thought about heavily, you must reflect on it by asking, do you believe you have enough details to successfully and professionally build this project from the plan? Be very critical. Root-level items as well as children, which massively helps with compartmentalizing complex systems and problems. Produce a report in your head about these critical comments, important implementation details. Echo the rating of the current plan. Ensure you rate the plan based on task complexity too. Complex tasks should be broken down into smaller tasks. Ensure you leverage the tree-like nature of plans.
+- Ensure each task (especially Level 2 tasks) has sufficient detail and acceptance criteria for autonomous execution by the AI agent
+- Tasks should not require frequent clarification or coordination between subtasks  
+- Rate tasks based on autonomy potential: Can the AI agent complete this independently with the given acceptance criteria?
+- Complex work should be broken into parallel Level 2 tasks rather than nested Level 3+ subtasks
+- Each Level 2 task must be self-contained with clear inputs, outputs, and success criteria
+- Focus on comprehensive acceptance criteria that eliminate ambiguity and enable independent execution
 
 Before you start critiquing, you must first get the plan again to fetch all items, and critique that rather than from memory.
-- Finally, resolve for the critical items that you found in the original plan and add the additional details to the plan.
-- WHILE the plan score is < 100%, repeat the process of reflection and resolution until the plan score is 100%. No matter how minor the remaioning issues are, they must be resolved.
-- THEN repeat the process for the children tasks, and their children tasks, and so on.
+- Reflect on the plan by asking: do you believe you have enough details to successfully and professionally build this project with autonomous execution? Be very critical about task clarity and independence.
+- Ensure each Level 2 task has acceptance criteria detailed enough for an AI agent to complete without human intervention
+- WHILE any task lacks clear autonomous execution criteria, refine the acceptance criteria until autonomous execution is possible
+- THEN repeat the process for all Level 1 and Level 2 tasks to ensure complete autonomous capability
 
 **MANDATORY:** As you assess the plan and tasks, ensure that each task ensures that each task aligns with the system design documents (.docs/designs).
 

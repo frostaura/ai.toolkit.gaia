@@ -1,1 +1,1 @@
-Execute on the following prompt with the provided input (pass the input along): .github/prompts/gaia-bo-plan.prompt.md
+Execute on the following prompt with the provided input (pass the input along): .github/prompts/gaia-no-plan.prompt.md
