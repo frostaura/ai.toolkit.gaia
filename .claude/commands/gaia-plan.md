@@ -1,1 +1,0 @@
-Execute on the following prompt with the provided input (pass the input along): .github/prompts/gaia-plan.prompt.md

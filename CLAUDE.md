@@ -1,1 +1,0 @@
-Refer to the following file for your instructions: .github/copilot-instructions.md

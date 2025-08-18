@@ -6,7 +6,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using ModelContextProtocol.Server;
 
 // Normal MCP server execution
 var builder = Host.CreateApplicationBuilder(args);
@@ -23,11 +22,11 @@ builder.Configuration
     .AddInMemoryCollection(new Dictionary<string, string?>
     {
         ["Application:Name"] = "fa.mcp.gaia",
-        ["Application:Version"] = "1.0.0",
+        ["Application:Version"] = "1.0.1",
         ["Logging:LogLevel:Default"] = "Warning",
         ["Logging:LogLevel:Microsoft.Hosting.Lifetime"] = "Warning",
         ["Logging:LogLevel:ModelContextProtocol"] = "Warning",
-        ["TaskPlanner:DatabasePath"] = ".github/state/Gaia.TaskPlanner.db.json",
+        ["TaskPlanner:DatabasePath"] = ".gaia/Gaia.TaskPlanner.db.json",
         ["TaskPlanner:WebhookUrl"] = "http://localhost:5001/api/webhook"
     });
 
