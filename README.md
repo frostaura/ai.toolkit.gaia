@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/frostaura/fa.templates.vibe-coding/blob/main/README.icon.png?raw=true" alt="GAIA Framework Logo" width="300" />
+  <img src="https://github.com/frostaura/fa.templates.vibe-coding/blob/main/README.icon.gif?raw=true" alt="GAIA Framework Logo" width="300" />
 </p>
 
 <h1 align="center">
