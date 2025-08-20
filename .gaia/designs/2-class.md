@@ -1,7 +1,7 @@
-<!-- reference @.docs/design.md -->
-<!-- reference @.docs/1-use-cases.md -->
+<!-- reference @.gaia/designs/design.md -->
+<!-- reference @.gaia/designs/1-use-cases.md -->
 
-[<< Back](./../design.md)
+[<< Back](./design.md)
 
 # Class Diagrams & Data Models
 Below we elaborate on the system's class diagrams and data relationships. This document translates use cases into concrete class structures and data models.
@@ -344,4 +344,4 @@ classDiagram
 4. Define interfaces before implementations
 5. Show relationships that matter for understanding system behavior
 
-[<< Back](./../design.md)
+[<< Back](./design.md)

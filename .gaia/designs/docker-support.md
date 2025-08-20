@@ -1,4 +1,4 @@
-[<< Back](../README.md)
+[<< Back](../../README.md)
 
 # Docker Support
 ![Docker Badge](https://dockeri.co/image/<DOCKER_USERNAME>/<APPLICATION>)
@@ -24,4 +24,4 @@ Automated builds are set up for Docker Hub. To use this service without the sour
 - Install Docker Desktop from here: https://www.docker.com/products/docker-desktop
 - After installation, ensure that if you're on windows, you switch docker from windows containers to linux containers. This can be done via the Docker icon in the system tray.
 
-[<< Back](../README.md)
+[<< Back](../../README.md)

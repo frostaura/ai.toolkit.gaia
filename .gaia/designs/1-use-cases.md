@@ -1,6 +1,6 @@
-<!-- reference @.docs/design.md -->
+<!-- reference @.gaia/designs/design.md -->
 
-[<< Back](./../design.md)
+[<< Back](./design.md)
 
 # Use Cases
 Below we elaborate on the system's use cases. These document various use cases that should be met, based on the system requirements.
@@ -293,4 +293,4 @@ graph LR
 4. Ensure traceability from business requirements through to acceptance criteria
 5. Add/remove sections based on your system complexity
 
-[<< Back](./../design.md)
+[<< Back](./design.md)

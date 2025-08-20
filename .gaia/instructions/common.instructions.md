@@ -27,7 +27,7 @@ applyTo: "**"
 - You must never move on to another todo item while you have not successfully updated the status of the current todo item to completed.
 - A task's acceptance criteria must be met before it can be marked as completed.
 - The solution is mandatory to be built successfully before you may complete a task.
-- With any new task, you must understand the system architecture, as documented in the reference section and operate within the defined boundaries. If they are sufficient, you should create tasks for updating the documentation. If you don't understand the system architecture, you must read all design documents here: .docs/designs
+- With any new task, you must understand the system architecture, as documented in the reference section and operate within the defined boundaries. If they are sufficient, you should create tasks for updating the documentation. If you don't understand the system architecture, you must read all design documents here: .gaia/designs
 - You must **never lie**. Especially on checks that tools mandates. Things like whether builds have been run etc.
 - Always **fix build errors as you go**.
 - Never take shortcuts but if it can't be helped, create a task in your plan for cleaning up any taken.

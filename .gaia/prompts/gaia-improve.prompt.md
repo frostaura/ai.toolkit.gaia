@@ -1,6 +1,6 @@
 <!-- A prompt that allows for analyzing the current state of the Gaia AI Toolkit framework and allows for iteratively improving the Gaia AI Toolkit.-->
 
-# Gaia - AI Toolkit Common Instructions
+# Gaia - AI Toolkit Improvement Process
 ## Crutial References
 | Reference | Description |
 | --- | --- |

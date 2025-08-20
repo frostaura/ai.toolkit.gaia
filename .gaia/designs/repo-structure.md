@@ -1,4 +1,4 @@
-[<< Back](../README.md)
+[<< Back](../../README.md)
 
 ## Repo Structure
 
@@ -7,7 +7,7 @@ This document describes the preferred repository structure. This may be used for
 ### Structure
 
 - ROOT (The repository root)
-  - /.docs (The collection of repository documents and system designs etc. This directory should be documented in [README.md](../README.md) too.)
+  - /.gaia (The collection of repository documents and system designs etc. This directory should be documented in [README.md](../../README.md) too.)
     - /designs (System designs - COMPLETED FROM TEMPLATES BELOW)
       - <DESIGN_NAME>.md (A system design file)
     - <DOCUMENT_NAME>.md (a system documentation file)
@@ -150,4 +150,4 @@ Following clean architecture principles with clear separation of concerns:
 
 This structure ensures that AI agents can navigate the codebase efficiently while maintaining clean separation between documentation, source code, and infrastructure components.
 
-[<< Back](../README.md)
+[<< Back](../../README.md)

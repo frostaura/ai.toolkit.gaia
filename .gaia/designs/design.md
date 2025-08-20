@@ -1,4 +1,4 @@
-[<< Back](../README.md)
+[<< Back](../../README.md)
 
 ## Design
 
@@ -48,10 +48,10 @@ The architecture follows a **3-layer hierarchical structure** with strict depend
 
 | Content                                      | Description                     |
 | -------------------------------------------- | ------------------------------- |
-| [Use Cases](./designs/1-use-cases.md)        | Use case diagram(s).            |
-| [Class Diagrams](./designs/2-class.md)       | Class diagram(s).               |
-| [Sequence Diagrams](./designs/3-sequence.md) | Sequence diagram(s).            |
-| [Frontend](./designs/4-frontend.md)          | Frontend design specifications. |
+| [Use Cases](./1-use-cases.md)        | Use case diagram(s).            |
+| [Class Diagrams](./2-class.md)       | Class diagram(s).               |
+| [Sequence Diagrams](./3-sequence.md) | Sequence diagram(s).            |
+| [Frontend](./4-frontend.md)          | Frontend design specifications. |
 
 #### **🧪 Testing Strategy**
 
@@ -103,4 +103,4 @@ The architecture follows a **3-layer hierarchical structure** with strict depend
 - **Performance Monitoring**: Real-time performance metrics and alerting
 - **Automated Deployment**: CI/CD pipeline with quality validation
 
-[<< Back](../README.md)
+[<< Back](../../README.md)

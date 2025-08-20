@@ -1,8 +1,8 @@
-<!-- reference @.docs/design.md -->
-<!-- reference @.docs/1-use-cases.md -->
-<!-- reference @.docs/2-class.md -->
+<!-- reference @.gaia/designs/design.md -->
+<!-- reference @.gaia/designs/1-use-cases.md -->
+<!-- reference @.gaia/designs/2-class.md -->
 
-[<< Back](./../design.md)
+[<< Back](./design.md)
 
 # Sequence Diagrams
 
@@ -281,6 +281,6 @@ sequenceDiagram
 **Related Documents**:
 - Business flows → [1-use-cases.md](./1-use-cases.md)
 - Class responsibilities → [2-class.md](./2-class.md)
-- Technical architecture → [3-architecture.md](./3-architecture.md)
+- Frontend design → [4-frontend.md](./4-frontend.md)
 
-[<< Back](./../design.md)
+[<< Back](./design.md)

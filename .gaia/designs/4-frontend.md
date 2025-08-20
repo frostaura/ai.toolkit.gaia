@@ -1,9 +1,9 @@
-<!-- reference @.docs/design.md -->
-<!-- reference @.docs/1-use-cases.md -->
-<!-- reference @.docs/2-class.md -->
-<!-- reference @.docs/3-sequence.md -->
+<!-- reference @.gaia/designs/design.md -->
+<!-- reference @.gaia/designs/1-use-cases.md -->
+<!-- reference @.gaia/designs/2-class.md -->
+<!-- reference @.gaia/designs/3-sequence.md -->
 
-[<< Back](./../design.md)
+[<< Back](./design.md)
 
 # Frontend Design Specification
 
@@ -294,4 +294,4 @@ graph LR
 4. **Include responsive behavior** for mobile, tablet, and desktop experiences
 5. **Plan accessibility** from the design stage, not as an afterthought
 
-[<< Back](./../design.md)
+[<< Back](./design.md)
