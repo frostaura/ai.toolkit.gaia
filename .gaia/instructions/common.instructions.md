@@ -1,6 +1,8 @@
 ---
 applyTo: "**"
 ---
+<!-- Custom instructions that should be applied to any prompt (all directories, files and file types). -->
+
 # Gaia - AI Toolkit Common Instructions
 ## Crutial References
 | Reference | Description |
