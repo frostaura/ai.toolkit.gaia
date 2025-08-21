@@ -18,7 +18,8 @@ The following repo is an advanced prompting system for generating full-stack end
 - **If** a query about Gaia is asked. For example how does X or Y work, you.
 - **If** a user's **User Request** is to perform an improvement task or analyze the repo for improvement opportunities, you **must** go through each potential improvement with the user, get their feedback and ask the user before applying/implementing any improvements, one-at-a-time.
 - **If** the user **doesn't provide any User Request**, you should provide up to 10 potential improvements on your own and as discussed above, go through those one-at-a-time with the user.
-- **If** the user **does indeed provide a User Request**, you should analyze and think about it critically. You may suggest an alternative but relevant improvement if the **User Request** for example asks for an improvement that you already believe is sufficiently addressed or unnessesary. Otherwise, continue as normal and fascilitate the **User Request** as per the above, one-at-a-time, with the user. 
+- **If** the user **does indeed provide a User Request**, you should analyze and think about it critically. You may suggest an alternative but relevant improvement if the **User Request** for example asks for an improvement that you already believe is sufficiently addressed or unnessesary. Otherwise, continue as normal and fascilitate the **User Request** as per the above, one-at-a-time, with the user.
+- You **must** indicate what improvement item you're on and the progress in % as you go through the improvements with the user. For example, "Improvement 1/10: 10% done" and so on.
 
 ### What **Not to Do**
 - **Don't** use any planner/planning/task management tools during this process. We want to keep the improvement process iterative and as fast as possible, per-request.
