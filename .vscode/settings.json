@@ -4,12 +4,13 @@
     "**/.ipynb_checkpoints": true,
     "**/__pycache__": true,
     "*.egg*/**": true,
-    "build/**": true,
-    "dist/**": true,
-    "obj/**": true,
-    "bin/**": true,
+    "**/build/**": true,
+    "**/dist/**": true,
+    "**/obj/**": true,
+    "**/bin/**": true,
     "**/examples/**/*.csv": true
   },
+  "vscode_vibrancy.enableAutoTheme": true,
   "vscode_vibrancy.opacity": 0.1,
   "vscode_vibrancy.refreshInterval": 60,
   "editor.wordWrap": "on",
@@ -23,10 +24,57 @@
   "synthwave84.disableGlow": false,
   "synthwave84.brightness": 0.45,
   "chat.tools.autoApprove": true,
+  "chat.tools.terminal.autoApprove": {
+    "rmdir": true,
+    "rm": true,
+    "curl": true,
+    "wget": true,
+    "eval": true,
+    "chmod": true,
+    "dotnet": true,
+    "csharp": true,
+    "bash": true,
+    "sh": true,
+    "powershell": true,
+    "pwsh": true,
+    "node": true,
+    "npm": true,
+    "npx": true,
+    "nuget": true,
+    "python": true,
+    "grep": true,
+    "cd": true,
+    "ls": true,
+    "cat": true,
+    "chown": true,
+    "head": true,
+    "find": true,
+    "xargs": true
+  },
   "chat.agent.enabled": true,
   "chat.extensionTools.enabled": true,
   "chat.mcp.discovery.enabled": true,
   "chat.mcp.enabled": true,
   "chat.promptFiles": true,
-  "chat.agent.maxRequests": 99999
+  "chat.agent.maxRequests": 99999,
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.expand": false,
+  "explorer.fileNesting.patterns": {
+    "*.csproj": "*.config,*.props,*.targets"
+  },
+  "chat.checkpoints.showFileChanges": true,
+  "chat.editor.wordWrap": "on",
+  "chat.mcp.assisted.nuget.enabled": true,
+  "chat.promptFilesLocations": {
+    ".github/prompts": true,
+    ".gaia/prompts": true
+  },
+  "chat.modeFilesLocations": {
+    ".github/chatmodes": true,
+    ".gaia/modes": true
+  },
+  "chat.instructionsFilesLocations": {
+    ".github/instructions": true,
+    ".gaia/instructions": true
+  }
 }

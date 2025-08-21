@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/frostaura/fa.templates.vibe-coding/blob/main/README.icon.png?raw=true" alt="GAIA Framework Logo" width="300" />
+  <img src="https://github.com/frostaura/fa.templates.vibe-coding/blob/main/README.icon.gif?raw=true" alt="GAIA Framework Logo" width="300" />
 </p>
 
 <h1 align="center">
@@ -12,7 +12,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Status](https://img.shields.io/badge/Status-Production%20Ready-green.svg)]()
 [![AI Enhanced](https://img.shields.io/badge/AI-Enhanced%20Intelligence-purple.svg)]()
-[![Version](https://img.shields.io/badge/Mark-III-blue.svg)]()
+[![Version](https://img.shields.io/badge/Version-4.1-blue.svg)]()
 
 ## 📋 Requirements
 
@@ -160,21 +160,21 @@
 [FINALIZE|VERIFY|POLISH]
 1. Ensure that the entire system has code comments, 100% unit test coverage and 0 errors or warnings.
 
-2. Reflect on the [design documentation](./.docs/designs/*.md), and ensure
+2. Reflect on the [design documentation](./.gaia/designs/*.md), and ensure
   2.1. all use cases have properly been implemented across the system, including ALL method bodies and
-  2.2. the UI/UX is properly tested and reflect the frontend design we captured by reflecting on [our massive initial prompt](./.github/prompts/gaia-create.prompt.md), [the plan](./.docs/plan.md) and ensure the entire system is properly implemented.
+  2.2. the UI/UX is properly tested and reflect the frontend design we captured by reflecting on [our comprehensive planning prompt](./.gaia/prompts/gaia-plan.prompt.md), the plan and ensure the entire system is properly implemented.
 
 3. 🎨 **CRITICAL VISUAL QUALITY ASSURANCE**: Ensure your frontend is genuinely beautiful:
    - Create Playwright visual tests with screenshots at multiple viewport sizes (mobile, tablet, desktop)
    - Analyze screenshots for UI/UX issues: contrast problems, spacing issues, alignment problems
-   - Compare against design specifications in `./.docs/designs/4-frontend.md`
+   - Compare against design specifications in `./.gaia/designs/4-frontend.md`
    - Test all interactive states: hover, focus, loading, error, and empty states
    - Validate responsive design across all breakpoints
    - Ensure UI matches the visual inspiration provided
 
 4. For all web server projects, there should be E2E tests for each endpoint too. For all frontends integrating with backends etc, there should be comprehensive and passing E2E tests too for every use case, unless impossible.
 
-5. Ensure that ALL ROUTES on the frontends and ALL CONTROLLERS on the backend flow in perfect harmony. GAIA's Playwright tests shall validate this synchronization and all use cases as described in (./.docs/designs/*.md).
+5. Ensure that ALL ROUTES on the frontends and ALL CONTROLLERS on the backend flow in perfect harmony. GAIA's Playwright tests shall validate this synchronization and all use cases as described in (./.gaia/designs/*.md).
 
 6. For production readiness, all components must be implemented and fully tested with 100% test coverage.
 

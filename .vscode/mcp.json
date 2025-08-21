@@ -1,20 +1,21 @@
 {
     "servers": {
-        "Context7": {
-            "type": "stdio",
-            "command": "npx",
-            "args": [
-                "-y",
-                "@upstash/context7-mcp"
-            ]
-        },
         "playwright-mcp": {
             "type": "stdio",
             "command": "npx",
             "args": [
                 "-y",
                 "@playwright/mcp@latest",
-                "--vision"
+                "--caps=vision"
+            ]
+        },
+        "Gaia": {
+            "type": "stdio",
+            "command": "dotnet",
+            "args": [
+                "run",
+                "--project",
+                ".github/mcps/gaia/src/fa.mcp.gaia/fa.mcp.gaia.csproj"
             ]
         }
     }
