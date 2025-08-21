@@ -59,24 +59,46 @@ As you generate the SDLC, you must produce appropriate **Reflection Metrics** so
 **Reflection Metrics**: Pipeline Quality with Adherence to `.gaia/designs` Principles / Framework.
 
 
-#### 3. Planning (Executing on the SDLC)
-In this section we run through all steps in the SDLC and start generating a comprehensive, **single** plan to build the entire solution. Here are the steps:
-- For each step in the SDLC (one-at-a-time, sequentially)
-  - Produce a partial plan for the step together with a **mandatory** acceptance criteria for each step.
-    - Ensure to adhere to the mandated reflection process and the respective step's reflection metrics.
-    - **Don't yet** capture the plan using our planning tools, this happens after the reflection process has been run for this planning step.
-- Based on each partial plan, produce the **comprehensive, single** plan.
+#### 3. Execute Design Steps
+In this section we **execute** the design steps from the SDLC to ensure design documentation is complete before creating tasks. Here are the steps:
+- For each design step in the SDLC (one-at-a-time, sequentially)
+  - **Actually execute** the design step (don't just plan it)
+  - Update the design documents in `.gaia/designs` as needed
+  - Ensure to adhere to the mandated reflection process and the respective step's reflection metrics
+  - Validate that the design step output meets 100% quality standards before proceeding
+- **Design Completion Checkpoint**: Before proceeding, validate that:
+  - All design documents in `.gaia/designs` are complete and up-to-date
+  - Design documents fully capture the requirements from step 1
+  - Design documents are consistent with each other
+  - Architecture follows the established design principles
 
-**Reflection Metrics**: Comprehensiveness, Alignment with Designs Produced, Frontend or Native App or Game Plan Quality, Backend Plan Quality, Database Plan Quality, Visual Excellence Plan Quality, Test Coverage Plan Quality.
+**Reflection Metrics**: Design Completeness, Adherence to Design Templates, Alignment Between Design Documentation, Design Captures All Requirements.
 
-#### 4. Capture Plan
-In this section we adapt the comprehensive plan into a collection of tasks.
+#### 4. Planning (Based on Completed Design)
+In this section we generate a comprehensive, **single** plan to build the entire solution based on the **completed** design documentation. Here are the steps:
+- For each remaining step in the SDLC (one-at-a-time, sequentially, **excluding design steps which are now complete**)
+  - Produce a partial plan for the step together with a **mandatory** acceptance criteria for each step
+  - Ensure the plan is aligned with the completed design documents from step 3
+  - Ensure to adhere to the mandated reflection process and the respective step's reflection metrics
+  - **Don't yet** capture the plan using our planning tools, this happens after the reflection process has been run for this planning step
+- Based on each partial plan, produce the **comprehensive, single** plan
+- **Task Alignment Validation**: Ensure each task explicitly references and aligns with the design documents
+
+**Reflection Metrics**: Comprehensiveness, Alignment with Completed Designs, Frontend or Native App or Game Plan Quality, Backend Plan Quality, Database Plan Quality, Visual Excellence Plan Quality, Test Coverage Plan Quality.
+
+#### 5. Capture Plan
+In this section we adapt the comprehensive plan into a collection of tasks, ensuring each task is aligned with the completed design documentation.
 
 At this point you must finally create a plan using the planning tools and capture each task from above, into the plan.
 
-**Reflection Metrics**: Task Capturing Completeness
+**MANDATORY**: Each task must:
+- Reference the relevant design documents from `.gaia/designs`
+- Be aligned with the completed design architecture and specifications
+- Include design document references in acceptance criteria where applicable
 
-#### 5. Plan Execution
+**Reflection Metrics**: Task Capturing Completeness, Design-Task Alignment Quality
+
+#### 6. Plan Execution
 After capturing your comprehensive plan via the planner tools, start executing on the plan by leveraging the planner tools.
 
 ### Error Handling & Edge Cases
@@ -148,6 +170,8 @@ After capturing your comprehensive plan via the planner tools, start executing o
 ### What to Do
 - You **must** always be honest and truthful.
 - You **must** always follow design-driven / spec-driven development. The design documentation is the source of truth first and foremost. This means when new work is required, you **must** understand the existing system first, if any, think about how to solve the **user request** with the design in mind, update the design docs based on the new design that includes the solution for the **user request**
+- You **must** complete ALL design work and design documentation BEFORE creating any tasks. Tasks must only be generated after design steps are fully executed and validated.
+- You **must** ensure every task explicitly aligns with and references the completed design documentation from `.gaia/designs`.
 - You **must** follow a process of reflection for all of the above steps. The details of the reflection process, for example which metrics to produce to score a step's output, may be specific to each step in the process and will be documented for each step above, where applicable. Your job, as part of this reflection process is to:
   - Critically review your step's output and produce a score for each of the quality metrics in the respective step's **Reflection Metrics**.
   - WHILE the score for each metric falls below **100%**, no less, you **must** incorporate feedback for yourself, produce the improved step output, then repeat the reflection process until all metrics achieve 100%.
@@ -156,6 +180,8 @@ After capturing your comprehensive plan via the planner tools, start executing o
 
 ### What **Not** to Do
 - **Don't** generate a plan for the above work. The above work is supposed to generate the plan for solving the **user request**. Instead you must create a plan once the process has produced a plan to solve for the **user request**, as outlined above.
+- **Don't** create tasks before completing the design steps. All design work must be executed and validated before task generation begins.
+- **Don't** create tasks that don't align with or reference the completed design documentation from `.gaia/designs`.
 - **Don't** build your own components when battle-tested components already exist. You **must** prioritize leveraging pre-built components where possible. Think ChakraUI.
 - **Don't** produce any documentation for anything without the user explicitly asking for it. We don't want unnecessary bloat to our repository.
 - **Don't** ever compromise on quality or take shortcuts without creating proper cleanup tasks
