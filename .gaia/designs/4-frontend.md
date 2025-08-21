@@ -7,97 +7,62 @@
 
 # Frontend Design Specification
 
-This document defines the complete frontend user experience, design system, and user interface specifications. It translates **use cases** into concrete user flows and visual design.
+Complete frontend user experience translating use cases into visual design.
 
-Ensure we follow our **design principles** and that this document naturally extends the **use cases**, **class diagrams** and **sequence diagrams**.
+## Template Guidance
 
-## 📋 Template Guidance
+**Purpose**: Define user interface interactions and visual design  
+**Focus**: User flows, design language, component specifications, responsive behavior
+**Avoid**: Implementation code, technical architecture, deployment details
 
-### Purpose & Scope
-This document defines **how users interact** with the system through visual interfaces. It bridges **use cases** to user experience design and provides implementation-ready specifications.
+**Guidelines**: User-centered, consistent, accessible, responsive, modern patterns
 
-**🎯 Focus**: User flows, design language, component specifications, responsive behavior
-**🚫 Avoid**: Implementation code, technical architecture, deployment details
+## User Flow Mapping
 
-### Frontend Design Guidelines
-- **User-centered**: Every design decision serves user needs from **use cases**
-- **Consistent**: Unified design language across all interfaces
-- **Accessible**: WCAG AA compliant for inclusive user experience
-- **Responsive**: Mobile-first design supporting all device types
-- **Modern**: Contemporary design patterns that users expect
-
-## 🗺️ User Flow Mapping
-
-### Primary User Journeys
-*Map directly from **use cases** to interface flows*
-
-#### Flow 1: [Use Case UC-001 - User Journey Name]
-**Entry Point**: [How users start this journey]
-**Goal**: [What users want to accomplish]
-**Success Outcome**: [How we know they succeeded]
+### UC-001: [User Journey Name]
+**Goal**: [What users accomplish]
+**Entry**: [How users start]
 
 ```mermaid
 graph LR
     A[Entry Point] --> B[Screen 1: Action]
-    B --> C[Screen 2: Input]
-    C --> D[Screen 3: Confirmation]
-    D --> E[Success State]
-    
-    B --> F[Alternative Path]
-    F --> D
-    
-    C --> G[Error State]
-    G --> C
+    B --> C[Screen 2: Input]  
+    C --> D[Success State]
+    B --> E[Alternative Path]
+    C --> F[Error State]
+    F --> C
 ```
 
-**Detailed Flow Steps**:
-1. **[Screen/Action Name]**: User arrives at [entry point] and sees [what they see]
-2. **[Screen/Action Name]**: User performs [action] and gets [feedback]
-3. **[Screen/Action Name]**: System shows [response] and user [next action]
-4. **[Success State]**: User reaches [goal] with [confirmation/next steps]
+**Flow Steps**:
+1. [Screen/Action]: User sees [interface] and performs [action]
+2. [Screen/Action]: System shows [response], user does [next action]
+3. [Success]: User reaches [goal] with [confirmation]
 
-**Key UI Requirements**:
-- **Navigation**: [How users move between steps]
-- **Feedback**: [How system communicates status/progress]
-- **Error Handling**: [How errors are presented and resolved]
-- **Accessibility**: [Keyboard navigation, screen reader support]
+**UI Requirements**: Navigation, feedback, error handling, accessibility
 
-#### Flow 2: [Use Case UC-002 - Another Journey Name]
-**Entry Point**: [Starting point]
-**Goal**: [User objective]
-**Complexity**: [Simple/Medium/Complex]
+### UC-002: [Another Journey]
+[Follow same pattern]
 
-[Follow same pattern as Flow 1]
+## Visual Design Language
 
-### Cross-Flow Interactions
-*How different user journeys connect and overlap*
+**Design Philosophy**: [Modern/Minimal/Bold - based on target audience]
+**Target Audience**: [Primary users and preferences]
 
-- **Journey Intersections**: [Where flows merge or branch]
-- **Shared Components**: [UI elements used across multiple flows]
-- **State Management**: [How user context is maintained across flows]
+**Colors**:
+- Primary: `#[HEX]` - CTAs and navigation
+- Secondary: `#[HEX]` - Accents and highlights  
+- Background: `#[HEX]` - Main backgrounds
+- Text: `#[HEX]` - Primary text
+- Error/Success/Warning: `#[HEX]` colors for states
 
-## 🎨 Visual Design Language
+**Typography**:
+- Primary Font: [Font Family] for headers
+- Body Font: [Font Family] for content
+- Sizes: H1 [size], H2 [size], Body [size]
 
-### Brand & Aesthetic Direction
-**Design Philosophy**: [Modern/Minimal/Bold/Professional/Playful - based on target audience]
-**Target Audience**: [Primary users and their preferences]
-**Visual Inspiration**: [Reference apps/sites that inspire the aesthetic]
-
-### Color System
-
-**Primary Palette**:
-- **Primary**: `#[HEX]` - Main brand color for CTAs and navigation
-- **Secondary**: `#[HEX]` - Accent color for highlights and emphasis  
-- **Tertiary**: `#[HEX]` - Supporting color for variety
-
-**Neutral Palette**:
-- **Background**: `#[HEX]` - Main background color
-- **Surface**: `#[HEX]` - Card and component backgrounds
-- **Border**: `#[HEX]` - Subtle borders and dividers
-- **Text Primary**: `#[HEX]` - Main text color
-- **Text Secondary**: `#[HEX]` - Secondary text and labels
-
-**Semantic Colors**:
+**Spacing**: 8px base unit (8px, 16px, 24px, 32px...)
+**Border Radius**: [value]px for components
+**Shadows**: [Light/medium/heavy shadow definitions]
 - **Success**: `#10B981` - Success states and positive actions
 - **Warning**: `#F59E0B` - Warnings and caution states
 - **Error**: `#EF4444` - Errors and destructive actions
@@ -132,107 +97,41 @@ graph LR
 
 **Layout Grid**:
 - **Container**: Max-width with centered content
-- **Columns**: Responsive grid system (1→2→3 columns)
-- **Gutters**: Consistent spacing between grid items
+## Responsive Design & Components
 
-## 📱 Responsive Design Strategy
+**Breakpoints**: Mobile (375-767px), Tablet (768-1023px), Desktop (1024px+)
+**Approach**: Mobile-first with progressive enhancement
+**Touch Targets**: Minimum 44px for accessibility
 
-### Device Breakpoints
-- **Mobile**: 375px - 767px (Primary mobile experience)
-- **Tablet**: 768px - 1023px (Intermediate layouts)
-- **Desktop**: 1024px+ (Full desktop experience)
+**Core Components**:
+- Navigation: Primary nav, breadcrumbs, pagination
+- Data Display: Cards, tables, lists  
+- Input: Forms, buttons, search with validation
+- Feedback: Notifications, loading states, empty states
+- Overlays: Modals, tooltips, dropdowns
 
-### Mobile-First Approach
-**Mobile Layout Patterns**:
-- Single-column content flow
-- Bottom navigation for primary actions
-- Collapsible menus and accordions
-- Swipe gestures for galleries/carousels
-- 44px minimum touch targets
+**Component States**: Default, hover, focus, active, disabled, loading, error
 
-**Progressive Enhancement**:
-- **Tablet**: Two-column layouts, expanded navigation
-- **Desktop**: Multi-column layouts, hover states, larger imagery
+## Information Architecture
 
-### Touch & Interaction
-- **Touch Targets**: Minimum 44px for accessibility
-- **Gesture Support**: Swipe, pinch, scroll where appropriate
-- **Visual Feedback**: Clear pressed/active states
+**Page Templates**: Landing, dashboard, detail pages, forms, lists
+**Navigation**: Primary (main sections), secondary (sub-sections), contextual (page actions)
+**Content Hierarchy**: Priority placement, visual weight, scanning patterns
 
-## 🧩 Component Specifications
+## Accessibility & Performance
 
-### Core Components
-*Essential UI building blocks referenced in user flows*
+**WCAG AA**: 4.5:1 color contrast, keyboard navigation, screen reader support
+**Performance**: FCP < 1.5s, LCP < 2.5s, Lighthouse 90+
+**Quality**: Cross-browser testing, responsive validation, error testing
 
-#### Navigation Components
-- **Primary Navigation**: Main site navigation with active states
-- **Breadcrumbs**: User location indicators for deep navigation
-- **Pagination**: Content navigation for lists and search results
+**Instructions**: 
+1. Map use cases to user flows with interface requirements
+2. Define consistent design language for target audience  
+3. Specify component requirements for all UI elements
+4. Include responsive behavior for all device types
+5. Plan accessibility from design stage
 
-#### Data Display Components  
-- **Cards**: Content containers with consistent styling
-- **Tables**: Structured data display with sorting/filtering
-- **Lists**: Simple and complex list layouts
-
-#### Input Components
-- **Forms**: Text inputs, dropdowns, checkboxes with validation
-- **Buttons**: Primary, secondary, and destructive action buttons
-- **Search**: Search inputs with autocomplete and filtering
-
-#### Feedback Components
-- **Notifications**: Success, error, warning, and info messages
-- **Loading States**: Spinners, skeleton screens, progress indicators
-- **Empty States**: Helpful content when no data is available
-
-#### Modal & Overlay Components
-- **Modals**: Dialog boxes for focused tasks
-- **Tooltips**: Contextual help and information
-- **Dropdowns**: Menu overlays and selection interfaces
-
-### Component States
-**Interactive States**:
-- **Default**: Normal appearance
-- **Hover**: Mouse-over feedback
-- **Focus**: Keyboard navigation indicator
-- **Active/Pressed**: Touch/click feedback
-- **Disabled**: Non-interactive appearance
-
-**Content States**:
-- **Loading**: Data fetching indicators
-- **Empty**: No content available
-- **Error**: Error condition display
-
-## 🎯 Information Architecture
-
-### Page Structure
-**Global Elements**:
-- **Header**: Logo, navigation, user account access
-- **Main Content**: Primary page content area
-- **Footer**: Secondary links, legal information
-
-**Page Templates**:
-- **Landing/Home**: Introduction and primary CTAs
-- **Dashboard**: Overview of user data and quick actions
-- **Detail Pages**: In-depth information and actions
-- **Form Pages**: Data input and submission
-- **List/Browse**: Content discovery and filtering
-
-### Navigation Patterns
-- **Primary Navigation**: Main site sections
-- **Secondary Navigation**: Sub-sections and related content
-- **Contextual Navigation**: Page-specific actions and tools
-- **User Navigation**: Account, settings, logout
-
-### Content Hierarchy
-- **Information Priority**: Most important content prominently placed
-- **Visual Weight**: Size, color, and spacing to guide attention
-- **Scanning Patterns**: F-pattern and Z-pattern layout considerations
-
-## ♿ Accessibility Standards
-
-### WCAG AA Compliance
-- **Color Contrast**: 4.5:1 minimum for text, 3:1 for UI elements
-- **Keyboard Navigation**: All functionality accessible via keyboard
+[<< Back](./design.md)
 - **Screen Reader Support**: Proper ARIA labels and semantic HTML
 - **Focus Management**: Clear focus indicators and logical tab order
 
