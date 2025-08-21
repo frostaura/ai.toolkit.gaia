@@ -33,3 +33,9 @@ applyTo: "**"
 - Never take shortcuts but if it can't be helped, create a task in your plan for cleaning up any taken.
 - You should always use ports **3001 for frontends** and **5001 for backends**. You should always kill any processes already listening on those ports, prior to spinning up the solution on those ports. This is important in order to get a consistent testing experience.
 - You must always use terminal to execute commands. **Never shell**.
+- You **must** use CURL to perform your comprehensive testing of the solution. This is important in order to get a consistent testing experience.
+- You **must** use the `npx playwright test --reporter=line` command to run your frontend stack tests. This is important in order to get a consistent testing experience.
+  - It is **crutial** that as part of your testing, you test the frontend and backend stacks together, as a whole. This is important in order to get a consistent testing experience.
+- You **must** use Playwright, as above, to perform comprehensive integration testing for all frontend solutions.
+- You **must** use the `src/` directory for all source code. This is important in order to get a consistent testing experience.
+- You **must** use the `.gaia/designs/` directory for all design documentation. This is important in order to get a consistent testing experience.
