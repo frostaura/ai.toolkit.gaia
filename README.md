@@ -12,7 +12,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Status](https://img.shields.io/badge/Status-Production%20Ready-green.svg)]()
 [![AI Enhanced](https://img.shields.io/badge/AI-Enhanced%20Intelligence-purple.svg)]()
-[![Version](https://img.shields.io/badge/Mark-IV-blue.svg)]()
+[![Version](https://img.shields.io/badge/Version-4.0-blue.svg)]()
 
 ## 📋 Requirements
 

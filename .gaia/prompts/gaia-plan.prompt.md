@@ -70,7 +70,11 @@ In this section we run through all steps in the SLDC and start generating a comp
 RELFECTION METRICS: Comprehensiveness, Alignment with Designs Produced, Frontend or Native App or Game Plan Quality, Backend Plan Quality, Database Plan Quality, Visual Excellence Plan Quality, Test Coverage Plan Quality.
 
 #### 4. Capture Plan
-In this section we adapt the comprehensive plan TODO: Continue here.
+In this section we adapt the comprehensive plan into a collection of tasks that may.
+
+At this point you must finally create a plan using the planning tools and capture each task from above, into the plan.
+
+RELFECTION METRICS: Task Capturing Completeness
 
 #### 5. Plan Execution
 After capturing your comprehensive plan via the planner tools, start executing on the plan by leveraging the planner tools.
