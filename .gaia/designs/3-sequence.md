@@ -6,281 +6,152 @@
 
 # Sequence Diagrams
 
-Below we elaborate on the system's sequence diagrams that show how classes collaborate to fulfill **use cases**.
+Use case execution flows showing class collaboration over time.
 
-Ensure we follow our **design principles** and that this document naturally extends the **use cases** and **class diagrams**.
+## Template Guidance
 
-## 📋 Template Guidance
+**Purpose**: Show how system executes use cases through object interactions
+**Focus**: Use case flows, object collaboration, interaction patterns  
+**Avoid**: Implementation details, infrastructure concerns
 
-### Purpose & Scope
-This document shows **how** the system executes use cases by mapping the **flow of interactions** between classes over time. It bridges static class structure to dynamic behavior.
+**Guidelines**: Use case driven, appropriate abstraction, include error scenarios
 
-**🎯 Focus**: Use case execution flows, object collaboration, interaction patterns
-**🚫 Avoid**: Implementation details, infrastructure concerns, deployment specifics
+## Primary Use Case Flows
 
-### Sequence Diagram Guidelines
-- **Use case driven**: Each major diagram should map to a specific use case
-- **Appropriate abstraction**: Show key interactions, hide internal details
-- **Clear participants**: Use meaningful names from class diagrams
-- **Error scenarios**: Include alternative flows for key failure modes
-
----
-
-## 🎯 Primary Use Case Flows
-
-### UC-001: [Use Case Name from use cases document]
-*Map this directly to a use case from your use cases document*
+### UC-001: [Use Case Name]
 
 ```mermaid
 sequenceDiagram
     autonumber
-    participant User as User/Client
-    participant System as System Interface
-    participant Service as [BusinessService]
-    participant Repository as [DataRepository]
-    participant External as [ExternalSystem]
+    participant User
+    participant System
+    participant Service
+    participant Repository
 
-    User->>System: [Initial Request/Action]
-    Note over User,System: [Context of the request]
-
-    System->>System: [Validate Input]
+    User->>System: [Initial Request]
+    System->>System: Validate Input
     
     alt Input Invalid
-        System-->>User: [Error Response]
+        System-->>User: Error Response
     else Input Valid
-        System->>Service: [Process Business Logic]
-        
-        Service->>Repository: [Retrieve Required Data]
-        Repository-->>Service: [Return Data]
-        
-        Service->>Service: [Apply Business Rules]
-        
-        opt External Integration Required
-            Service->>External: [Call External Service]
-            External-->>Service: [Return Response]
-        end
-        
-        Service->>Repository: [Save Results]
-        Repository-->>Service: [Confirm Save]
-        
-        Service-->>System: [Return Success]
-        System-->>User: [Success Response]
+        System->>Service: Process Request
+        Service->>Repository: Retrieve Data
+        Repository-->>Service: Return Data
+        Service->>Service: Apply Business Rules
+        Service-->>System: Return Result
+        System-->>User: Success Response
     end
 ```
 
-### UC-002: [Another Use Case Name]
-*Choose your most critical or complex use case*
+### UC-002: [Another Use Case]
 
 ```mermaid
 sequenceDiagram
     autonumber
-    participant Actor as [Primary Actor]
-    participant Interface as [System Interface]
-    participant ServiceA as [Service A]
-    participant ServiceB as [Service B]
-    participant Storage as [Data Storage]
+    participant Actor
+    participant Interface
+    participant ServiceA
+    participant ServiceB
+    participant Storage
 
-    Actor->>Interface: [Trigger Action]
-    Interface->>ServiceA: [Initial Processing]
-    
-    ServiceA->>Storage: [Load Context Data]
-    Storage-->>ServiceA: [Return Context]
-    
-    ServiceA->>ServiceB: [Delegate Specialized Logic]
-    ServiceB->>ServiceB: [Complex Business Processing]
-    ServiceB-->>ServiceA: [Return Processed Result]
-    
-    ServiceA->>Storage: [Persist Changes]
-    Storage-->>ServiceA: [Confirm Persistence]
-    
-    ServiceA-->>Interface: [Return Final Result]
-    Interface-->>Actor: [Present Outcome]
+    Actor->>Interface: Trigger Action
+    Interface->>ServiceA: Process
+    ServiceA->>ServiceB: Delegate Logic
+    ServiceB-->>ServiceA: Return Result
+    ServiceA->>Storage: Persist Changes
+    ServiceA-->>Interface: Return Result
+    Interface-->>Actor: Present Outcome
 ```
 
-## 🔄 Alternative and Error Flows
+## Error Handling & Integration Patterns
 
-### Error Handling Pattern
-*Standard pattern for handling errors across use cases*
-
+### Standard Error Pattern
 ```mermaid
 sequenceDiagram
     autonumber
-    participant User as User
-    participant System as System
-    participant Service as Business Service
-    participant Data as Data Layer
+    participant User
+    participant System
+    participant Service
+    participant Data
 
-    User->>System: [Request Action]
-    System->>Service: [Process Request]
+    User->>System: Request Action
+    System->>Service: Process Request
+    Service->>Data: Access Data
     
-    Service->>Data: [Access Data]
-    
-    alt Data Access Successful
-        Data-->>Service: [Return Data]
-        Service->>Service: [Process Successfully]
-        Service-->>System: [Return Success]
-        System-->>User: [Success Response]
-    else Data Access Failed
-        Data--xService: [Data Error]
-        Service->>Service: [Log Error & Determine Recovery]
-        
-        alt Recoverable Error
-            Service->>Data: [Retry Operation]
-            Data-->>Service: [Success on Retry]
-            Service-->>System: [Return Success]
-            System-->>User: [Success Response]
-        else Non-Recoverable Error
-            Service-->>System: [Return Business Error]
-            System-->>User: [User-Friendly Error Message]
-        end
+    alt Success
+        Data-->>Service: Return Data
+        Service-->>System: Success
+        System-->>User: Success Response
+    else Error
+        Data--xService: Data Error
+        Service-->>System: Business Error
+        System-->>User: User-Friendly Error
     end
 ```
-
-### Multi-Actor Collaboration
-*When use cases involve multiple actors or systems*
-
-```mermaid
-sequenceDiagram
-    autonumber
-    participant UserA as [Primary User]
-    participant UserB as [Secondary User]
-    participant System as [System]
-    participant NotificationService as [Notification Service]
-    participant AuditService as [Audit Service]
-
-    UserA->>System: [Initiate Collaborative Action]
-    System->>AuditService: [Log Action Start]
-    
-    System->>NotificationService: [Notify UserB]
-    NotificationService->>UserB: [Send Notification]
-    
-    UserB->>System: [Respond to Notification]
-    System->>System: [Process Combined Input]
-    
-    System->>NotificationService: [Notify Both Users]
-    NotificationService->>UserA: [Send Update]
-    NotificationService->>UserB: [Send Update]
-    
-    System->>AuditService: [Log Completion]
-```
-
-## 🔌 Integration Patterns
 
 ### External Service Integration
-*Pattern for integrating with external systems*
-
 ```mermaid
 sequenceDiagram
     autonumber
-    participant User as User
-    participant System as System
-    participant IntegrationService as Integration Service
-    participant ExternalAPI as External API
-    participant FallbackData as Fallback Data
+    participant User
+    participant System
+    participant IntegrationService
+    participant ExternalAPI
 
-    User->>System: [Request Requiring External Data]
-    System->>IntegrationService: [Request External Integration]
+    User->>System: Request External Data
+    System->>IntegrationService: Request Integration
+    IntegrationService->>ExternalAPI: API Call
     
-    IntegrationService->>ExternalAPI: [API Call]
-    
-    alt External API Available
-        ExternalAPI-->>IntegrationService: [Return Data]
-        IntegrationService-->>System: [Return Processed Data]
-        System-->>User: [Complete Response]
-    else External API Unavailable
-        ExternalAPI--xIntegrationService: [Service Unavailable]
-        IntegrationService->>FallbackData: [Use Cached/Default Data]
-        FallbackData-->>IntegrationService: [Return Fallback Data]
-        IntegrationService-->>System: [Return Limited Response]
-        System-->>User: [Response with Degraded Functionality]
+    alt API Available
+        ExternalAPI-->>IntegrationService: Return Data
+        IntegrationService-->>System: Processed Data
+        System-->>User: Complete Response
+    else API Unavailable
+        ExternalAPI--xIntegrationService: Service Unavailable
+        IntegrationService-->>System: Fallback Data
+        System-->>User: Limited Response
     end
 ```
 
-## 📊 Complex Business Process Flows
+## Complex Business Process
 
-### Multi-Step Business Process
-*For use cases that involve multiple sequential steps*
-
+### Multi-Step Process Flow
 ```mermaid
 sequenceDiagram
     autonumber
-    participant User as User
-    participant Orchestrator as Process Orchestrator
-    participant StepA as Step A Service
-    participant StepB as Step B Service
-    participant StepC as Step C Service
-    participant Repository as Data Repository
+    participant User
+    participant Orchestrator
+    participant StepA
+    participant StepB
+    participant Repository
 
-    User->>Orchestrator: [Start Multi-Step Process]
+    User->>Orchestrator: Start Process
+    Orchestrator->>Repository: Create Process Record
+    Orchestrator->>StepA: Execute Step A
+    StepA-->>Orchestrator: Step A Complete
     
-    Orchestrator->>Repository: [Create Process Record]
-    Repository-->>Orchestrator: [Confirm Creation]
+    Orchestrator->>StepB: Execute Step B
     
-    Orchestrator->>StepA: [Execute Step A]
-    StepA->>StepA: [Process Step A Logic]
-    StepA-->>Orchestrator: [Step A Complete]
-    
-    Orchestrator->>Repository: [Update Process Status]
-    
-    Orchestrator->>StepB: [Execute Step B]
-    StepB->>StepB: [Process Step B Logic]
-    
-    alt Step B Fails
-        StepB--xOrchestrator: [Step B Failed]
-        Orchestrator->>StepA: [Compensate Step A]
-        StepA-->>Orchestrator: [Compensation Complete]
-        Orchestrator-->>User: [Process Failed - Compensated]
-    else Step B Succeeds
-        StepB-->>Orchestrator: [Step B Complete]
-        
-        Orchestrator->>StepC: [Execute Final Step]
-        StepC->>StepC: [Process Final Logic]
-        StepC-->>Orchestrator: [Final Step Complete]
-        
-        Orchestrator->>Repository: [Mark Process Complete]
-        Orchestrator-->>User: [Process Successfully Completed]
+    alt Step B Success
+        StepB-->>Orchestrator: Step B Complete
+        Orchestrator-->>User: Process Complete
+    else Step B Fails
+        StepB--xOrchestrator: Step B Failed
+        Orchestrator->>StepA: Compensate Step A
+        Orchestrator-->>User: Process Failed
     end
 ```
 
-## 📋 Use Case to Sequence Mapping
+## Mapping Guidelines
 
-### Mapping Guidelines
-**For each major use case, create a sequence diagram that shows:**
+**Simple Use Cases**: Single sequence with happy path + validation errors
+**Complex Use Cases**: Primary sequence + separate alternative flows
+**Integration-Heavy**: Focus on external interactions + fallback patterns
 
-1. **Primary Actor Interaction**: How the use case is triggered
-2. **System Response Flow**: How the system processes the request
-3. **Key Decision Points**: Where business rules are applied
-4. **Data Interactions**: When and how data is accessed/modified
-5. **Success/Failure Outcomes**: How different scenarios conclude
-
-### Sequence Complexity Guidelines
-
-**Simple Use Cases** (3-5 steps):
-- Single sequence diagram showing happy path
-- Brief alternative flow for validation errors
-
-**Complex Use Cases** (6+ steps or multiple actors):
-- Primary sequence diagram for happy path
-- Separate diagrams for key alternative flows
-- Error handling pattern diagram
-
-**Integration-Heavy Use Cases**:
-- Focus on external system interactions
-- Show fallback/retry patterns
-- Include timeout and failure scenarios
-
----
-
-**Template Instructions**:
-1. **Replace all placeholders** with actual actors, services, and systems from your class diagrams
-2. **Map to specific use cases** - each diagram should fulfill an identified use case
-3. **Focus on business value** - show how user goals are achieved through system interactions
-4. **Include realistic error scenarios** - show how the system handles common failure modes
-5. **Keep appropriate detail level** - enough to understand the flow, not implementation specifics
-
-**Related Documents**:
-- Business flows → [1-use-cases.md](./1-use-cases.md)
-- Class responsibilities → [2-class.md](./2-class.md)
-- Frontend design → [4-frontend.md](./4-frontend.md)
+**Instructions**: 
+1. Replace placeholders with actual actors/services from class diagrams
+2. Map each diagram to specific use cases
+3. Show business value achievement through interactions
+4. Include realistic error scenarios
 
 [<< Back](./design.md)
