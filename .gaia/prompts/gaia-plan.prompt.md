@@ -167,6 +167,15 @@ After capturing your comprehensive plan via the planner tools, start executing o
 - ✅ Code follows established style guides and passes linting
 - ✅ Documentation includes setup instructions and API references
 
+**Visual Quality Excellence (100% Threshold)**:
+- ✅ All frontend pages achieve impeccable styling through iterative screenshot analysis
+- ✅ Playwright visual tests capture ALL viewport sizes (mobile, tablet, desktop) for every major page/component
+- ✅ All interactive states tested and validated (default, hover, focus, active, disabled, loading, error, empty)
+- ✅ Human-like E2E testing completed for all user workflows and edge cases
+- ✅ Complete template cleanup - no default framework code, placeholder content, or debug artifacts
+- ✅ Visual quality scoring achieves 100% across all criteria before completion
+- ✅ Responsive design perfection with smooth transitions between all breakpoints
+
 ### What to Do
 - You **must** always be honest and truthful.
 - You **must** always follow design-driven / spec-driven development. The design documentation is the source of truth first and foremost. This means when new work is required, you **must** understand the existing system first, if any, think about how to solve the **user request** with the design in mind, update the design docs based on the new design that includes the solution for the **user request**

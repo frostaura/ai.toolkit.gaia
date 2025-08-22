@@ -174,17 +174,38 @@ graph LR
 - **Lighthouse Score**: 90+ across all categories
 
 ### Quality Assurance
+
+#### Iterative Visual Testing Process
+**MANDATORY**: Frontend must achieve **impeccable styling** through iterative screenshot analysis:
+
+1. **Screenshot Capture**: Use Playwright to capture screenshots at all viewport sizes (mobile: 375px, tablet: 768px, desktop: 1024px+)
+2. **Critical Analysis**: Analyze each screenshot like a UI/UX specialist, scoring 0-100% on:
+   - **Visual Hierarchy**: Clear information hierarchy and content flow
+   - **Spacing & Alignment**: Consistent spacing, proper alignment, no cramped elements
+   - **Typography**: Font sizes, weights, line-height, readability
+   - **Color & Contrast**: Brand consistency, sufficient contrast, visual appeal
+   - **Component States**: All interactive states (default, hover, focus, active, disabled, loading, error)
+   - **Responsive Behavior**: Smooth transitions between breakpoints, no broken layouts
+   - **Professional Polish**: No unstyled components, placeholder content, or debug elements
+
+3. **Iterative Refinement**: 
+   - **REPEAT** screenshot → analysis → fixes until **ALL** criteria score 100%
+   - Document specific issues found and fixes applied
+   - Never settle for "good enough" - achieve visual excellence
+
 **Visual Testing Requirements**:
-- **Screenshot Tests**: All major pages at mobile/tablet/desktop
-- **Component Testing**: All states and variations
+- **Screenshot Tests**: All major pages and components at mobile/tablet/desktop
+- **State Coverage**: Default, hover, focus, active, disabled, loading, error, empty states
+- **User Flow Testing**: Complete user journeys with screenshot validation at each step
 - **Accessibility Testing**: Keyboard navigation and screen reader testing
 - **Cross-browser Testing**: Chrome, Firefox, Safari, Edge
 
 **Testing Strategy**:
-- **Responsive Testing**: All breakpoints function correctly
-- **Interactive Testing**: All user flows work as designed
-- **Error Testing**: Error states display appropriately
-- **Performance Testing**: Page load times meet targets
+- **Responsive Testing**: All breakpoints function correctly with perfect layout
+- **Interactive Testing**: All user flows work as designed with proper visual feedback
+- **Error Testing**: Error states display appropriately with clear messaging
+- **Performance Testing**: Page load times meet targets with smooth animations
+- **Template Cleanup Validation**: No default template code, placeholders, or debug files remain
 
 **Template Instructions**:
 1. **Map all use cases** to user flows with specific interface requirements
@@ -192,5 +213,50 @@ graph LR
 3. **Specify component requirements** for all UI elements mentioned in flows
 4. **Include responsive behavior** for mobile, tablet, and desktop experiences
 5. **Plan accessibility** from the design stage, not as an afterthought
+
+#### Human-Like End-to-End Testing
+**Playwright E2E Validation**: Test the application like a human automation tester:
+
+**Navigation Testing**:
+- Navigate through all pages and sections naturally
+- Test all clickable elements, links, and navigation patterns
+- Verify proper loading states and transitions between pages
+- Screenshot each major page and interaction point
+
+**Form & Interaction Testing**:
+- Fill out forms with both valid and invalid data
+- Test all input types (text, email, password, dropdowns, checkboxes)
+- Verify form validation messages and error states
+- Test search functionality, filtering, and sorting features
+- Screenshot all form states and validation scenarios
+
+**User Journey Completion**:
+- Complete full user workflows from start to finish
+- Test common user tasks and edge cases
+- Verify data persistence and state management
+- Screenshot successful completion states and any error scenarios
+
+#### Template & Debug Cleanup Requirements
+**MANDATORY**: Remove all development artifacts before production:
+
+**Template Code Cleanup**:
+- Remove all default framework templates (Create React App boilerplate, etc.)
+- Remove placeholder text, Lorem Ipsum content, and sample data
+- Remove unused components, pages, and code snippets
+- Remove commented-out code blocks and TODO comments
+
+**Debug & Development Cleanup**:
+- Remove console.log statements and debugging code
+- Remove development-only components (DevTools, Debug panels)
+- Remove mock data and test fixtures from production builds
+- Clean up temporary files, .tmp directories, and build artifacts
+
+**Validation Checklist**:
+- [ ] No "Welcome to React" or framework default pages
+- [ ] No placeholder or Lorem Ipsum text anywhere
+- [ ] No console.log or debugging statements
+- [ ] No unused imports or dead code
+- [ ] No development-only features in production
+- [ ] All components are purposeful and implemented
 
 [<< Back](./design.md)
