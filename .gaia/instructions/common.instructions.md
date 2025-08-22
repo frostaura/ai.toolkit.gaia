@@ -23,6 +23,26 @@ applyTo: "**"
 - `npx playwright test --reporter=line`
  - Run playwright tests without blocking the terminal. Always headless and **never** `--reporter=html`
 
+### Terminal and Process Management
+When working with development servers and long-running processes, you **must** follow these guidelines to prevent terminal blocking:
+
+#### Development Servers (Frontend & Backend)
+- **Always run development servers in background processes** using `&` suffix or in separate terminal sessions
+- For frontend servers (e.g., `npm run dev`, `vite dev`): Use `npm run dev &` or run in async terminal session
+- For backend servers (e.g., `dotnet run`, `node server.js`): Use `dotnet run &` or run in async terminal session
+- **Never let development servers occupy the main terminal session** where subsequent commands need to be executed
+
+#### Process Management Rules
+- Before starting any long-running service, kill existing processes on the target ports (3001 for frontend, 5001 for backend)
+- Use `kill -9 $(lsof -t -i:3001)` and `kill -9 $(lsof -t -i:5001)` to clean up existing processes
+- After starting background processes, always verify they are running with `ps aux | grep <process_name>`
+- When testing is complete, clean up background processes to avoid port conflicts
+
+#### Terminal Session Strategy
+- Use separate terminal sessions for long-running processes when background execution (`&`) is not suitable
+- Main terminal session must remain available for build commands, tests, and other operations
+- Always document which processes are running in background in your progress updates
+
 ## Rules to be Followed
 - You must never move on to another todo item while you have not successfully updated the status of the current todo item to completed.
 - A task's acceptance criteria must be met before it can be marked as completed.
@@ -32,7 +52,7 @@ applyTo: "**"
 - Always **fix build errors as you go**.
 - Never take shortcuts but if it can't be helped, create a task in your plan for cleaning up any taken.
 - You should always use ports **3001 for frontends** and **5001 for backends**. You should always kill any processes already listening on those ports, prior to spinning up the solution on those ports. This is important in order to get a consistent testing experience.
-- You must always use terminal to execute commands. **Never shell**.
+- You must always use terminal to execute commands. **Never shell**. Follow the Terminal and Process Management guidelines above to prevent terminal blocking when running development servers.
 - You **must** use CURL to perform your comprehensive testing of the solution. This is important in order to get a consistent testing experience.
 - You **must** use the `npx playwright test --reporter=line` command to run your frontend stack tests. This is important in order to get a consistent testing experience.
   - It is **crutial** that as part of your testing, you test the frontend and backend stacks together, as a whole. This is important in order to get a consistent testing experience.
