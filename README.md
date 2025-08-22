@@ -165,12 +165,15 @@
   2.2. the UI/UX is properly tested and reflect the frontend design we captured by reflecting on [our comprehensive planning prompt](./.gaia/prompts/gaia-plan.prompt.md), the plan and ensure the entire system is properly implemented.
 
 3. 🎨 **CRITICAL VISUAL QUALITY ASSURANCE**: Ensure your frontend is genuinely beautiful:
-   - Create Playwright visual tests with screenshots at multiple viewport sizes (mobile, tablet, desktop)
-   - Analyze screenshots for UI/UX issues: contrast problems, spacing issues, alignment problems
-   - Compare against design specifications in `./.gaia/designs/4-frontend.md`
-   - Test all interactive states: hover, focus, loading, error, and empty states
-   - Validate responsive design across all breakpoints
-   - Ensure UI matches the visual inspiration provided
+   - **Iterative Screenshot Process**: Create Playwright visual tests with screenshots at multiple viewport sizes (mobile: 375px, tablet: 768px, desktop: 1024px+)
+   - **Critical Analysis**: Analyze each screenshot like a UI/UX specialist, scoring 0-100% on visual quality criteria
+   - **Professional Standards**: Achieve impeccable styling - no unstyled components, proper spacing, consistent typography, perfect alignment
+   - **Comprehensive State Testing**: Test ALL interactive states (default, hover, focus, active, disabled, loading, error, empty) with screenshots
+   - **Human-like E2E Testing**: Navigate the application like a human tester - complete real user workflows, test all interactions, verify all functionality
+   - **Template Cleanup Validation**: Remove ALL default template code, placeholder text, debug logs, and development artifacts
+   - **Design Specification Compliance**: Compare against and exceed standards in `./.gaia/designs/4-frontend.md`
+   - **Visual Excellence**: REPEAT screenshot → analyze → fix process until 100% visual quality is achieved across all criteria
+   - **Responsive Perfection**: Validate flawless responsive design across all breakpoints with smooth transitions
 
 4. For all web server projects, there should be E2E tests for each endpoint too. For all frontends integrating with backends etc, there should be comprehensive and passing E2E tests too for every use case, unless impossible.
 

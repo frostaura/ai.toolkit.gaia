@@ -22,6 +22,24 @@ applyTo: "**"
 ### Common Commands
 - `npx playwright test --reporter=line`
  - Run playwright tests without blocking the terminal. Always headless and **never** `--reporter=html`
+- `npx playwright test --reporter=line --project=chromium --grep="visual"`
+ - Run visual regression tests specifically
+- `npx playwright test --reporter=line --headed --project=chromium`
+ - Run tests in headed mode for debugging visual issues
+- `npx playwright test --reporter=line --trace=on`
+ - Run tests with trace collection for detailed debugging
+
+#### Visual Testing Commands
+**Screenshot Analysis Commands**:
+- Take screenshots at multiple viewports: Use `page.setViewportSize()` with mobile (375px), tablet (768px), desktop (1024px+)
+- Critical analysis command pattern: `await page.screenshot({ path: 'analysis-[pagename]-[viewport].png', fullPage: true })`
+- Interactive state testing: Capture screenshots for hover, focus, loading, error states using `page.hover()`, `page.focus()`, etc.
+
+**Template Cleanup Validation Commands**:
+- Check for placeholder content: `grep -r "Lorem ipsum\|Welcome to\|placeholder\|TODO\|console\.log" src/`
+- Verify no debug statements: `grep -r "console\.\|debugger\|alert(" src/`
+- Validate no unused imports: Use ESLint with unused-imports rules
+- Clean build artifacts: `rm -rf dist/ build/ .tmp/` before final validation
 
 ### Terminal and Process Management
 When working with development servers and long-running processes, you **must** follow these guidelines to prevent terminal blocking:
@@ -57,5 +75,10 @@ When working with development servers and long-running processes, you **must** f
 - You **must** use the `npx playwright test --reporter=line` command to run your frontend stack tests. This is important in order to get a consistent testing experience.
   - It is **crutial** that as part of your testing, you test the frontend and backend stacks together, as a whole. This is important in order to get a consistent testing experience.
 - You **must** use Playwright, as above, to perform comprehensive integration testing for all frontend solutions.
+  - **Visual Quality Mandate**: Take screenshots at ALL viewport sizes (mobile: 375px, tablet: 768px, desktop: 1024px+) for EVERY major page/component
+  - **Iterative Screenshot Analysis**: Analyze screenshots like a UI/UX specialist, scoring visual quality 0-100% until ALL criteria achieve 100%
+  - **Human-like E2E Testing**: Navigate application like a human automation tester - test ALL interactions, flows, and edge cases
+  - **Template Cleanup Validation**: Verify removal of ALL default template code, placeholder content, debug statements, and development artifacts
+  - **State Coverage**: Test and screenshot ALL interactive states (default, hover, focus, active, disabled, loading, error, empty)
 - You **must** use the `src/` directory for all source code. This is important in order to get a consistent testing experience.
 - You **must** use the `.gaia/designs/` directory for all design documentation. This is important in order to get a consistent testing experience.
