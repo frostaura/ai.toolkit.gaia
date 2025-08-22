@@ -31,7 +31,7 @@ applyTo: "**"
 
 #### Visual Testing Commands
 **Screenshot Analysis Commands**:
-- Take screenshots at multiple viewports: Use `page.setViewportSize()` with mobile (375x667), tablet (768x1024), desktop (1920x1080)
+- Take screenshots at multiple viewports: Use `page.setViewportSize()` with mobile (375px), tablet (768px), desktop (1024px+)
 - Critical analysis command pattern: `await page.screenshot({ path: 'analysis-[pagename]-[viewport].png', fullPage: true })`
 - Interactive state testing: Capture screenshots for hover, focus, loading, error states using `page.hover()`, `page.focus()`, etc.
 
