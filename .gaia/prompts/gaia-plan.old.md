@@ -22,8 +22,6 @@ The below are the steps you must follow to generate a plan. There are various gu
 ### Conditional, Entry Flows
 This section describes the two main conditional flows / entry points. Around these flows are various guidelines, restrictions and requirements that you must follow to generate a plan.
 
-**EXCEPTION** IGNORE ".github/mcps/gaia/src" directory, as this is a template directory that should not be considered as part of the codebase as it's a utility project.
-
 #### The Repository is Empty (Condition: No "src/" directory exists)
 In this case, there is no existing codebase, and you must create a new plan to create the system from scratch.
 

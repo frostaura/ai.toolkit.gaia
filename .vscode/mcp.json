@@ -15,7 +15,7 @@
             "args": [
                 "run",
                 "--project",
-                ".github/mcps/gaia/src/fa.mcp.gaia/fa.mcp.gaia.csproj"
+                "src/gaia/fa.mcp.gaia.csproj"
             ]
         }
     }
