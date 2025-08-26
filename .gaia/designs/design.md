@@ -32,5 +32,14 @@ System architecture following iDesign architectural principles.
 **Testing**: 100% unit test coverage, integration testing, E2E validation
 **Performance**: API < 200ms, Frontend LCP < 2.5s, zero build warnings
 **Security**: Automated vulnerability scanning, secure coding practices
+**Regression Prevention (NEW)**: Mandatory validation that all existing features continue working when new features are added
+
+### Regression Testing Standards (NEW - MANDATORY)
+
+**Backward Compatibility**: All new features must maintain 100% backward compatibility with existing functionality
+**Test Continuity**: Complete test suite must pass after each feature implementation before proceeding to next feature
+**Feature Isolation**: New features must not interfere with existing feature behavior or state management
+**Performance Preservation**: New features must not degrade existing feature performance by more than 5%
+**Visual Consistency**: UI changes must not unintentionally modify existing component appearance or behavior
 
 [<< Back](../../README.md)

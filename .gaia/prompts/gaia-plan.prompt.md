@@ -101,6 +101,31 @@ At this point you must finally create a plan using the planning tools and captur
 #### 6. Plan Execution
 After capturing your comprehensive plan via the planner tools, start executing on the plan by leveraging the planner tools.
 
+**MANDATORY Regression Prevention**: For each feature implementation task:
+1. **Before starting**: Identify all existing features that could be impacted
+2. **During implementation**: Follow incremental development with frequent testing
+3. **After implementation**: Execute comprehensive regression validation (see step 7)
+4. **If regressions detected**: Apply rollback procedures and fix compatibility issues before proceeding
+
+#### 7. Feature Compatibility Validation (NEW - MANDATORY)
+**CRITICAL**: This step must be executed after EACH feature implementation to prevent breaking existing functionality.
+
+**Validation Process**:
+1. **Full Test Suite Execution**: Run ALL existing tests (unit, integration, E2E) and ensure 100% pass rate
+2. **Existing Feature Verification**: Manually verify that all previously implemented features still function correctly
+3. **Visual Regression Testing**: If frontend changes were made, capture screenshots of all existing pages/components and compare for unintended visual changes
+4. **End-to-End User Journey Testing**: Execute complete user workflows for all existing features to ensure they work end-to-end
+5. **Performance Impact Assessment**: Verify that new feature doesn't negatively impact performance of existing features
+
+**Reflection Metrics**: Regression Test Pass Rate (100% Required), Existing Feature Functionality Score (100% Required), Visual Consistency Score (100% Required), Performance Impact Score (≤ 5% degradation allowed).
+
+**If Validation Fails**:
+- **Stop Development**: Do not proceed to next feature until all regressions are fixed
+- **Root Cause Analysis**: Identify why the new feature broke existing functionality  
+- **Fix Strategy**: Either fix the compatibility issue or refactor the approach
+- **Re-validate**: Repeat validation process until 100% pass rate achieved
+- **Document**: Record what broke, why, and how it was fixed for future reference
+
 ### Error Handling & Edge Cases
 
 #### Common Failure Scenarios & Fallback Strategies
@@ -128,6 +153,12 @@ After capturing your comprehensive plan via the planner tools, start executing o
 - **Resource Limitations**: If system resources are insufficient, break large tasks into smaller, manageable chunks
 - **External Service Failures**: Plan for offline-first approaches where external services are involved
 
+**Regression Prevention Failures (NEW)**:
+- **Test Failures After Feature Implementation**: If existing tests fail after implementing new feature, immediately halt progress and investigate root cause
+- **Feature Compatibility Issues**: If new feature breaks existing functionality, implement compatibility layer or refactor approach
+- **Performance Degradation**: If new feature causes >5% performance drop in existing features, optimize or reconsider implementation strategy
+- **Visual Regression Detected**: If new changes unintentionally modify existing UI elements, revert visual changes and implement isolation strategies
+
 #### Recovery Mechanisms
 
 **Graceful Degradation**:
@@ -136,11 +167,20 @@ After capturing your comprehensive plan via the planner tools, start executing o
 3. If still failing, skip non-critical steps and continue
 4. Always capture what was skipped for later review and fixing via tasks (for these todos)
 
+**Regression Recovery Process (NEW)**:
+1. **Immediate Halt**: Stop all development when regression is detected
+2. **Impact Assessment**: Determine scope of broken functionality and affected user workflows  
+3. **Rollback Decision**: If fix is complex, rollback to last working state and re-approach feature implementation
+4. **Compatibility Fix**: If fix is straightforward, implement compatibility solution and re-test thoroughly
+5. **Documentation**: Record regression details, fix applied, and preventive measures for future development
+
 **User Intervention Points**:
 - Before starting any step that has failed twice
 - When conflicting information is detected
 - When scope significantly changes during analysis
 - When technical constraints block progress
+- **NEW**: When regression testing fails repeatedly (>2 attempts) for the same feature
+- **NEW**: When backward compatibility cannot be maintained and breaking changes are unavoidable
 
 ### Quality Benchmarks & Success Criteria
 
@@ -176,11 +216,24 @@ After capturing your comprehensive plan via the planner tools, start executing o
 - ✅ Visual quality scoring achieves 100% across all criteria before completion
 - ✅ Responsive design perfection with smooth transitions between all breakpoints
 
+**Regression Prevention Quality (100% Threshold - NEW)**:
+- ✅ All existing automated tests pass at 100% rate after each feature implementation
+- ✅ All previously implemented features verified to work correctly via manual testing
+- ✅ Visual regression testing confirms no unintended UI changes to existing components
+- ✅ End-to-end user journeys for all existing features execute successfully without errors
+- ✅ Performance benchmarks maintained within 5% of previous measurements
+- ✅ Integration points between new and existing features function seamlessly
+- ✅ Database schema changes maintain backward compatibility with existing data
+- ✅ API endpoints maintain backward compatibility or proper versioning is implemented
+
 ### What to Do
 - You **must** always be honest and truthful.
 - You **must** always follow design-driven / spec-driven development. The design documentation is the source of truth first and foremost. This means when new work is required, you **must** understand the existing system first, if any, think about how to solve the **user request** with the design in mind, update the design docs based on the new design that includes the solution for the **user request**
 - You **must** complete ALL design work and design documentation BEFORE creating any tasks. Tasks must only be generated after design steps are fully executed and validated.
 - You **must** ensure every task explicitly aligns with and references the completed design documentation from `.gaia/designs`.
+- You **must** implement MANDATORY regression prevention by executing Feature Compatibility Validation (step 7) after each feature implementation. Never skip this step.
+- You **must** maintain backward compatibility when implementing new features. If breaking changes are required, implement proper migration strategies and update all affected code.
+- You **must** run the complete test suite before considering any feature complete. All tests must pass at 100% rate.
 - You **must** follow a process of reflection for all of the above steps. The details of the reflection process, for example which metrics to produce to score a step's output, may be specific to each step in the process and will be documented for each step above, where applicable. Your job, as part of this reflection process is to:
   - Critically review your step's output and produce a score for each of the quality metrics in the respective step's **Reflection Metrics**.
   - WHILE the score for each metric falls below **100%**, no less, you **must** incorporate feedback for yourself, produce the improved step output, then repeat the reflection process until all metrics achieve 100%.

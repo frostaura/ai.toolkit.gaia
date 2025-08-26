@@ -206,6 +206,28 @@ graph LR
 - **Error Testing**: Error states display appropriately with clear messaging
 - **Performance Testing**: Page load times meet targets with smooth animations
 - **Template Cleanup Validation**: No default template code, placeholders, or debug files remain
+- **Regression Testing (NEW - MANDATORY)**: All existing features and components must pass validation when new features are added
+
+#### Regression Testing Requirements (NEW - MANDATORY)
+**CRITICAL**: Before any new feature is considered complete, ALL existing frontend functionality must be validated.
+
+**Visual Regression Testing**:
+- **Screenshot Comparison**: Capture screenshots of all existing pages/components before and after new feature implementation
+- **Pixel-Perfect Validation**: Compare screenshots to detect unintended visual changes in existing elements
+- **Component Isolation**: Verify that new components don't interfere with existing component styling or behavior
+- **Responsive Regression**: Test all existing responsive breakpoints still function correctly
+
+**Functional Regression Testing**:
+- **User Flow Continuity**: Ensure all existing user journeys continue to work end-to-end
+- **Interaction Preservation**: Verify all existing interactive elements (buttons, forms, navigation) function as before
+- **State Management Integrity**: Confirm that new features don't corrupt existing application state
+- **Performance Consistency**: Ensure new features don't degrade performance of existing functionality
+
+**Automated Regression Suite**:
+- **Test Suite Execution**: Run complete Playwright test suite for all existing features
+- **100% Pass Requirement**: All existing automated tests must pass before new feature is considered complete  
+- **Coverage Maintenance**: Ensure test coverage doesn't decrease when adding new features
+- **Continuous Validation**: Set up automated triggers to run regression tests on every code change
 
 **Template Instructions**:
 1. **Map all use cases** to user flows with specific interface requirements

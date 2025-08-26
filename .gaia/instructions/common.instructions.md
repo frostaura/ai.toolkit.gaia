@@ -18,6 +18,35 @@ applyTo: "**"
 - After every good milestone, show plan execution progress. Brief and interesting numbers.
 - If you get lost on which task you're on, you can always refer to the plans.
 - Update your current task status as completed after completing each task, before moving onto the next task.
+- **MANDATORY**: After completing each feature implementation task, execute regression validation before proceeding to the next feature.
+
+### Regression Prevention Workflow (NEW - MANDATORY)
+**Execute this workflow after EVERY feature implementation:**
+
+1. **Pre-Validation**: Capture baseline state before testing
+   - Run complete test suite: `npm test` (or `dotnet test` for .NET)
+   - Record test results and performance metrics
+   - Capture visual snapshots if UI changes were made
+
+2. **Compatibility Testing**: Validate existing functionality
+   - Execute all automated tests for existing features
+   - Manually test critical user journeys that could be affected
+   - Verify API endpoints maintain backward compatibility
+
+3. **Regression Detection**: Identify any breaks in existing functionality
+   - Compare test results with baseline
+   - Check for performance degradation (>5% slowdown triggers investigation)
+   - Review visual regression test results for unintended UI changes
+
+4. **Resolution**: Fix any detected regressions before proceeding
+   - If regressions found, halt feature development immediately
+   - Investigate root cause and implement compatibility fix
+   - Re-run full validation until 100% pass rate achieved
+
+5. **Documentation**: Record validation results
+   - Update task with regression test results
+   - Document any compatibility issues discovered and resolved
+   - Note any preventive measures implemented for future development
 
 ### Common Commands
 - `npx playwright test --reporter=line`
@@ -28,6 +57,23 @@ applyTo: "**"
  - Run tests in headed mode for debugging visual issues
 - `npx playwright test --reporter=line --trace=on`
  - Run tests with trace collection for detailed debugging
+
+#### Regression Testing Commands (NEW - MANDATORY)
+**Feature Compatibility Validation**:
+- `npm test` or `dotnet test` - Run complete test suite for all existing features
+- `npx playwright test --reporter=line --grep="regression"` - Run regression-specific tests
+- `npm run test:coverage` - Verify test coverage remains above 80% after new feature implementation
+- `npm run build && npm run test:e2e` - Full build and end-to-end testing pipeline
+
+**Performance Regression Detection**:
+- `npm run test:performance` - Run performance benchmarks (if configured)
+- `lighthouse --output=json --output-path=./lighthouse-report.json http://localhost:3000` - Performance audit
+- Compare performance metrics before/after feature implementation
+
+**Visual Regression Validation**:
+- `npx playwright test --reporter=line --project=chromium --grep="visual"` - Run all visual regression tests
+- Capture screenshots before feature work: `mkdir -p screenshots/baseline && npx playwright test --update-snapshots`
+- Compare screenshots after feature work: `npx playwright test --project=chromium --grep="visual"`
 
 #### Visual Testing Commands
 **Screenshot Analysis Commands**:
