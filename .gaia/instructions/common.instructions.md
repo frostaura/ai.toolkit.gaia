@@ -87,6 +87,41 @@ applyTo: "**"
 - Validate no unused imports: Use ESLint with unused-imports rules
 - Clean build artifacts: `rm -rf dist/ build/ .tmp/` before final validation
 
+### Package Management
+**Always use auto-confirming commands to prevent terminal blocking on package installations:**
+
+#### Node.js Package Managers
+- **npm**: Use `npm install --no-audit --no-fund` to suppress interactive prompts, or set `CI=true` environment variable
+- **yarn**: Use `yarn install --non-interactive` to prevent prompts
+- **pnpm**: Use `pnpm install --reporter=silent` to suppress interactive prompts
+
+#### System Package Managers
+- **apt/apt-get**: Always use `apt-get install -y` to auto-confirm installations
+- **yum**: Use `yum install -y` for auto-confirmation
+- **brew**: Use `brew install --quiet` to reduce prompts
+
+#### Language-Specific Package Managers
+- **pip**: Set `PIP_YES=1` environment variable or use `pip install --quiet` to reduce prompts
+- **dotnet**: Use `dotnet add package --accept-license` when licenses require acceptance
+- **go**: Use `go mod download` and `go mod tidy` (typically no confirmation needed)
+- **composer**: Use `composer install --no-interaction` to prevent prompts
+
+#### Environment Variable Setup for Auto-Confirmation
+Set these environment variables at the beginning of scripts to ensure non-interactive behavior:
+```bash
+export CI=true                    # For npm and other tools
+export PIP_YES=1                  # For pip auto-confirmation
+export DEBIAN_FRONTEND=noninteractive  # For apt/apt-get
+export npm_config_audit=false     # Disable npm audit prompts
+export npm_config_fund=false      # Disable npm funding prompts
+```
+
+#### Package Installation Best Practices
+- **Always verify package installation success** with `npm list` or equivalent verification commands
+- **Use lock files** (package-lock.json, yarn.lock) to ensure consistent installations
+- **Clean package caches** if installation fails: `npm cache clean --force`
+- **Handle installation failures gracefully** with retry logic and fallback strategies
+
 ### Terminal and Process Management
 When working with development servers and long-running processes, you **must** follow these guidelines to prevent terminal blocking:
 
