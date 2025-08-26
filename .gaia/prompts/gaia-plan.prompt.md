@@ -48,8 +48,8 @@ The above steps should be followed in order to determine the minimum SDLC that i
   - Capture the above designs by overriding the respective design file from `.gaia/designs`.
   - Produce a brief README.md file to represent the project.
   - etc.
-- Quality Gates | **Reflection Metrics**: System Integration Tests, Test Coverage per Project, Console Error Monitoring, etc.
-  - Produce test plan(s) in your mind with console error detection
+- Quality Gates | **Reflection Metrics**: System Integration Tests, Test Coverage per Project, Console Error Monitoring, Direct Playwright Usage, etc.
+  - Produce test plan(s) in your mind with console error detection using Playwright directly (never create separate test scripts)
 - etc.
   - etc.
 ```
@@ -209,22 +209,24 @@ After capturing your comprehensive plan via the planner tools, start executing o
 
 **Visual Quality Excellence (100% Threshold)**:
 - ✅ All frontend pages achieve impeccable styling through iterative screenshot analysis
-- ✅ Playwright visual tests capture ALL viewport sizes (mobile, tablet, desktop) for every major page/component
+- ✅ Playwright visual tests capture ALL viewport sizes (mobile, tablet, desktop) for every major page/component using Playwright's direct commands only
 - ✅ All interactive states tested and validated (default, hover, focus, active, disabled, loading, error, empty)
-- ✅ Human-like E2E testing completed for all user workflows and edge cases
+- ✅ Human-like E2E testing completed for all user workflows and edge cases using Playwright directly
 - ✅ Complete template cleanup - no default framework code, placeholder content, or debug artifacts
 - ✅ Visual quality scoring achieves 100% across all criteria before completion
 - ✅ Responsive design perfection with smooth transitions between all breakpoints
+- ✅ **No custom test scripts created** - all testing performed using Playwright's native capabilities
 
 **Regression Prevention Quality (100% Threshold - NEW)**:
-- ✅ All existing automated tests pass at 100% rate after each feature implementation
-- ✅ All previously implemented features verified to work correctly via manual testing
-- ✅ Visual regression testing confirms no unintended UI changes to existing components
-- ✅ End-to-end user journeys for all existing features execute successfully without errors
+- ✅ All existing automated tests pass at 100% rate after each feature implementation using Playwright directly
+- ✅ All previously implemented features verified to work correctly via manual testing with Playwright
+- ✅ Visual regression testing confirms no unintended UI changes to existing components using Playwright's built-in comparison tools
+- ✅ End-to-end user journeys for all existing features execute successfully without errors using Playwright commands
 - ✅ Performance benchmarks maintained within 5% of previous measurements
 - ✅ Integration points between new and existing features function seamlessly
 - ✅ Database schema changes maintain backward compatibility with existing data
 - ✅ API endpoints maintain backward compatibility or proper versioning is implemented
+- ✅ **All regression testing performed using Playwright directly** - no separate test scripts created
 
 ### What to Do
 - You **must** always be honest and truthful.
