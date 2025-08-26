@@ -59,11 +59,12 @@ applyTo: "**"
  - Run tests with trace collection for detailed debugging
 
 #### Regression Testing Commands (NEW - MANDATORY)
-**Feature Compatibility Validation**:
+**Feature Compatibility Validation - Use Playwright Directly**:
 - `npm test` or `dotnet test` - Run complete test suite for all existing features
-- `npx playwright test --reporter=line --grep="regression"` - Run regression-specific tests
+- `npx playwright test --reporter=line --grep="regression"` - Run regression-specific tests using Playwright directly
 - `npm run test:coverage` - Verify test coverage remains above 80% after new feature implementation
 - `npm run build && npm run test:e2e` - Full build and end-to-end testing pipeline
+- **NEVER create custom test scripts** - always use Playwright's native commands and built-in test capabilities
 
 **Performance Regression Detection**:
 - `npm run test:performance` - Run performance benchmarks (if configured)
@@ -71,15 +72,17 @@ applyTo: "**"
 - Compare performance metrics before/after feature implementation
 
 **Visual Regression Validation**:
-- `npx playwright test --reporter=line --project=chromium --grep="visual"` - Run all visual regression tests
+- `npx playwright test --reporter=line --project=chromium --grep="visual"` - Run all visual regression tests using Playwright directly
 - Capture screenshots before feature work: `mkdir -p screenshots/baseline && npx playwright test --update-snapshots`
 - Compare screenshots after feature work: `npx playwright test --project=chromium --grep="visual"`
+- **Use Playwright's built-in visual comparison tools** - never create custom screenshot comparison scripts
 
 #### Visual Testing Commands
-**Screenshot Analysis Commands**:
+**Screenshot Analysis Commands - Use Playwright Directly**:
 - Take screenshots at multiple viewports: Use `page.setViewportSize()` with mobile (375px), tablet (768px), desktop (1024px+)
 - Critical analysis command pattern: `await page.screenshot({ path: 'analysis-[pagename]-[viewport].png', fullPage: true })`
 - Interactive state testing: Capture screenshots for hover, focus, loading, error states using `page.hover()`, `page.focus()`, etc.
+- **Always use Playwright's native screenshot and testing capabilities** - never write custom screenshot scripts
 
 **Template Cleanup Validation Commands**:
 - Check for placeholder content: `grep -r "Lorem ipsum\|Welcome to\|placeholder\|TODO\|console\.log" src/`
@@ -155,7 +158,8 @@ When working with development servers and long-running processes, you **must** f
 - You **must** use CURL to perform your comprehensive testing of the solution. This is important in order to get a consistent testing experience.
 - You **must** use the `npx playwright test --reporter=line` command to run your frontend stack tests. This is important in order to get a consistent testing experience.
   - It is **crutial** that as part of your testing, you test the frontend and backend stacks together, as a whole. This is important in order to get a consistent testing experience.
-- You **must** use Playwright, as above, to perform comprehensive integration testing for all frontend solutions.
+- You **must** use Playwright directly to perform comprehensive integration testing for all frontend solutions. **NEVER create separate test scripts** - use Playwright's built-in capabilities and commands exclusively.
+  - **Console Error Monitoring**: Setup console error detection with automatic test failure on ANY console errors/warnings/exceptions
   - **Visual Quality Mandate**: Take screenshots at ALL viewport sizes (mobile: 375px, tablet: 768px, desktop: 1024px+) for EVERY major page/component
   - **Iterative Screenshot Analysis**: Analyze screenshots like a UI/UX specialist, scoring visual quality 0-100% until ALL criteria achieve 100%
   - **Human-like E2E Testing**: Navigate application like a human automation tester - test ALL interactions, flows, and edge cases
