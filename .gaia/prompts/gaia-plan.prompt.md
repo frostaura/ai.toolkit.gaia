@@ -48,8 +48,8 @@ The above steps should be followed in order to determine the minimum SDLC that i
   - Capture the above designs by overriding the respective design file from `.gaia/designs`.
   - Produce a brief README.md file to represent the project.
   - etc.
-- Quality Gates | **Reflection Metrics**: System Integration Tests, Test Coverage per Project, etc.
-  - Produce test plan(s) in your mind
+- Quality Gates | **Reflection Metrics**: System Integration Tests, Test Coverage per Project, Console Error Monitoring, etc.
+  - Produce test plan(s) in your mind with console error detection
 - etc.
   - etc.
 ```
@@ -108,30 +108,22 @@ After capturing your comprehensive plan via the planner tools, start executing o
 4. **If regressions detected**: Apply rollback procedures and fix compatibility issues before proceeding
 
 #### 7. Feature Compatibility Validation (NEW - MANDATORY)
-**CRITICAL**: This step must be executed after EACH feature implementation AND before starting ANY new task to prevent breaking existing functionality.
+**CRITICAL**: This step must be executed after EACH feature implementation to prevent breaking existing functionality.
 
-**Enhanced Validation Process**:
+**Validation Process**:
 1. **Full Test Suite Execution**: Run ALL existing tests (unit, integration, E2E) and ensure 100% pass rate
-2. **Console Error Validation**: Monitor browser console during ALL tests and ensure ZERO errors, warnings, or JavaScript exceptions
-3. **Existing Feature Verification**: Manually verify that all previously implemented features still function correctly
-4. **Visual Regression Testing**: Capture screenshots of ALL existing pages/components and validate visual quality scores remain 100%
-5. **End-to-End User Journey Testing**: Execute complete user workflows for ALL existing features to ensure they work end-to-end
-6. **Performance Impact Assessment**: Verify that new feature doesn't negatively impact performance of existing features (≤5% degradation allowed)
-7. **Beauty Analysis Integration**: Re-analyze ALL screenshots using enhanced beauty criteria and ensure 100% scores maintained
+2. **Existing Feature Verification**: Manually verify that all previously implemented features still function correctly
+3. **Visual Regression Testing**: If frontend changes were made, capture screenshots of all existing pages/components and compare for unintended visual changes
+4. **End-to-End User Journey Testing**: Execute complete user workflows for all existing features to ensure they work end-to-end
+5. **Performance Impact Assessment**: Verify that new feature doesn't negatively impact performance of existing features
 
-**Enhanced Reflection Metrics**: 
-- Regression Test Pass Rate (100% Required)
-- Console Error Count (0 Required) 
-- Existing Feature Functionality Score (100% Required)
-- Visual Consistency Score (100% Required)
-- Beauty Analysis Score (100% Required)
-- Performance Impact Score (≤ 5% degradation allowed)
+**Reflection Metrics**: Regression Test Pass Rate (100% Required), Existing Feature Functionality Score (100% Required), Visual Consistency Score (100% Required), Performance Impact Score (≤ 5% degradation allowed).
 
 **If Validation Fails**:
-- **HALT Development**: Do not proceed to next feature/task until ALL regressions are fixed
-- **Root Cause Analysis**: Identify why the new feature broke existing functionality or introduced console errors
+- **Stop Development**: Do not proceed to next feature until all regressions are fixed
+- **Root Cause Analysis**: Identify why the new feature broke existing functionality  
 - **Fix Strategy**: Either fix the compatibility issue or refactor the approach
-- **Complete Retest**: Re-run ENTIRE validation process until 100% pass rate achieved across ALL metrics
+- **Re-validate**: Repeat validation process until 100% pass rate achieved
 - **Document**: Record what broke, why, and how it was fixed for future reference
 
 ### Error Handling & Edge Cases

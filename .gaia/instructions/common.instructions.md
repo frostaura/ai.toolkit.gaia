@@ -8,7 +8,6 @@ applyTo: "**"
 | Reference | Description |
 | --- | --- |
 | .gaia/designs/*.md | A collection of important design documentation for the solution, together with overview for the design system, expected repository structure and Docker setup. |
-| .gaia/examples/ | Integration testing examples and templates demonstrating console error monitoring, beauty analysis, and comprehensive Playwright test setup. |
 
 ## Instructions
 ### Planning and Task Management
@@ -21,90 +20,33 @@ applyTo: "**"
 - Update your current task status as completed after completing each task, before moving onto the next task.
 - **MANDATORY**: After completing each feature implementation task, execute regression validation before proceeding to the next feature.
 
-### Continuous Integration Testing Workflow (ENHANCED - MANDATORY)
-**CRITICAL**: This workflow ensures ZERO regressions and maintains system integrity throughout development.
-
-#### After Every Task Completion:
-1. **Immediate Integration Test**: Before marking any task complete
-   - Run COMPLETE test suite: `npm test && npx playwright test --reporter=line`
-   - Validate ALL existing features still function perfectly
-   - Capture screenshots of ALL components and analyze for visual regression
-   - Monitor browser console for ANY errors/warnings during testing
-
-2. **Complete System Validation**: Before starting next task  
-   - **MANDATORY**: Execute end-to-end testing of ENTIRE application
-   - **MANDATORY**: Test ALL user journeys from start to finish
-   - **MANDATORY**: Validate ALL interactive elements across ALL viewport sizes
-   - **MANDATORY**: Ensure browser console remains error-free throughout entire test suite
-
-3. **Beauty & Function Analysis**: For every UI component
-   - Score visual quality 0-100% using enhanced beauty criteria
-   - Validate responsive behavior across mobile/tablet/desktop
-   - Test ALL interactive states (hover, focus, active, disabled, loading, error)
-   - Ensure professional polish with zero placeholder content or debug elements
-
-#### Issue Discovery & Resolution Workflow:
-1. **Issue Detection**: When any test fails or visual quality scores below 100%
-   - **HALT**: Stop all development work immediately
-   - **ANALYZE**: Identify root cause and impact scope
-   - **DOCUMENT**: Record issue details and affected components
-
-2. **Fix Implementation**: Address discovered issues
-   - Apply minimal changes to resolve the specific issue
-   - Avoid introducing new changes during bug fixing
-   - Focus on surgical fixes that don't impact other functionality
-
-3. **Retest Everything**: After each fix
-   - **MANDATORY**: Re-run COMPLETE test suite before proceeding
-   - **MANDATORY**: Validate ALL previously working functionality still works
-   - **MANDATORY**: Confirm the fix doesn't introduce new regressions
-   - **MANDATORY**: Repeat until 100% pass rate achieved across all tests
-
-4. **Only Then Proceed**: Move to next task only after achieving
-   - 100% test pass rate
-   - 100% visual quality scores
-   - Zero console errors or warnings
-   - Complete end-to-end functionality validation
-
 ### Regression Prevention Workflow (NEW - MANDATORY)
-**Execute this workflow after EVERY feature implementation AND before starting any new task:**
+**Execute this workflow after EVERY feature implementation:**
 
 1. **Pre-Validation**: Capture baseline state before testing
    - Run complete test suite: `npm test` (or `dotnet test` for .NET)
    - Record test results and performance metrics
    - Capture visual snapshots if UI changes were made
-   - Monitor and record console error baseline
 
 2. **Compatibility Testing**: Validate existing functionality
    - Execute all automated tests for existing features
    - Manually test critical user journeys that could be affected
    - Verify API endpoints maintain backward compatibility
-   - Validate all previous features still function correctly
 
 3. **Regression Detection**: Identify any breaks in existing functionality
    - Compare test results with baseline
    - Check for performance degradation (>5% slowdown triggers investigation)
    - Review visual regression test results for unintended UI changes
-   - Validate zero new console errors or JavaScript exceptions
 
-4. **Complete Integration Validation (ENHANCED)**: Before proceeding to next task
-   - **MANDATORY**: Re-run COMPLETE test suite and achieve 100% pass rate
-   - **MANDATORY**: Test ALL previously implemented features end-to-end
-   - **MANDATORY**: Capture screenshots of ALL pages/components and validate visual quality scores remain 100%
-   - **MANDATORY**: Monitor browser console during ALL tests and ensure zero errors/warnings
-   - **MANDATORY**: Validate complete user journeys across the entire application
-
-5. **Resolution**: Fix any detected regressions before proceeding
+4. **Resolution**: Fix any detected regressions before proceeding
    - If regressions found, halt feature development immediately
    - Investigate root cause and implement compatibility fix
    - Re-run full validation until 100% pass rate achieved
-   - Document fixes and update preventive measures
 
-6. **Documentation**: Record validation results
+5. **Documentation**: Record validation results
    - Update task with regression test results
    - Document any compatibility issues discovered and resolved
    - Note any preventive measures implemented for future development
-   - Log console error patterns and resolutions
 
 ### Common Commands
 - `npx playwright test --reporter=line`
@@ -133,34 +75,11 @@ applyTo: "**"
 - Capture screenshots before feature work: `mkdir -p screenshots/baseline && npx playwright test --update-snapshots`
 - Compare screenshots after feature work: `npx playwright test --project=chromium --grep="visual"`
 
-**Console Error Detection (NEW - MANDATORY)**:
-- `npx playwright test --reporter=line --grep="console-errors"` - Run console error detection tests
-- Browser console monitoring: Enable console error capture in ALL Playwright tests
-- JavaScript exception tracking: Configure automatic test failure on unhandled JS exceptions
-- Network error monitoring: Track and report failed HTTP requests during test execution
-- Warning validation: Log and analyze console warnings for potential issues
-
 #### Visual Testing Commands
 **Screenshot Analysis Commands**:
 - Take screenshots at multiple viewports: Use `page.setViewportSize()` with mobile (375px), tablet (768px), desktop (1024px+)
 - Critical analysis command pattern: `await page.screenshot({ path: 'analysis-[pagename]-[viewport].png', fullPage: true })`
 - Interactive state testing: Capture screenshots for hover, focus, loading, error states using `page.hover()`, `page.focus()`, etc.
-
-**Console Error Monitoring Commands (NEW - MANDATORY)**:
-- Capture console errors: `page.on('console', msg => { if (msg.type() === 'error') console.log('Console Error:', msg.text()) })`
-- Monitor network failures: `page.on('response', response => { if (!response.ok()) console.log('Network Error:', response.url(), response.status()) })`
-- Track JavaScript exceptions: `page.on('pageerror', exception => console.log('JS Exception:', exception.message))`
-- Log console warnings: `page.on('console', msg => { if (msg.type() === 'warning') console.log('Console Warning:', msg.text()) })`
-- MANDATORY: Fail tests on ANY console errors or unhandled JavaScript exceptions during test execution
-
-**Beauty Analysis Criteria Commands (ENHANCED)**:
-- **Visual Hierarchy Analysis**: Verify clear information hierarchy, logical content flow, and appropriate element sizing
-- **Spacing & Alignment Validation**: Confirm consistent spacing (8px, 16px, 24px grid), perfect alignment, no cramped/overlapping elements
-- **Typography Excellence**: Validate font sizes (min 14px for body text), proper line-height (1.4-1.6), adequate contrast ratios (4.5:1 minimum)
-- **Color & Brand Consistency**: Ensure consistent color palette, sufficient contrast, professional color combinations, no jarring color conflicts
-- **Component State Perfection**: Test and validate ALL interactive states with proper visual feedback and smooth transitions
-- **Responsive Behavior Excellence**: Validate smooth breakpoint transitions, no horizontal scrolling, proper mobile touch targets (44px minimum)
-- **Professional Polish Standards**: Zero unstyled components, no placeholder content, no debug elements, perfect loading states
 
 **Template Cleanup Validation Commands**:
 - Check for placeholder content: `grep -r "Lorem ipsum\|Welcome to\|placeholder\|TODO\|console\.log" src/`
@@ -237,12 +156,11 @@ When working with development servers and long-running processes, you **must** f
 - You **must** use the `npx playwright test --reporter=line` command to run your frontend stack tests. This is important in order to get a consistent testing experience.
   - It is **crutial** that as part of your testing, you test the frontend and backend stacks together, as a whole. This is important in order to get a consistent testing experience.
 - You **must** use Playwright, as above, to perform comprehensive integration testing for all frontend solutions.
+  - **Console Error Monitoring**: Setup console error detection with automatic test failure on ANY console errors/warnings/exceptions
   - **Visual Quality Mandate**: Take screenshots at ALL viewport sizes (mobile: 375px, tablet: 768px, desktop: 1024px+) for EVERY major page/component
   - **Iterative Screenshot Analysis**: Analyze screenshots like a UI/UX specialist, scoring visual quality 0-100% until ALL criteria achieve 100%
-  - **Console Error Monitoring**: MANDATORY capture and analysis of browser console errors, warnings, and network failures during ALL test execution
   - **Human-like E2E Testing**: Navigate application like a human automation tester - test ALL interactions, flows, and edge cases
   - **Template Cleanup Validation**: Verify removal of ALL default template code, placeholder content, debug statements, and development artifacts
   - **State Coverage**: Test and screenshot ALL interactive states (default, hover, focus, active, disabled, loading, error, empty)
-  - **Continuous Integration Testing**: After EVERY task completion, re-run the COMPLETE test suite before proceeding to next task
 - You **must** use the `src/` directory for all source code. This is important in order to get a consistent testing experience.
 - You **must** use the `.gaia/designs/` directory for all design documentation. This is important in order to get a consistent testing experience.
