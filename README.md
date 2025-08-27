@@ -18,6 +18,7 @@
 
 - **AI Assistant**: GitHub Copilot, Cursor AI, or similar
 - **Runtime**: Node.js 20+ LTS (managed with nvm)
+- **.NET SDK**: .NET 9 SDK (mandatory for local planner MCP)
 - **Containerization**: Docker 24+ & Docker Compose
 - **Version Control**: Git 2.40+
 - **Package Manager**: npm 10+ or yarn 4+
@@ -56,6 +57,40 @@
 - **Docker 24+** with optimized multi-stage builds
 - **GitHub Actions** for CI/CD automation
 - **Real-time monitoring** and error tracking
+
+## 💫 Perfect For Building
+
+GAIA empowers you to manifest complete, production-ready applications across diverse domains:
+
+### **🛒 E-commerce & Marketplaces**
+- Product catalogs with search and filtering
+- Shopping carts and secure payment processing
+- User accounts and order management
+- Admin dashboards for inventory control
+
+### **💬 Communication & Collaboration**
+- Real-time chat applications with WebSocket support
+- Team collaboration tools with file sharing
+- Social platforms with user profiles and messaging
+- Video conferencing and meeting platforms
+
+### **📊 Business Applications**
+- Analytics dashboards with data visualization
+- CRM systems with customer management
+- Project management tools with task tracking
+- Financial applications with reporting
+
+### **🎮 Interactive & Gaming**
+- Web-based games with real-time multiplayer
+- Educational platforms with interactive content
+- Entertainment applications with media streaming
+- Progressive Web Apps (PWAs) with offline support
+
+### **🔧 Developer Tools & APIs**
+- RESTful APIs with comprehensive documentation
+- Microservices architectures with container orchestration
+- CI/CD pipelines with automated testing
+- Developer portals with API management
 
 ## 📖 Table of Contents
 
@@ -292,6 +327,58 @@ custom dashboards, data visualization, and team collaboration"
 ✅ Role-based access control and user management
 ✅ Scalable architecture with microservices
 ```
+
+## 🔧 Troubleshooting
+
+### Common Issues & Solutions
+
+#### **GAIA Agent Not Available**
+- **Issue**: `/gaia-create` agent not found in Copilot Chat
+- **Solution**: Ensure you're in Agent mode in VS Code with GitHub Copilot extension enabled
+- **Alternative**: Use the prompt directly without the agent prefix
+
+#### **Prerequisites Missing**
+- **Issue**: Build or runtime errors during development
+- **Solution**: Verify all requirements are installed:
+  ```bash
+  node --version  # Should be 20+ LTS
+  dotnet --version  # Should be 9.0+
+  docker --version  # Should be 24+
+  ```
+
+#### **Container Issues**
+- **Issue**: Docker containers not starting or database connection errors
+- **Solution**: 
+  ```bash
+  docker compose down
+  docker compose up --build
+  ```
+
+#### **Port Conflicts**
+- **Issue**: Application won't start due to port already in use
+- **Solution**: Check and modify port configurations in `docker-compose.yml` or stop conflicting services
+
+#### **AI Assistant Integration**
+- **Issue**: AI assistant not responding or generating incomplete code
+- **Solution**: 
+  - Ensure you're using the latest version of your AI assistant
+  - Try breaking down complex requests into smaller, specific tasks
+  - Provide more context about your requirements
+
+#### **Build Failures**
+- **Issue**: TypeScript or .NET compilation errors
+- **Solution**:
+  ```bash
+  # Frontend
+  npm install
+  npm run build
+  
+  # Backend  
+  dotnet restore
+  dotnet build
+  ```
+
+For additional support, visit our [Community & Support](#-community--support) section.
 
 ## 🌍 Community & Support
 
