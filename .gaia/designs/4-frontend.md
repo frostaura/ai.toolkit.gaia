@@ -57,7 +57,8 @@ graph LR
 **React Bits Resources**:
 - Reference React Bits (https://reactbits.dev/) for beautiful, production-ready components
 - Leverage curated UI patterns that combine functionality with stunning visual design
-- Access MCP server for direct component recommendations and implementations
+- **Prioritize react-bits-mcp server when available** for direct component recommendations and implementations
+- Use ReactBits components as first choice before falling back to Ant Design or other component libraries
 
 **Colors**:
 - Primary: `#[HEX]` - CTAs and navigation
@@ -132,10 +133,12 @@ For enhanced visual appeal and modern UI patterns, leverage React Bits component
 - **Professional Polish**: Elevate standard business interfaces to visually stunning applications
 
 **Usage Guidelines**:
+- **Tool-First Approach**: When react-bits-mcp server is available, use it for component discovery and recommendations before manual selection
 - Prioritize React Bits components for hero sections, feature showcases, and key user interactions
-- Combine with Tailwind CSS for consistent spacing, colors, and responsive design
+- Combine with Tailwind CSS for consistent spacing, colors, and responsive design  
 - Maintain accessibility standards while enhancing visual appeal
 - Use React Bits for inspiration and direct implementation of beautiful UI patterns
+- **Fallback Hierarchy**: ReactBits (via MCP tools) → Ant Design → ChakraUI → Custom components
 
 ## Information Architecture
 
