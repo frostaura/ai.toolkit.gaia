@@ -246,7 +246,7 @@ After capturing your comprehensive plan via the planner tools, start executing o
 - **Don't** generate a plan for the above work. The above work is supposed to generate the plan for solving the **user request**. Instead you must create a plan once the process has produced a plan to solve for the **user request**, as outlined above.
 - **Don't** create tasks before completing the design steps. All design work must be executed and validated before task generation begins.
 - **Don't** create tasks that don't align with or reference the completed design documentation from `.gaia/designs`.
-- **Don't** build your own components when battle-tested components already exist. You **must** prioritize leveraging pre-built components where possible. Think ChakraUI.
+- **Don't** build your own components when battle-tested components already exist. You **must** prioritize leveraging pre-built components where possible. Think React Bits (https://reactbits.dev/) for beautiful, production-ready components that inspire and impress, ChakraUI, or Ant Design.
 - **Don't** produce any documentation for anything without the user explicitly asking for it. We don't want unnecessary bloat to our repository.
 - **Don't** ever compromise on quality or take shortcuts without creating proper cleanup tasks
 
@@ -263,7 +263,9 @@ This section describes sensible defaults for when a **user request** doesn't exp
   - TypeScript
   - React with TypeScript
   - Redux
+  - React Bits (https://reactbits.dev/) for beautiful UI components
   - Chakra UI
+  - Tailwind CSS
 - Native Application
   - .NET MAUI
 - Game

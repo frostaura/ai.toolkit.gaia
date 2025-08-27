@@ -45,8 +45,19 @@ graph LR
 
 ## Visual Design Language
 
-**Design Philosophy**: [Modern/Minimal/Bold - based on target audience]
-**Target Audience**: [Primary users and preferences]
+**Design Philosophy**: Modern, visually stunning, and functional-first approach that inspires and impresses users
+**Target Audience**: Users who appreciate beautiful, professional interfaces that go beyond standard business applications
+
+**Enhanced UI Approach**:
+- **Beautiful by Design**: Prioritize visual appeal while maintaining functionality
+- **Modern Aesthetics**: Implement contemporary design patterns and visual hierarchy
+- **Professional Polish**: Elevate standard components with thoughtful styling and interactions
+- **Inspirational Elements**: Include visually striking components that create memorable experiences
+
+**React Bits Resources**:
+- Reference React Bits (https://reactbits.dev/) for beautiful, production-ready components
+- Leverage curated UI patterns that combine functionality with stunning visual design
+- Access MCP server for direct component recommendations and implementations
 
 **Colors**:
 - Primary: `#[HEX]` - CTAs and navigation
@@ -111,6 +122,20 @@ graph LR
 - Overlays: Modals, tooltips, dropdowns
 
 **Component States**: Default, hover, focus, active, disabled, loading, error
+
+**React Bits Integration**:
+For enhanced visual appeal and modern UI patterns, leverage React Bits components (https://reactbits.dev/):
+- **Beautiful Pre-built Components**: Access curated, production-ready React components that combine functionality with stunning visual design
+- **Modern Design Patterns**: Utilize contemporary UI patterns that go beyond business-oriented interfaces
+- **Enhanced User Experience**: Incorporate visually striking elements that inspire and impress while maintaining functionality
+- **Seamless Integration**: Components work harmoniously with Tailwind CSS and existing design systems
+- **Professional Polish**: Elevate standard business interfaces to visually stunning applications
+
+**Usage Guidelines**:
+- Prioritize React Bits components for hero sections, feature showcases, and key user interactions
+- Combine with Tailwind CSS for consistent spacing, colors, and responsive design
+- Maintain accessibility standards while enhancing visual appeal
+- Use React Bits for inspiration and direct implementation of beautiful UI patterns
 
 ## Information Architecture
 
