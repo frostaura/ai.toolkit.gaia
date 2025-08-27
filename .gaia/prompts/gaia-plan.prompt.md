@@ -246,12 +246,18 @@ After capturing your comprehensive plan via the planner tools, start executing o
 - **Don't** generate a plan for the above work. The above work is supposed to generate the plan for solving the **user request**. Instead you must create a plan once the process has produced a plan to solve for the **user request**, as outlined above.
 - **Don't** create tasks before completing the design steps. All design work must be executed and validated before task generation begins.
 - **Don't** create tasks that don't align with or reference the completed design documentation from `.gaia/designs`.
-- **Don't** build your own components when battle-tested components already exist. You **must** prioritize leveraging pre-built components where possible. Think React Bits (https://reactbits.dev/) for beautiful, production-ready components that inspire and impress, ChakraUI, or Ant Design.
+- **Don't** build your own components when battle-tested components already exist. You **must** prioritize leveraging pre-built components where possible. **When ReactBits MCP tools are available**, prioritize React Bits (https://reactbits.dev/) components first using the react-bits-mcp server for direct component recommendations and implementations. Otherwise, fall back to ChakraUI or Ant Design.
 - **Don't** produce any documentation for anything without the user explicitly asking for it. We don't want unnecessary bloat to our repository.
 - **Don't** ever compromise on quality or take shortcuts without creating proper cleanup tasks
 
 ### Guidelines
 This section describes sensible defaults for when a **user request** doesn't explicitly specify the criteria below.
+
+#### Tool Prioritization
+When building frontend applications, leverage available MCP tools for enhanced component libraries:
+- **ReactBits MCP Server**: If the react-bits-mcp server is available, prioritize using ReactBits components through the MCP server for direct component recommendations and implementations
+- **Component Selection Order**: ReactBits (via MCP tools when available) → ChakraUI → Ant Design → Custom components (last resort)
+- **Tool Availability Check**: Always check for available MCP servers before defaulting to manual component selection
 
 #### Default Technology Stacks
 - Backend
@@ -263,7 +269,7 @@ This section describes sensible defaults for when a **user request** doesn't exp
   - TypeScript
   - React with TypeScript
   - Redux
-  - React Bits (https://reactbits.dev/) for beautiful UI components
+  - React Bits (https://reactbits.dev/) for beautiful UI components - **Use react-bits-mcp server when available for component recommendations**
   - Chakra UI
   - Tailwind CSS
 - Native Application
