@@ -11,7 +11,7 @@
         },
         "react-bits-mcp": {
             "command": "npx",
-            "args": ["-y", "reactbits-dev-mcp-server"]
+            "args": ["mcp-remote", "https://react-bits-mcp.davidhzdev.workers.dev/sse"]
         },
         "Gaia": {
             "type": "stdio",
