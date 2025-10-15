@@ -121,7 +121,7 @@ After capturing your comprehensive plan via the planner tools, start executing o
 
 **If Validation Fails**:
 - **Stop Development**: Do not proceed to next feature until all regressions are fixed
-- **Root Cause Analysis**: Identify why the new feature broke existing functionality  
+- **Root Cause Analysis**: Identify why the new feature broke existing functionality
 - **Fix Strategy**: Either fix the compatibility issue or refactor the approach
 - **Re-validate**: Repeat validation process until 100% pass rate achieved
 - **Document**: Record what broke, why, and how it was fixed for future reference
@@ -169,7 +169,7 @@ After capturing your comprehensive plan via the planner tools, start executing o
 
 **Regression Recovery Process (NEW)**:
 1. **Immediate Halt**: Stop all development when regression is detected
-2. **Impact Assessment**: Determine scope of broken functionality and affected user workflows  
+2. **Impact Assessment**: Determine scope of broken functionality and affected user workflows
 3. **Rollback Decision**: If fix is complex, rollback to last working state and re-approach feature implementation
 4. **Compatibility Fix**: If fix is straightforward, implement compatibility solution and re-test thoroughly
 5. **Documentation**: Record regression details, fix applied, and preventive measures for future development
@@ -183,6 +183,32 @@ After capturing your comprehensive plan via the planner tools, start executing o
 - **NEW**: When backward compatibility cannot be maintained and breaking changes are unavoidable
 
 ### Quality Benchmarks & Success Criteria
+
+#### Reflection Process Transparency Requirements
+
+**MANDATORY**: Every reflection process must be fully documented and visible. For each step requiring reflection:
+
+1. **Iteration Header**: Display "Reflection Iteration X/N for [Step Name]"
+2. **Current Scores**: List each metric with current percentage score (0-100%)
+3. **Detailed Reasoning**: Explain why each score was assigned with specific examples
+4. **Improvement Plan**: Describe exactly what will be changed in the next iteration
+5. **Progress Tracking**: Show movement toward 100% threshold across iterations
+6. **Completion Validation**: Confirm when all metrics achieve 100% before proceeding
+
+**Example Reflection Output Format**:
+```
+Reflection Iteration 1/3 for Requirements Gathering:
+- Clarity: 75% - Missing specific acceptance criteria for user authentication flows
+- Efficiency: 85% - Architecture is sound but database indexing strategy unclear
+- Quality: 70% - Error handling scenarios not fully defined
+- Comprehensiveness: 80% - Integration points identified but API contracts need detail
+
+Improvement Plan for Iteration 2:
+- Add detailed authentication flow acceptance criteria with test scenarios
+- Define database indexing strategy for user lookup tables
+- Document error handling for network failures, validation errors, and timeouts
+- Create detailed API contracts with request/response examples
+```
 
 #### Reflection Metrics Definitions
 
@@ -238,7 +264,13 @@ After capturing your comprehensive plan via the planner tools, start executing o
 - You **must** run the complete test suite before considering any feature complete. All tests must pass at 100% rate.
 - You **must** follow a process of reflection for all of the above steps. The details of the reflection process, for example which metrics to produce to score a step's output, may be specific to each step in the process and will be documented for each step above, where applicable. Your job, as part of this reflection process is to:
   - Critically review your step's output and produce a score for each of the quality metrics in the respective step's **Reflection Metrics**.
+  - **MANDATORY TRANSPARENCY**: You **must** print every reflection iteration you go through, showing:
+    - Current iteration number (e.g., "Reflection Iteration 1/N")
+    - Each metric's current score with detailed reasoning
+    - Specific improvements being made for the next iteration
+    - Progress toward the 100% quality threshold
   - WHILE the score for each metric falls below **100%**, no less, you **must** incorporate feedback for yourself, produce the improved step output, then repeat the reflection process until all metrics achieve 100%.
+  - **ITERATION DOCUMENTATION**: Each reflection cycle must be documented and visible to maintain transparency in the quality improvement process.
 - You **must** follow your instruction files referenced above and beyond the mandates in this prompt.
 - For designing the frontend, apps, games etc, if applicable, you **must**, if the **user request** contains attached images, you should comprehensively analyze those and assume they are inspiration for the visuals of the frontend(s) and incorporate your analysis of the inspiration, if any is provided, into the frontend design, unless otherwise specified. If the **user request** **doesn't** contain any inspiration or explicit instruction around visuals, you should activate your creative side and ensure you come up with the best suited frontend(s) / visual system(s) that you believe is most appropriate for the **user request**.
 
@@ -293,7 +325,7 @@ When building frontend applications, leverage available MCP tools for enhanced c
 
 **Configuration Management**:
 - Backend: Use `appsettings.json` with environment-specific files, store secrets securely
-- Frontend: Use `.env` files and Redux initial state for app configuration  
+- Frontend: Use `.env` files and Redux initial state for app configuration
 - Database: Connection strings in config files, never hardcoded
 
 #### Progressive Enhancement & Accessibility Defaults
@@ -323,4 +355,4 @@ When building frontend applications, leverage available MCP tools for enhanced c
 - Date/number formatting: locale-aware formatting functions
 
 ### User Request
-User's prompt: 
+User's prompt:
