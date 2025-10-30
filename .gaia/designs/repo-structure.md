@@ -10,10 +10,15 @@ This document describes the preferred repository structure. This may be used for
   - /.gaia (The collection of repository documents and system designs etc. This directory should be documented in [README.md](../../README.md) too.)
     - /designs (System designs - COMPLETED FROM TEMPLATES BELOW)
       - <DESIGN_NAME>.md (A system design file)
+    - /prompts (AI framework prompt collection)
+      - gaia-plan.prompt.md (The main planning and execution prompt for building solutions)
+      - gaia-improve.prompt.md (The prompt for improving the Gaia AI Toolkit framework)
+      - gaia-no-plan.prompt.md (The prompt for working without the Gaia framework)
+      - gaia-test.prompt.md (The prompt for testing purposes)
+    - /instructions (Copilot instructions for enforcing rules)
+      - <INSTRUCTION_NAME>.instructions.md (Instruction files)
     - <DOCUMENT_NAME>.md (a system documentation file)
   - /.github (GitHub-related content and AI state management)
-    - /prompts (AI framework prompt collection)
-      - gaia-create.prompt.md (The specialized AI (Gaia) prompt to start generating a brand new idea)
     - /state (AI session and project state tracking)
       - Gaia.TaskPlanner.db.json (system/execution plan, milestones & current session progress tracking)
     - templates
@@ -100,25 +105,27 @@ This repository follows a structured approach designed for AI-enhanced software 
 
 ## Core Directories
 
-### `.github/` - AI Framework Intelligence & CI/CD Pipeline
+### `.gaia/` - AI Framework Intelligence
 
-The heart of the AI coding framework and automation, containing both the orchestration files that guide the AI through the development process and CI/CD workflows:
+The heart of the AI coding framework, containing the orchestration files that guide the AI through the development process:
 
-- **prompts/**: AI coding framework files - initialization and core intelligence
-  - **gaia_for_new_projects.prompt.md**: The master prompt containing comprehensive instructions for AI agents, for brand new projects.
-  - **gaia_for_existing_projects.prompt.md**: The master prompt containing comprehensive instructions for AI agents, for continuing on an existing system.
+- **prompts/**: AI coding framework prompt files
+  - **gaia-plan.prompt.md**: The main planning and execution prompt for building solutions
+  - **gaia-improve.prompt.md**: The prompt for improving the Gaia AI Toolkit framework
+  - **gaia-no-plan.prompt.md**: The prompt for working without the Gaia framework
+  - **gaia-test.prompt.md**: The prompt for testing purposes
+- **instructions/**: Copilot instructions for enforcing common and file-specific rules
+- **designs/**: System architecture and design documents
+
+### `.github/` - CI/CD Pipeline & State Management
+
+GitHub-related automation and state tracking:
+
 - **state/**: AI planning, session and project state tracking
   - **Gaia.TaskPlanner.db.json**: Auto-generated project plan with milestones, deliverables & tracking of development progress and current status
 - **workflows/**: Automated build, test, and deployment processes
 
-### `.docs/` - Documentation Hub
 
-Centralized location for all project documentation:
-
-- **designs/**: System architecture and design documents following the 5-template structure
-- **design.md**: Main design document with links to all architectural templates
-- **repo-structure.md**: This document explaining the repository organization
-- **docker-support.md**: Container setup and deployment guidelines
 
 ### `src/` - Source Code Organization
 
