@@ -106,7 +106,7 @@ GAIA empowers you to manifest complete, production-ready applications across div
 
 ## 🌟 Commune with GAIA in 3 Steps
 
-> **🚀 Quick Start**: Already familiar with GAIA? Jump straight to invoking `/gaia-create` in Copilot chat in agent mode and describe your vision, after cloning / forking the repository!
+> **🚀 Quick Start**: Already familiar with GAIA? Jump straight to invoking `/gaia-plan` in Copilot chat in agent mode and describe your vision, after cloning / forking the repository!
 
 ### Step 1: Preparation (2 minutes)
 
@@ -130,7 +130,7 @@ GAIA empowers you to manifest complete, production-ready applications across div
    - In VS Code: Open GitHub Copilot Chat
    - In Cursor AI: Open the chat panel
 3. **Switch to Agent mode** (if using VS Code with Copilot)
-4. **Invoke GAIA**: Type `/` in the chat input to see available agents, then select `gaia-create`
+4. **Invoke GAIA**: Type `/` in the chat input to see available agents, then select `gaia-plan`
 5. **Share your vision**: Describe your project in detail and attach 2-3 screenshots of frontend inspiration
 6. **Press ENTER** to begin the creation process
 
@@ -333,7 +333,7 @@ custom dashboards, data visualization, and team collaboration"
 ### Common Issues & Solutions
 
 #### **GAIA Agent Not Available**
-- **Issue**: `/gaia-create` agent not found in Copilot Chat
+- **Issue**: `/gaia-plan` agent not found in Copilot Chat
 - **Solution**: Ensure you're in Agent mode in VS Code with GitHub Copilot extension enabled
 - **Alternative**: Use the prompt directly without the agent prefix
 
