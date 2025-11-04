@@ -54,8 +54,12 @@
   },
   "chat.agent.enabled": true,
   "chat.extensionTools.enabled": true,
-  "chat.mcp.discovery.enabled": true,
-  "chat.mcp.enabled": true,
+  "chat.mcp.discovery.enabled": {
+    "claude-desktop": true,
+    "windsurf": true,
+    "cursor-global": true,
+    "cursor-workspace": true
+  },
   "chat.promptFiles": true,
   "chat.agent.maxRequests": 99999,
   "explorer.fileNesting.enabled": true,
@@ -77,5 +81,6 @@
   "chat.instructionsFilesLocations": {
     ".github/instructions": true,
     ".gaia/instructions": true
-  }
+  },
+  "chat.mcp.access": "all"
 }
