@@ -1,86 +1,221 @@
 {
-  "files.exclude": {
-    "**/.git": true,
-    "**/.ipynb_checkpoints": true,
-    "**/__pycache__": true,
-    "*.egg*/**": true,
-    "**/build/**": true,
-    "**/dist/**": true,
-    "**/obj/**": true,
-    "**/bin/**": true,
-    "**/examples/**/*.csv": true
-  },
-  "vscode_vibrancy.enableAutoTheme": true,
-  "vscode_vibrancy.opacity": 0.1,
-  "vscode_vibrancy.refreshInterval": 60,
-  "editor.wordWrap": "on",
-  "editor.autoClosingBrackets": "always",
-  "editor.autoClosingComments": "always",
-  "diffEditor.codeLens": true,
-  "accessibility.hideAccessibleView": true,
-  "search.showLineNumbers": true,
-  "scm.alwaysShowRepositories": true,
-  "editor.cursorBlinking": "phase",
-  "synthwave84.disableGlow": false,
-  "synthwave84.brightness": 0.45,
-  "chat.tools.autoApprove": true,
-  "chat.tools.terminal.autoApprove": {
-    "rmdir": true,
-    "rm": true,
-    "curl": true,
-    "wget": true,
-    "eval": true,
-    "chmod": true,
-    "dotnet": true,
-    "csharp": true,
-    "bash": true,
-    "sh": true,
-    "powershell": true,
-    "pwsh": true,
-    "node": true,
-    "npm": true,
-    "npx": true,
-    "nuget": true,
-    "python": true,
-    "grep": true,
-    "cd": true,
-    "ls": true,
-    "cat": true,
-    "chown": true,
-    "head": true,
-    "find": true,
-    "xargs": true,
-    "echo": true
-  },
-  "chat.agent.enabled": true,
-  "chat.extensionTools.enabled": true,
-  "chat.mcp.discovery.enabled": {
-    "claude-desktop": true,
-    "windsurf": true,
-    "cursor-global": true,
-    "cursor-workspace": true
-  },
-  "chat.promptFiles": true,
-  "chat.agent.maxRequests": 99999,
-  "explorer.fileNesting.enabled": true,
-  "explorer.fileNesting.expand": false,
-  "explorer.fileNesting.patterns": {
-    "*.csproj": "*.config,*.props,*.targets"
-  },
-  "chat.checkpoints.showFileChanges": true,
-  "chat.editor.wordWrap": "on",
-  "chat.mcp.assisted.nuget.enabled": true,
-  "chat.promptFilesLocations": {
-    ".github/prompts": true,
-    ".gaia/prompts": true
-  },
-  "chat.modeFilesLocations": {
-    ".github/chatmodes": true,
-    ".gaia/modes": true
-  },
-  "chat.instructionsFilesLocations": {
-    ".github/instructions": true,
-    ".gaia/instructions": true
-  },
-  "chat.mcp.access": "all"
+    "files.exclude": {
+        "**/.git": true,
+        "**/.ipynb_checkpoints": true,
+        "**/__pycache__": true,
+        "*.egg*/**": true,
+        "**/build/**": true,
+        "**/obj/**": true,
+        "**/bin/**": true,
+        "**/examples/**/*.csv": true,
+        "**/test-results/**": true,
+        "**/*.gitignore": true,
+        "**/.vscode": false,
+        "**/playwright-report": true,
+        "**/node_modules": true,
+        "**/tsconfig*": true,
+        "**/*.config.js": true,
+        "**/.vite": true,
+        "**/.playwright-mcp": true,
+        "src/frontend/*.png": true,
+        "**/.dockerignore": true,
+        "**/frontend/coverage": true,
+        "src/frontend/vite.config.ts": true,
+        "package.json": true,
+        "package*.json": true,
+        "**/.editorconfig": true,
+        "**/stylecop.*": true,
+        "**/omnisharp.json": true,
+        "**/coverage": true,
+        "**/coverage.*": true,
+        "**/Directory.Build.*": true,
+        "**/*py": true,
+    },
+    "vscode_vibrancy.enableAutoTheme": true,
+    "vscode_vibrancy.opacity": 0.1,
+    "vscode_vibrancy.refreshInterval": 60,
+    "editor.wordWrap": "on",
+    "editor.autoClosingBrackets": "always",
+    "editor.autoClosingComments": "always",
+    "diffEditor.codeLens": true,
+    "accessibility.hideAccessibleView": true,
+    "search.showLineNumbers": true,
+    "scm.alwaysShowRepositories": true,
+    "editor.cursorBlinking": "phase",
+    "synthwave84.disableGlow": false,
+    "synthwave84.brightness": 0.45,
+    "chat.agent.enabled": true,
+    "chat.extensionTools.enabled": true,
+    "chat.mcp.discovery.enabled": {
+        "claude-desktop": true,
+        "windsurf": true,
+        "cursor-global": true,
+        "cursor-workspace": true
+    },
+    "chat.promptFiles": true,
+    "chat.agent.maxRequests": 99999,
+    "explorer.fileNesting.enabled": true,
+    "explorer.fileNesting.expand": false,
+    "explorer.fileNesting.patterns": {
+        "*.csproj": "*.config,*.props,*.targets"
+    },
+    "chat.checkpoints.showFileChanges": true,
+    "chat.editor.wordWrap": "on",
+    "chat.mcp.assisted.nuget.enabled": true,
+    "chat.agent.thinkingStyle": "expanded",
+    "github.copilot.chat.agent.autoFix": true,
+    "chat.tools.edits.autoApprove": {
+        "**/*": true
+    },
+    "chat.tools.terminal.autoApprove": {
+        "/.*/": true,
+        "/^([^|&;]+(\\s*[|&]{1,2}\\s*[^|&;]+)*)$/": true,
+        "/^npm\\s+.*$/": true,
+        "/^xargs\\s+.*$/": true,
+        "/^curl\\s+.*$/": true,
+        "/^sleep\\s+.*$/": true,
+        "/^head\\s+.*$/": true,
+        "/^tail\\s+.*$/": true,
+        "/^lsof\\s+.*$/": true,
+        "/^true\\s+.*$/": true,
+        "/^false\\s+.*$/": true,
+        "/^kill\\s+.*$/": true,
+        "/^find\\s+.*$/": true,
+        "/^rm\\s+.*$/": true,
+        "/^rmdir\\s+.*$/": true,
+        "/^python3\\s+.*$/": true
+    },
+    "github.copilot.chat.agent.thinkingTool": true,
+    "chat.mcp.autostart": "newAndOutdated",
+    "chat.tools.terminal.enableAutoApprove": true,
+    "chat.promptFilesLocations": {
+        ".github/prompts": true,
+        ".gaia/prompts": true
+    },
+    "chat.modeFilesLocations": {
+        ".github/chatmodes": true,
+        ".gaia/modes": true
+    },
+    "chat.mcp.access": "all",
+    "playwright.showTrace": false,
+    "playwright.reuseBrowser": false,
+    "playwright.showReport": false,
+    "playwright.configPath": "src/frontend/tests/integration-tests/playwright.config.ts",
+    "playwright.testDir": "src/frontend/tests/integration-tests",
+    "playwright.showBrowser": false,
+    "playwright.defaultOptions": {
+        "headless": true
+    },
+    "files.associations": {
+        "*.spec.ts": "typescript",
+        "*.css.tsx": "typescriptreact",
+        "*.css.ts": "typescript"
+    },
+    "testing.openTesting": "openOnTestStart",
+    "testing.defaultGutterClickAction": "run",
+    "testing.followRunningTest": true,
+    "typescript.preferences.includePackageJsonAutoImports": "auto",
+    "testing.automaticallyOpenTestResults": "openOnTestStart",
+    // Code Formatting - 4 Space Indentation
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false,
+    "editor.formatOnSave": true,
+    "typescript.preferences.indentSize": 4,
+    "javascript.preferences.indentSize": 4,
+    "files.insertFinalNewline": true,
+    "files.trimTrailingWhitespace": true,
+    "[typescript]": {
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true,
+        "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+    "[typescriptreact]": {
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true,
+        "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+    "[javascript]": {
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true
+    },
+    "[json]": {
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true,
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "[jsonc]": {
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true,
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    // ESLint Configuration - ESLint 9 Flat Config
+    "eslint.enable": true,
+    "eslint.format.enable": true,
+    "eslint.lintTask.enable": true,
+    "eslint.run": "onType",
+    "eslint.useFlatConfig": true,
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact"
+    ],
+    "eslint.workingDirectories": [
+        "src/frontend"
+    ],
+    "eslint.codeAction.showDocumentation": {
+        "enable": true
+    },
+    "eslint.trace.server": "verbose",
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit",
+        "source.organizeImports": "explicit"
+    },
+    // TypeScript formatting configuration
+    "typescript.format.enable": true,
+    "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": true,
+    "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets": false,
+    "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": false,
+    "typescript.format.insertSpaceAfterSemicolonInForStatements": true,
+    "typescript.format.insertSpaceBeforeAndAfterBinaryOperators": true,
+    "typescript.format.insertSpaceAfterCommaDelimiter": true,
+    "typescript.format.insertSpaceAfterKeywordsInControlFlowStatements": true,
+    "typescript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": true,
+    "typescript.format.placeOpenBraceOnNewLineForFunctions": false,
+    "typescript.format.placeOpenBraceOnNewLineForControlBlocks": false,
+    "typescript.preferences.quoteStyle": "single",
+    "typescript.preferences.semicolons": "insert",
+    "chat.mcp.serverSampling": {
+        "MagicOrange_Intelligence/.vscode/mcp.json: Gaia": {
+            "allowedDuringChat": true
+        }
+    },
+    // C# / .NET Backend Settings
+    "[csharp]": {
+        "editor.defaultFormatter": "ms-dotnettools.csharp",
+        "editor.formatOnSave": true,
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true
+    },
+    "omnisharp.enableRoslynAnalyzers": true,
+    "omnisharp.enableEditorConfigSupport": true,
+    "omnisharp.analyzeOpenDocumentsOnly": false,
+    "csharp.format.enable": true,
+    "csharp.suppressDotnetRestoreNotification": true,
+    "dotnet.enableXMLDocCommentsPreview": true,
+    "dotnet.completion.showCompletionItemsFromUnimportedNamespaces": true,
+    // Coverage Gutters for Backend
+    "coverage-gutters.coverageFileNames": [
+        "coverage.cobertura.xml",
+        "coverage/coverage.cobertura.xml",
+        "lcov.info",
+        "coverage/lcov.info",
+        "src/backend/**/coverage/*.cobertura.xml"
+    ],
+    "coverage-gutters.showGutterCoverage": true,
+    "coverage-gutters.watchOnActivate": true,
+    "coverage-gutters.showLineCoverage": true,
+    "coverage-gutters.showRulerCoverage": true,
+    "dotnet.formatting.organizeImportsOnFormat": true
 }

@@ -1,10 +1,10 @@
-using FrostAura.MCP.Gaia.Interfaces;
-using FrostAura.MCP.Gaia.Models;
-using FrostAura.MCP.Gaia.Configuration;
-using Microsoft.Extensions.Configuration;
-using ModelContextProtocol.Server;
 using System.ComponentModel;
 using System.Text.Json;
+using FrostAura.MCP.Gaia.Configuration;
+using FrostAura.MCP.Gaia.Interfaces;
+using FrostAura.MCP.Gaia.Models;
+using Microsoft.Extensions.Configuration;
+using ModelContextProtocol.Server;
 
 namespace FrostAura.MCP.Gaia.Managers;
 
@@ -64,7 +64,7 @@ public class TaskPlannerManager : ITaskPlannerManager
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
-        
+
         await _repository.AddPlanAsync(plan);
         var json = JsonSerializer.Serialize(plan, _jsonOptions);
         return json;
@@ -73,37 +73,33 @@ public class TaskPlannerManager : ITaskPlannerManager
     /// <summary>
     /// Lists all project plans via MCP
     /// </summary>
-    /// <param name="hideCompleted">Optional string to hide completed plans ("true" to hide, anything else to show all)</param>
+    /// <param name="hideCompletedPlansAndTasks">Whether to hide completed plans & tasks. Ideal for only fetching plans with outstanding tasks.</param>
     /// <returns>JSON string containing all project plans with their status and progress information</returns>
     [McpServerTool]
     [Description("Lists all project plans with their IDs, names, descriptions, progress metrics, and calculated status. Does not include tasks.")]
     public async Task<string> ListPlansAsync(
-        [Description("Optional string to hide completed plans (\"true\" to hide completed plans, anything else shows all)")] string? hideCompleted = null)
+        [Description("Whether to hide completed plans & tasks. Ideal for only fetching plans with outstanding tasks.")] bool hideCompletedPlansAndTasks)
     {
-        // Parse hideCompleted parameter
-        bool shouldHideCompleted = !string.IsNullOrEmpty(hideCompleted) && 
-                                   hideCompleted.Equals("true", StringComparison.OrdinalIgnoreCase);
-
         // Get all plans
         var plans = await _repository.GetAllPlansAsync();
-        
+
         // Create plan summaries with calculated status and progress
         var planSummaries = new List<object>();
-        
+
         foreach (var plan in plans)
         {
             // Get tasks for this plan to calculate status and progress
             var tasks = await _repository.GetTasksByPlanAsync(plan.Id);
-            
+
             // Calculate plan status and progress metrics
             string planStatus = "Todo"; // Default status
-            
+
             // Calculate progress statistics
             var totalTasks = tasks.Count;
             var completedTasks = tasks.Count(t => t.Status == Enums.TaskStatus.Completed);
             var inProgressTasks = tasks.Count(t => t.Status == Enums.TaskStatus.InProgress);
             var pendingTasks = tasks.Count(t => t.Status == Enums.TaskStatus.Todo);
-            
+
             if (tasks.Any())
             {
                 if (completedTasks == totalTasks)
@@ -116,23 +112,25 @@ public class TaskPlannerManager : ITaskPlannerManager
                 }
                 // else remains "Todo"
             }
-            
+
             // Skip completed plans if hideCompleted is true
-            if (shouldHideCompleted && planStatus == "Completed")
+            if (hideCompletedPlansAndTasks && planStatus == "Completed")
             {
                 continue;
             }
-            
+
+            if (hideCompletedPlansAndTasks) tasks = tasks.Where(t => t.Status != Enums.TaskStatus.Completed).ToList();
+
             // Calculate estimate hours by status
             var totalTaskEstimateHours = tasks.Sum(t => t.EstimateHours);
             var completedTaskEstimateHours = tasks.Where(t => t.Status == Enums.TaskStatus.Completed).Sum(t => t.EstimateHours);
             var inProgressTaskEstimateHours = tasks.Where(t => t.Status == Enums.TaskStatus.InProgress).Sum(t => t.EstimateHours);
             var pendingTaskEstimateHours = tasks.Where(t => t.Status == Enums.TaskStatus.Todo).Sum(t => t.EstimateHours);
-            
+
             // Calculate completion percentages
             var completionPercentage = totalTasks > 0 ? Math.Round((double)completedTasks / totalTasks * 100, 2) : 0.0;
             var estimateCompletionPercentage = totalTaskEstimateHours > 0 ? Math.Round(completedTaskEstimateHours / totalTaskEstimateHours * 100, 2) : 0.0;
-            
+
             planSummaries.Add(new
             {
                 id = plan.Id,
@@ -159,7 +157,7 @@ public class TaskPlannerManager : ITaskPlannerManager
                 updatedAt = plan.UpdatedAt
             });
         }
-        
+
         var json = JsonSerializer.Serialize(planSummaries, _jsonOptions);
         return json;
     }
@@ -168,34 +166,30 @@ public class TaskPlannerManager : ITaskPlannerManager
     /// Gets all tasks from a specific plan via MCP
     /// </summary>
     /// <param name="planId">ID of the plan to get tasks from</param>
-    /// <param name="hideCompleted">Optional string to hide completed tasks ("true" to hide, anything else to show all)</param>
+    /// <param name="hideCompletedTasks">Whether to hide completed tasks. Ideal for only fetching plans with outstanding tasks.</param>
     /// <returns>JSON string containing all tasks for the specified plan in hierarchical structure</returns>
     [McpServerTool]
     [Description("Gets all tasks from a specific plan with their IDs, titles, descriptions, and status details in hierarchical structure.")]
     public async Task<string> GetTasksFromPlan(
         [Description("ID of the plan to get tasks from")] string planId,
-        [Description("Optional string to hide completed tasks (\"true\" to hide completed tasks, anything else shows all)")] string? hideCompleted = null)
+        [Description("Whether to hide completed tasks. Ideal for only fetching plans with outstanding tasks.")] bool hideCompletedTasks = true)
     {
         // Input validation
         if (string.IsNullOrWhiteSpace(planId))
             throw new ArgumentException("Plan ID cannot be null or empty.", nameof(planId));
 
-        // Parse hideCompleted parameter
-        bool shouldHideCompleted = !string.IsNullOrEmpty(hideCompleted) && 
-                                   hideCompleted.Equals("true", StringComparison.OrdinalIgnoreCase);
-
         // Get all tasks for the plan
         var tasks = await _repository.GetTasksByPlanAsync(planId);
-        
+
         // Filter out completed tasks if requested
-        if (shouldHideCompleted)
+        if (hideCompletedTasks)
         {
             tasks = tasks.Where(t => t.Status != Enums.TaskStatus.Completed).ToList();
         }
-        
+
         // Build hierarchical structure
         var hierarchicalTasks = BuildTaskHierarchyForPlan(tasks);
-        
+
         var json = JsonSerializer.Serialize(hierarchicalTasks, _jsonOptions);
         return json;
     }
@@ -241,7 +235,7 @@ public class TaskPlannerManager : ITaskPlannerManager
 
         var tagList = string.IsNullOrWhiteSpace(tags) ? new List<string>() : tags.Split(',').Select(t => t.Trim()).ToList();
         var groupList = string.IsNullOrWhiteSpace(groups) ? new List<string>() : groups.Split(',').Select(g => g.Trim()).ToList();
-        
+
         var task = new TaskItem
         {
             Id = Guid.NewGuid().ToString(),
@@ -257,7 +251,7 @@ public class TaskPlannerManager : ITaskPlannerManager
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
-        
+
         await _repository.AddTaskAsync(task);
         var json = JsonSerializer.Serialize(task, _jsonOptions);
         return json;
@@ -279,111 +273,114 @@ public class TaskPlannerManager : ITaskPlannerManager
 
         // Get the root task
         var rootTask = await _repository.GetTaskByIdAsync(taskId);
-        
+
         if (rootTask == null)
         {
-            var notFoundResult = new { 
-                message = "Task not found", 
-                taskId, 
-                task = (TaskItem?)null 
+            var notFoundResult = new
+            {
+                message = "Task not found",
+                taskId,
+                task = (TaskItem?)null
             };
             return JsonSerializer.Serialize(notFoundResult, _jsonOptions);
         }
 
         // Get all tasks for the same plan to build the hierarchy
         var allTasks = await _repository.GetTasksByPlanAsync(rootTask.PlanId);
-        
+
         // Build the hierarchical structure starting from the root task
         var taskWithChildren = await BuildTaskHierarchyAsync(rootTask, allTasks);
-        
-        var result = new { 
-            message = "Task retrieved successfully", 
-            taskId, 
-            task = taskWithChildren 
+
+        var result = new
+        {
+            message = "Task retrieved successfully",
+            taskId,
+            task = taskWithChildren
         };
-        
+
         return JsonSerializer.Serialize(result, _jsonOptions);
     }
 
     /// <summary>
-    /// Marks a task as completed via MCP
+    /// Marks a task as completed and sets the completion timestamp. This tool updates the task status to 'Completed' and records when it was completed.
     /// </summary>
-    /// <param name="taskId">ID of the task to mark as completed</param>
-    /// <param name="hasPassedMinimalQualityGates">String indicating that the caller has confirmed the solution builds and all tests pass ("true" to confirm quality gates passed)</param>
-    /// <param name="hasAddedCleanupTasks">String indicating that the caller has added the necessary cleanup tasks for any potential shortcuts taken, dummy or mock data used, code commented out etc. ("true" to confirm cleanup tasks added)</param>
+    /// <param name="taskId">ID of the task to mark as completed.</param>
+    /// <param name="hasValidatedThinkingPriorToCompletion">Whether you have used your CritiqueThought tool prior to considering the task completed.This is **mandatory**.</param>
+    /// <param name="hasFullUnitTestsCoverageWithAllPassingTests">Whether you have confirmed the entire solution builds successfully, we optained **100% test coverage** of the task **and** entire solution and all tests pass before marking task as completed. `npm run test:unit` should be leveraged here or the available NPM command for testing, for this project.</param>
+    /// <param name="hasAddedCleanupTasks">Whether the caller has added the necessary cleanup tasks for any potential shortcuts taken, dummy or mock data used, code commented out, temporary files created etc. These tasks are typically nested tasks (level-2 tasks), associated with the larger task.</param>
     /// <returns>JSON string containing the updated task</returns>
     [McpServerTool]
-    [Description("Marks a task as completed and sets the completion timestamp. This tool updates the task status to 'Completed' and records when it was completed.")]
+    [Description($@"
+        - Marks a task as completed and sets the completion timestamp. This tool updates the task status to 'Completed' and records when it was completed.
+        - You **must be honest and truthful**. For each of the parameters that require bools, you must ensure you perform the applicable tasks in order to be allowed to proceed with completion.
+            - You must not take shortcuts.
+            - You must not care about what work is scoped to the ticket, all checks must pass regardless.
+            - You must provide a value for all parameters, truthfully. **If not all parameters are provided, the tool is expected to produce an error.
+    ")]
     public async Task<string> MarkTaskAsCompletedAsync(
-        [Description("ID of the task to mark as completed")] string taskId,
-        [Description("String indicating that the caller has confirmed the entire solution builds successfully and all tests pass before marking task as completed (\"true\" to confirm quality gates passed). You **must be honest and truthful**.")] string hasPassedMinimalQualityGates,
-        [Description("String indicating that the caller has added the necessary cleanup tasks for any potential shortcuts taken, dummy or mock data used, code commented out etc. (\"true\" to confirm cleanup tasks added).  You **must be honest and truthful**.")]
-        string hasAddedCleanupTasks)
+        [Description("ID of the task to mark as completed.")] string taskId,
+        [Description($"Whether you have used your {nameof(ThinkingManager.DoubleCheckThoughtAsync)} tool prior to considering the task completed. This is **mandatory** not just for when you struggle but for general feedback. Consider the {nameof(ThinkingManager.DoubleCheckThoughtAsync)} tool a reviewer.")] bool hasValidatedThinkingPriorToCompletion,
+        [Description("Whether you have confirmed the entire solution builds successfully, we optained **100% test coverage** of the task **and** entire solution and all tests pass before marking task as completed. `npm run test:unit` should be leveraged here or the available NPM command for testing, for this project.")] bool hasFullUnitTestsCoverageWithAllPassingTests,
+        [Description("Whether the caller has added the necessary cleanup tasks for any potential shortcuts taken, dummy or mock data used, code commented out, temporary files created etc. These tasks are typically nested tasks (level-2 tasks), associated with the larger task.")]
+        bool hasAddedCleanupTasks)
     {
         // Input validation
         if (string.IsNullOrWhiteSpace(taskId))
             throw new ArgumentException("Task ID cannot be null or empty.", nameof(taskId));
 
-        // Parse hasPassedMinimalQualityGates parameter
-        bool qualityGatesPassed = !string.IsNullOrEmpty(hasPassedMinimalQualityGates) && 
-                                  hasPassedMinimalQualityGates.Equals("true", StringComparison.OrdinalIgnoreCase);
-
         // Quality gates validation
-        if (!qualityGatesPassed)
+        if (!hasFullUnitTestsCoverageWithAllPassingTests)
         {
-            var qualityGatesResult = new { 
-                message = "Quality gates validation failed. You must ensure the entire solution builds successfully and all tests pass before attempting to mark task as completed. Set hasPassedMinimalQualityGates to \"true\" only after confirming the solution is in a stable state.", 
-                taskId, 
+            var qualityGatesResult = new
+            {
+                message = "Quality gates validation failed. You must ensure the entire solution builds successfully and all tests pass before attempting to mark task as completed. Set hasPassedMinimalQualityGates to \"true\" only after confirming the solution is in a stable state.",
+                taskId,
                 success = false,
                 error = "QualityGatesNotMet",
-                requirements = new[] 
+                requirements = new[]
                 {
                     "Solution must build successfully without errors",
                     "All unit tests must pass",
                     "All integration tests must pass",
                     "Code quality checks must pass"
                 },
-                providedQualityGatesStatus = hasPassedMinimalQualityGates,
-                parsedQualityGatesStatus = qualityGatesPassed
+                hasFullUnitTestsCoverageWithAllPassingTests
             };
             return JsonSerializer.Serialize(qualityGatesResult, _jsonOptions);
         }
 
-        // Parse hasAddedCleanupTasks parameter
-        bool cleanupTasksAdded = !string.IsNullOrEmpty(hasAddedCleanupTasks) && 
-                                 hasAddedCleanupTasks.Equals("true", StringComparison.OrdinalIgnoreCase);
-
         // Cleanup tasks validation
-        if (!cleanupTasksAdded)
+        if (!hasAddedCleanupTasks)
         {
-            var cleanupTasksResult = new { 
-                message = "Cleanup tasks validation failed. You must add the necessary cleanup tasks for any potential shortcuts taken, dummy or mock data used, code commented out etc. before attempting to mark task as completed. Set hasAddedCleanupTasks to \"true\" only after confirming cleanup tasks have been added.", 
-                taskId, 
+            var cleanupTasksResult = new
+            {
+                message = "Cleanup tasks validation failed. You must add the necessary cleanup tasks for any potential shortcuts taken, dummy or mock data used, code commented out etc. before attempting to mark task as completed.",
+                taskId,
                 success = false,
                 error = "CleanupTasksNotAdded",
-                requirements = new[] 
+                requirements = new[]
                 {
                     "All shortcuts must have corresponding cleanup tasks",
                     "Any dummy or mock data usage must have cleanup tasks",
                     "Any commented out code must have cleanup tasks",
                     "Any temporary solutions must have proper implementation tasks"
                 },
-                providedCleanupTasksStatus = hasAddedCleanupTasks,
-                parsedCleanupTasksStatus = cleanupTasksAdded
+                hasAddedCleanupTasks
             };
             return JsonSerializer.Serialize(cleanupTasksResult, _jsonOptions);
         }
 
         // Get the task
         var task = await _repository.GetTaskByIdAsync(taskId);
-        
+
         if (task == null)
         {
-            var notFoundResult = new { 
-                message = "Task not found", 
-                taskId, 
+            var notFoundResult = new
+            {
+                message = "Task not found",
+                taskId,
                 success = false,
-                task = (TaskItem?)null 
+                task = (TaskItem?)null
             };
             return JsonSerializer.Serialize(notFoundResult, _jsonOptions);
         }
@@ -391,9 +388,10 @@ public class TaskPlannerManager : ITaskPlannerManager
         // Check if task is already completed
         if (task.Status == Enums.TaskStatus.Completed)
         {
-            var alreadyCompletedResult = new { 
-                message = "Task is already completed", 
-                taskId, 
+            var alreadyCompletedResult = new
+            {
+                message = "Task is already completed",
+                taskId,
                 success = false,
                 task,
                 completedAt = task.CompletedAt
@@ -409,122 +407,15 @@ public class TaskPlannerManager : ITaskPlannerManager
         // Save the updated task
         await _repository.UpdateTaskAsync(task);
 
-        var successResult = new { 
-            message = "Task marked as completed successfully", 
-            taskId, 
+        var successResult = new
+        {
+            message = "Task marked as completed successfully",
+            taskId,
             success = true,
             task,
             completedAt = task.CompletedAt
         };
-        
-        return JsonSerializer.Serialize(successResult, _jsonOptions);
-    }
 
-    /// <summary>
-    /// Updates the status of a task via MCP
-    /// </summary>
-    /// <param name="taskId">ID of the task to update</param>
-    /// <param name="status">New status for the task</param>
-    /// <param name="hasPassedMinimalQualityGates">String indicating that the caller has confirmed the solution builds and all tests pass ("true" to confirm quality gates passed)</param>
-    /// <returns>JSON string containing the updated task</returns>
-    // [McpServerTool]
-    [Description("Updates the status of a task. Available statuses are: Todo, InProgress, Completed, Blocked, Cancelled. When marking as Completed, automatically sets completion timestamp.")]
-    public async Task<string> UpdateTaskStatusAsync(
-        [Description("ID of the task to update")] string taskId,
-        [Description("New status for the task (Todo, InProgress, Completed, Blocked, Cancelled)")] string status,
-        [Description("String indicating that the caller has confirmed the entire solution builds successfully and all tests pass before changing task status (\"true\" to confirm quality gates passed)")] string hasPassedMinimalQualityGates)
-    {
-        // Input validation
-        if (string.IsNullOrWhiteSpace(taskId))
-            throw new ArgumentException("Task ID cannot be null or empty.", nameof(taskId));
-        if (string.IsNullOrWhiteSpace(status))
-            throw new ArgumentException("Status cannot be null or empty.", nameof(status));
-
-        // Parse hasPassedMinimalQualityGates parameter
-        bool qualityGatesPassed = !string.IsNullOrEmpty(hasPassedMinimalQualityGates) && 
-                                  hasPassedMinimalQualityGates.Equals("true", StringComparison.OrdinalIgnoreCase);
-
-        // Quality gates validation
-        if (!qualityGatesPassed)
-        {
-            var qualityGatesResult = new { 
-                message = "Quality gates validation failed. You must ensure the entire solution builds successfully and all tests pass before attempting to change task status. Set hasPassedMinimalQualityGates to \"true\" only after confirming the solution is in a stable state.", 
-                taskId, 
-                success = false,
-                error = "QualityGatesNotMet",
-                requirements = new[] 
-                {
-                    "Solution must build successfully without errors",
-                    "All unit tests must pass",
-                    "All integration tests must pass",
-                    "Code quality checks must pass"
-                },
-                providedQualityGatesStatus = hasPassedMinimalQualityGates,
-                parsedQualityGatesStatus = qualityGatesPassed
-            };
-            return JsonSerializer.Serialize(qualityGatesResult, _jsonOptions);
-        }
-
-        // Parse and validate status
-        if (!Enum.TryParse<Enums.TaskStatus>(status, true, out var taskStatus))
-        {
-            var invalidStatusResult = new { 
-                message = $"Invalid status '{status}'. Valid statuses are: {string.Join(", ", Enum.GetNames<Enums.TaskStatus>())}", 
-                taskId, 
-                success = false,
-                providedStatus = status,
-                validStatuses = Enum.GetNames<Enums.TaskStatus>()
-            };
-            return JsonSerializer.Serialize(invalidStatusResult, _jsonOptions);
-        }
-
-        // Get the task
-        var task = await _repository.GetTaskByIdAsync(taskId);
-        
-        if (task == null)
-        {
-            var notFoundResult = new { 
-                message = "Task not found", 
-                taskId, 
-                success = false,
-                task = (TaskItem?)null 
-            };
-            return JsonSerializer.Serialize(notFoundResult, _jsonOptions);
-        }
-
-        var previousStatus = task.Status;
-        var wasCompleted = task.Status == Enums.TaskStatus.Completed;
-
-        // Update task status and timestamps
-        task.Status = taskStatus;
-        task.UpdatedAt = DateTime.UtcNow;
-
-        // Handle completion timestamp logic
-        if (taskStatus == Enums.TaskStatus.Completed && !wasCompleted)
-        {
-            // Task is being marked as completed for the first time
-            task.CompletedAt = DateTime.UtcNow;
-        }
-        else if (taskStatus != Enums.TaskStatus.Completed && wasCompleted)
-        {
-            // Task is being moved away from completed status
-            task.CompletedAt = null;
-        }
-        // If already completed and staying completed, keep existing CompletedAt
-
-        // Save the updated task
-        await _repository.UpdateTaskAsync(task);
-
-        var successResult = new { 
-            message = $"Task status updated successfully from '{previousStatus}' to '{taskStatus}'", 
-            taskId, 
-            success = true,
-            task,
-            previousStatus = previousStatus.ToString(),
-            newStatus = taskStatus.ToString(),
-            completedAt = task.CompletedAt
-        };
-        
         return JsonSerializer.Serialize(successResult, _jsonOptions);
     }
 
@@ -557,17 +448,17 @@ public class TaskPlannerManager : ITaskPlannerManager
 
         // Find all direct children of this task
         var children = allTasks.Where(t => t.ParentTaskId == parentTask.Id).ToList();
-        
+
         // Recursively build hierarchy for each child
         foreach (var child in children)
         {
             var childWithHierarchy = await BuildTaskHierarchyAsync(child, allTasks);
             taskWithChildren.Children.Add(childWithHierarchy);
         }
-        
+
         // Sort children by creation date for consistent ordering
         taskWithChildren.Children = taskWithChildren.Children.OrderBy(c => c.CreatedAt).ToList();
-        
+
         return taskWithChildren;
     }
 
@@ -596,9 +487,9 @@ public class TaskPlannerManager : ITaskPlannerManager
             completedAt = t.CompletedAt,
             children = new List<object>()
         });
-        
+
         var rootTasks = new List<object>();
-        
+
         // Build the hierarchy
         foreach (var task in tasks)
         {
@@ -613,7 +504,7 @@ public class TaskPlannerManager : ITaskPlannerManager
             else
             {
                 // This is a child task
-                if (taskDict.TryGetValue(task.Id, out var childTask) && 
+                if (taskDict.TryGetValue(task.Id, out var childTask) &&
                     taskDict.TryGetValue(task.ParentTaskId, out var parentTask))
                 {
                     ((List<object>)parentTask.children).Add(childTask);
@@ -625,13 +516,13 @@ public class TaskPlannerManager : ITaskPlannerManager
                 }
             }
         }
-        
+
         // Sort root tasks by creation date for consistent ordering
         rootTasks = rootTasks.OrderBy(t => ((dynamic)t).createdAt).ToList();
-        
+
         // Recursively sort children by creation date
         SortChildrenRecursively(rootTasks);
-        
+
         return rootTasks;
     }
 
@@ -649,7 +540,7 @@ public class TaskPlannerManager : ITaskPlannerManager
                 var sortedChildren = children.OrderBy(c => ((dynamic)c).createdAt).ToList();
                 children.Clear();
                 children.AddRange(sortedChildren);
-                
+
                 // Recursively sort grandchildren
                 SortChildrenRecursively(children);
             }

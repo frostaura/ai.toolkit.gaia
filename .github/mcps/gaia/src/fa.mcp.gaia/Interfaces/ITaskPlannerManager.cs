@@ -18,17 +18,17 @@ public interface ITaskPlannerManager
     /// <summary>
     /// Lists all project plans via MCP
     /// </summary>
-    /// <param name="hideCompleted">Optional string to hide completed plans ("true" to hide, anything else to show all)</param>
+    /// <param name="hideCompletedPlansAndTasks">Whether to hide completed plans & tasks. Ideal for only fetching plans with outstanding tasks.</param>
     /// <returns>JSON string containing all project plans with their status and progress information</returns>
-    Task<string> ListPlansAsync(string? hideCompleted = null);
+    Task<string> ListPlansAsync(bool hideCompletedPlansAndTasks);
 
     /// <summary>
     /// Gets all tasks from a specific plan via MCP
     /// </summary>
     /// <param name="planId">ID of the plan to get tasks from</param>
-    /// <param name="hideCompleted">Optional string to hide completed tasks ("true" to hide, anything else to show all)</param>
+    /// <param name="hideCompletedTasks">Whether to hide completed tasks. Ideal for only fetching plans with outstanding tasks.</param>
     /// <returns>JSON string containing all tasks for the specified plan in hierarchical structure</returns>
-    Task<string> GetTasksFromPlan(string planId, string? hideCompleted = null);
+    Task<string> GetTasksFromPlan(string planId, bool hideCompletedTasks);
 
     /// <summary>
     /// Adds a new Task item via MCP
@@ -52,23 +52,16 @@ public interface ITaskPlannerManager
     Task<string> GetTaskWithChildrenByIdAsync(string taskId);
 
     /// <summary>
-    /// Marks a task as completed via MCP
+    /// Marks a task as completed and sets the completion timestamp. This tool updates the task status to 'Completed' and records when it was completed.
     /// </summary>
-    /// <param name="taskId">ID of the task to mark as completed</param>
-    /// <param name="hasPassedMinimalQualityGates">String indicating that the caller has confirmed the solution builds and all tests pass ("true" to confirm quality gates passed)</param>
-    /// <param name="hasAddedCleanupTasks">String indicating that the caller has added the necessary cleanup tasks for any potential shortcuts taken, dummy or mock data used, code commented out etc. ("true" to confirm cleanup tasks added)</param>
+    /// <param name="taskId">ID of the task to mark as completed.</param>
+    /// <param name="hasValidatedThinkingPriorToCompletion">Whether you have used your CritiqueThought tool prior to considering the task completed.This is **mandatory**.</param>
+    /// <param name="hasFullUnitTestsCoverageWithAllPassingTests">Whether you have confirmed the entire solution builds successfully, we optained **100% test coverage** of the task **and** entire solution and all tests pass before marking task as completed. `npm run test:unit` should be leveraged here or the available NPM command for testing, for this project.</param>
+    /// <param name="hasAddedCleanupTasks">Whether the caller has added the necessary cleanup tasks for any potential shortcuts taken, dummy or mock data used, code commented out, temporary files created etc. These tasks are typically nested tasks (level-2 tasks), associated with the larger task.</param>
     /// <returns>JSON string containing the updated task</returns>
     Task<string> MarkTaskAsCompletedAsync(
         string taskId,
-        string hasPassedMinimalQualityGates,
-        string hasAddedCleanupTasks);
-
-    /// <summary>
-    /// Updates the status of a task via MCP
-    /// </summary>
-    /// <param name="taskId">ID of the task to update</param>
-    /// <param name="status">New status for the task (Todo, InProgress, Completed, Blocked, Cancelled)</param>
-    /// <param name="hasPassedMinimalQualityGates">String indicating that the caller has confirmed the solution builds and all tests pass ("true" to confirm quality gates passed)</param>
-    /// <returns>JSON string containing the updated task</returns>
-    Task<string> UpdateTaskStatusAsync(string taskId, string status, string hasPassedMinimalQualityGates);
+        bool hasValidatedThinkingPriorToCompletion,
+        bool hasFullUnitTestsCoverageWithAllPassingTests,
+        bool hasAddedCleanupTasks);
 }

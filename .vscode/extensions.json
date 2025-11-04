@@ -1,11 +1,28 @@
 {
     "recommendations": [
+        // Database
         "ckolkman.vscode-postgres",
+        // AI/Copilot
         "github.copilot",
         "github.copilot-chat",
+        // Gaia AI Toolkit (Local Extension)
+        "gaia.gaia-plans-viewer",
+        // .NET / C# Development
+        "ms-dotnettools.csharp",
+        "ms-dotnettools.csdevkit",
+        // Code Coverage
+        "ryanluker.vscode-coverage-gutters",
+        // Frontend Development
+        "dbaeumer.vscode-eslint",
+        "orta.vscode-jest",
+        "styled-components.vscode-styled-components",
+        "ms-playwright.playwright",
+        // DevOps & Docker
+        "ms-azuretools.vscode-docker",
+        "github.vscode-github-actions",
+        // UI/UX
         "gruntfuggly.todo-tree",
         "illixion.vscode-vibrancy-continued",
-        "ms-azuretools.vscode-docker",
         "oderwat.indent-rainbow",
         "ritwickdey.liveserver",
         "robbowen.synthwave-vscode",

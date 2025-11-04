@@ -9,11 +9,7 @@
                 "--caps=vision"
             ]
         },
-        "react-bits-mcp": {
-            "command": "npx",
-            "args": ["mcp-remote", "https://react-bits-mcp.davidhzdev.workers.dev/sse"]
-        },
-        "Gaia": {
+        "gaia": {
             "type": "stdio",
             "command": "dotnet",
             "args": [
@@ -21,6 +17,15 @@
                 "--project",
                 ".github/mcps/gaia/src/fa.mcp.gaia/fa.mcp.gaia.csproj"
             ]
+        },
+        "chakra-ui": {
+            "type": "stdio",
+            "command": "npx",
+            "args": [
+                "-y",
+                "@chakra-ui/react-mcp"
+            ]
         }
-    }
+    },
+    "inputs": []
 }
