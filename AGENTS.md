@@ -1,0 +1,1 @@
+- Refer to .gaia/designs for all design documentation.
