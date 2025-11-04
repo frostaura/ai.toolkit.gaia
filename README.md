@@ -5,18 +5,18 @@
 <h1 align="center">
   <b>GAIA</b>
 </h1>
-<h3 align="center">🌍 The Gaia AI Coding Toolkit: For Automated Full-stack Software Development</h3>
+<h3 align="center">🌍 Gaia, Agents AI Coding Toolkit: For Automated Full-stack Software Development</h3>
 
 **Awaken your creative vision through GAIA's intelligence. Speak your dreams into existence, and watch as the Earth Mother transforms your intentions into production-ready applications.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Status](https://img.shields.io/badge/Status-Production%20Ready-green.svg)]()
 [![AI Enhanced](https://img.shields.io/badge/AI-Enhanced%20Intelligence-purple.svg)]()
-[![Version](https://img.shields.io/badge/Version-4.2-blue.svg)]()
+[![Version](https://img.shields.io/badge/Version-5.0-blue.svg)]()
 
 ## 📋 Requirements
 
-- **AI Assistant**: GitHub Copilot, Cursor AI, or similar
+- **AI Assistant**: GitHub Copilot CLI, Claude Code CLI
 - **Runtime**: Node.js 20+ LTS (managed with nvm)
 - **.NET SDK**: .NET 9 SDK (mandatory for local planner MCP)
 - **Containerization**: Docker 24+ & Docker Compose
