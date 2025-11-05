@@ -33,7 +33,6 @@
 - **React 18+** + **TypeScript 5+** for component architecture
 - **Redux Toolkit 2+** + **RTK Query** for predictable state management
 - **Tailwind CSS 3+** + **Ant Design 5+** for stunning UI foundation
-- **React Bits** (https://reactbits.dev/) for beautiful, production-ready components that inspire and impress
 - **React Router 6+** for client-side routing
 
 ### **Backend Foundation**
