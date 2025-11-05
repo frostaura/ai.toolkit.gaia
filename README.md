@@ -3,11 +3,11 @@
 </p>
 
 <h1 align="center">
-  <b>GAIA</b>
+  <b>GAIA 5</b>
 </h1>
-<h3 align="center">🌍 Gaia, Agents AI Coding Toolkit: For Automated Full-stack Software Development</h3>
+<h3 align="center">🌍 Gaia 5 Agent System: Autonomous AI Software Development Workforce</h3>
 
-**Awaken your creative vision through GAIA's intelligence. Speak your dreams into existence, and watch as the Earth Mother transforms your intentions into production-ready applications.**
+**Awaken your creative vision through GAIA 5's specialized agent intelligence. Speak your dreams into existence, and watch as 20 autonomous agents transform your intentions into production-ready applications.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Status](https://img.shields.io/badge/Status-Production%20Ready-green.svg)]()
@@ -97,6 +97,58 @@ GAIA empowers you to manifest complete, production-ready applications across div
 - CI/CD pipelines with automated testing
 - Developer portals with API management
 
+## 🎭 The Gaia 5 Agent Revolution
+
+**20 Specialized AI Agents** working in perfect orchestration to build your application:
+
+### 🎯 **Core Orchestration**
+
+- **Gaia-Conductor**: Master orchestrator managing the entire pipeline
+
+### 🔍 **Analysis & Planning**
+
+- **Hestia**: Repository analysis and classification
+- **Decider**: SDLC strategy selection
+- **Cartographer**: Implementation planning
+- **Ledger**: Task management via MCP tools
+
+### 🏗️ **Design & Architecture**
+
+- **Athena**: Design system architecture
+- **SchemaForge**: Database design
+- **Iris**: API contracts
+- **Aegis**: Security implementation
+
+### 🔨 **Implementation**
+
+- **Builder**: Feature development
+- **Prometheus**: Infrastructure orchestration
+
+### 🧪 **Quality Assurance**
+
+- **Zeus**: Testing orchestration
+- **Apollo**: Unit testing (100% coverage)
+- **Hermes**: Integration testing
+- **Astra**: E2E automation
+- **Sentinel**: Regression testing
+- **Quicksilver**: Performance analysis
+
+### 🚀 **Operations**
+
+- **Helmsman**: Deployment management
+- **Cerberus**: Quality gates
+- **Scribe**: Documentation
+
+**Key Features:**
+
+- 🤖 **Autonomous Operation**: No user intervention required
+- 🎯 **100% Quality Standards**: Zero compromises on testing or coverage
+- 🧹 **Linting Excellence**: Comprehensive code quality standards with build integration
+- 👁️ **Agent Identification**: All responses prefixed with `[agent_name]:` for clear tracking
+- 🔄 **Intelligent Yielding**: Agents collaborate and escalate smartly
+- 📊 **Real-time Tracking**: MCP tools provide live progress visibility
+- 🛡️ **Regression Prevention**: Mandatory compatibility validation
+
 ## 📖 Table of Contents
 
 - [💫 Perfect For Building](#-perfect-for-building)
@@ -109,93 +161,247 @@ GAIA empowers you to manifest complete, production-ready applications across div
 - [🌍 Community & Support](#-community--support)
 - [🙏 Acknowledgments](#-acknowledgments--inspiration)
 
-## 🌟 Commune with GAIA in 3 Steps
+## 🌟 Commune with GAIA 5 Agents in 4 Steps
 
-> **🚀 Quick Start**: Already familiar with GAIA? Jump straight to invoking `/gaia-plan` in Copilot chat in agent mode and describe your vision, after cloning / forking the repository!
+> **🚀 Quick Start**: Experience the power of Gaia 5's specialized agent system! The AI workforce that builds production-ready applications autonomously.
 
-### Step 1: Preparation (2 minutes)
+### Step 1: Environment Setup (3 minutes)
 
 1. **Fork this repository** to your GitHub account
 2. **Clone the forked repository** to your local machine:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/fa.templates.vibe-coding.git
-   cd fa.templates.vibe-coding
+   git clone https://github.com/YOUR_USERNAME/ai.toolkit.gaia.git
+   cd ai.toolkit.gaia
    ```
-3. **Open in your AI-enhanced workspace**:
-   - VS Code with [GitHub Copilot](https://github.com/features/copilot)
+3. **Install GitHub Copilot CLI**:
+   ```bash
+   npm install -g @github/copilot
+   ```
 4. **Ensure you have the prerequisites**:
-   - Node.js 18+ and npm/yarn
+   - Node.js 20+ LTS and npm/yarn
+   - .NET 9 SDK (for Gaia MCP server)
    - Docker (for containerization)
    - Git for version control
 
-### Step 2: Invoke GAIA's Wisdom (1 minute)
+### Step 2: Configure MCP Tools (2 minutes)
 
-1. **Open the forked repository** in VS Code or Cursor AI
-2. **Open the AI chat interface**:
-   - In VS Code: Open GitHub Copilot Chat
-   - In Cursor AI: Open the chat panel
-3. **Switch to Agent mode** (if using VS Code with Copilot)
-4. **Invoke GAIA**: Type `/` in the chat input to see available agents, then select `gaia-plan`
-5. **Share your vision**: Describe your project in detail and attach 2-3 screenshots of frontend inspiration
-6. **Press ENTER** to begin the creation process
+1. **Create MCP configuration** at `~/.config/copilot/mcp-config.json`:
 
-### Step 3: Witness Creation ✨
+   ```json
+   {
+     "mcpServers": {
+       "playwright": {
+         "command": "npx",
+         "args": ["@playwright/mcp@latest"],
+         "tools": ["*"],
+         "transport": "stdio"
+       },
+       "gaia": {
+         "command": "dotnet",
+         "args": [
+           "run",
+           "--project",
+           "{{YOUR_GAIA_PATH}}/.github/mcps/gaia/src/fa.mcp.gaia/fa.mcp.gaia.csproj"
+         ],
+         "tools": ["*"],
+         "transport": "stdio"
+       },
+       "chakra-ui": {
+         "command": "npx",
+         "args": ["-y", "@chakra-ui/react-mcp"],
+         "tools": ["*"],
+         "transport": "stdio"
+       }
+     }
+   }
+   ```
 
-#### Step 3.1 🌍 GAIA'S FLOW
+   > **Important**: Replace `{{YOUR_GAIA_PATH}}` with the full absolute path to your cloned `ai.toolkit.gaia` repository
+   >
+   > **Example**: `/Users/yourname/Desktop/Projects/ai.toolkit.gaia`
 
-**CONTINUOUS CREATION**: GAIA's intelligence flows continuously, manifesting your vision without pause. Behold:
+2. **Verify MCP tools load** when starting GitHub Copilot CLI:
+   - ✅ Gaia MCP server (project planning and task management)
+   - ✅ Playwright MCP server (E2E testing and browser automation)
+   - ✅ Chakra UI MCP server (React component library integration)
 
-- ✅ **Milestone manifestations** revealed for tracking
-- ✅ **Progress reports** shared for transparency
-- ✅ **Status updates** displayed for awareness
-- ✅ **Continuous flow** to the next task
+### Step 3: Launch the Gaia Agent System (1 minute)
 
-**No intervention required** - GAIA works continuously until your vision becomes reality!
+1. **Start GitHub Copilot CLI** in your project root:
 
-#### Step 3.2 🚀 Automatic Development
+   ```bash
+   cd /path/to/your/ai.toolkit.gaia
+   gh copilot
+   ```
 
-**GAIA's Enhanced Intelligence** automatically and continuously:
+2. **Activate Agent Mode**:
 
-**🏗️ Architecture & Design Excellence**:
+   - Type `/agent` and press ENTER
+   - Select **Gaia-Conductor** from the agent list
+   - The master orchestrator is now ready to coordinate the entire agent workforce
 
-- ✅ **Sequential Design Process**: Use Cases → Class Diagrams → Sequence Flows → Frontend Design
-- ✅ **iDesign Architecture**: Manager/Engine/Data layer separation with clean interfaces
-- ✅ **Technology Stack Selection**: Battle-tested React/Next.js + Express/TypeScript + PostgreSQL/Prisma
-- ✅ **Responsive Design System**: Mobile-first with Tailwind CSS + Ant Design + React Bits for visually stunning components
+3. **Describe Your Vision**:
+
+   ```
+   I want to build a [describe your application]
+   - [Key features you want]
+   - [User types and permissions]
+   - [Any specific requirements]
+   ```
+
+4. **Optional: Direct Agent Interaction**:
+   - You can also ask Gaia-Conductor specific questions about:
+     - Architecture decisions
+     - Technology stack recommendations
+     - Implementation strategies
+     - Quality standards and testing approaches
+   - The conductor will coordinate with specialized agents as needed
+
+### Step 4: Witness the Agent Orchestra ✨
+
+#### 🎭 The Gaia 5 Agent Workforce
+
+**20 Specialized Agents** work in perfect harmony:
+
+**🔍 Analysis & Planning**:
+
+- **Hestia**: Repository state analysis (EMPTY | CODE+DESIGN | CODE-ONLY)
+- **Decider**: SDLC strategy selection
+- **Cartographer**: Implementation strategy design
+- **Ledger**: Task management via MCP tools
+
+**🏗️ Design & Architecture**:
+
+- **Athena**: Design system architecture
+- **SchemaForge**: Database design and migrations
+- **Iris**: API contract definition
+- **Aegis**: Security implementation
+
+**🔨 Implementation & Development**:
+
+- **Builder**: Feature development with regression prevention
+- **Prometheus**: Docker orchestration and service management
+
+**🧪 Quality Assurance & Testing**:
+
+- **Zeus**: Testing orchestration (coordinates all QA agents)
+- **Apollo**: 100% unit test coverage
+- **Hermes**: Integration testing with Playwright
+- **Astra**: E2E automation and visual regression
+- **Sentinel**: Regression testing and compatibility
+- **Quicksilver**: Performance analysis and optimization
+
+**🚀 Deployment & Operations**:
+
+- **Helmsman**: Release management and deployment
+- **Cerberus**: Quality gate enforcement
+
+**📝 Documentation**:
+
+- **Scribe**: Documentation curation and maintenance
+
+#### 🌊 Autonomous Development Flow
+
+**Phase 1: Repository Analysis & Planning**
+
+```
+Hestia → Decider → Athena → Cartographer → Ledger
+```
+
+- Analyzes your codebase state
+- Designs appropriate SDLC approach
+- Creates comprehensive design documentation
+- Plans implementation strategy
+- Captures tasks in MCP Gaia tools
+
+**Phase 2: Implementation & Testing**
+
+```
+Builder → Prometheus → Zeus → (Apollo, Hermes, Astra, Sentinel, Quicksilver)
+```
+
+- Implements features incrementally
+- Launches services for testing
+- Orchestrates comprehensive testing
+- Achieves 100% test coverage across all layers
+
+**Phase 3: Quality Gates & Deployment**
+
+```
+Cerberus → Helmsman
+```
+
+- Validates all quality standards
+- Manages deployment and release
+
+#### 🎯 What You Get (Automatically)
+
+**🏗️ Architecture Excellence**:
+
+- ✅ Sequential design process (Use Cases → Class Diagrams → Sequence Flows → Frontend Design)
+- ✅ Clean architecture with proper separation of concerns
+- ✅ Battle-tested technology stacks (React/TypeScript + .NET/C# + PostgreSQL)
+- ✅ Responsive design with Tailwind CSS + Chakra UI components
 
 **🔧 Implementation Excellence**:
 
-- ✅ **Comprehensive Scaffolding**: Frontend + Backend + Database + Docker setup
-- ✅ **Authentication System**: JWT tokens + bcrypt security + role-based access
-- ✅ **API Development**: RESTful endpoints with validation + error handling
-- ✅ **Database Integration**: Type-safe Prisma ORM with optimized queries
+- ✅ Complete scaffolding (Frontend + Backend + Database + Docker)
+- ✅ Authentication system (JWT + role-based access)
+- ✅ RESTful APIs with validation and error handling
+- ✅ Type-safe database integration
 
 **🧪 Quality Assurance Excellence**:
 
-- ✅ **Testing Framework**: 100% coverage with Vitest + Playwright + Visual regression
-- ✅ **Accessibility Compliance**: WCAG 2.1 AA standards with semantic HTML
-- ✅ **Performance Optimization**: Core Web Vitals + bundle optimization
-- ✅ **Security Hardening**: Input validation + rate limiting + vulnerability scanning
+- ✅ **100% Test Coverage**: Unit, integration, and E2E testing
+- ✅ **Visual Regression Testing**: Playwright-powered screenshot comparison
+- ✅ **Performance Monitoring**: Core Web Vitals compliance
+- ✅ **Security Hardening**: Input validation + vulnerability scanning
 
 **🚀 DevOps Excellence**:
 
-- ✅ **Docker Containerization**: Multi-stage builds + development/production environments
-- ✅ **CI/CD Pipeline**: GitHub Actions + automated testing + deployment
-- ✅ **Monitoring & Logging**: Error tracking + performance monitoring + health checks
-- ✅ **Production Readiness**: Load testing + security scanning + documentation
+- ✅ Docker containerization with multi-stage builds
+- ✅ CI/CD pipelines with automated testing
+- ✅ Production-ready deployment configuration
+- ✅ Real-time monitoring and error tracking
 
-**🎯 Enhanced Quality Gates**:
+**Result**: A complete, enterprise-grade application with zero manual intervention!
 
-- ✅ **Visual Testing**: Screenshot comparisons at mobile/tablet/desktop breakpoints
-- ✅ **Error Recovery**: Automated build fixes + dependency resolution + test repairs
-- ✅ **Integration Validation**: Frontend ↔ Backend ↔ Database connectivity testing
-- ✅ **User Experience**: Comprehensive form validation + loading states + error handling
+#### 🔍 Monitoring Agent Progress
 
-**Result:** A complete, production-ready application with enterprise-grade quality and comprehensive testing!
+**Real-time Visibility**: Watch the agent orchestra in action:
 
-#### Step 3.3 ⚠️ At The End (VALIDATION | MANDATORY)
+- 📋 **Task Planning**: Ledger creates and tracks tasks via MCP Gaia tools
+- 🏗️ **Implementation Progress**: Builder marks tasks complete as features develop
+- 🧪 **Testing Coordination**: Zeus orchestrates comprehensive testing across all agents
+- 📊 **Quality Metrics**: Each agent reports reflection scores (targeting 100%)
+- 🎯 **Quality Gates**: Cerberus validates all standards before progression
 
-**At the end of the run** we should run the following prompt repeatedly until our solution is as refined as we want it to be:
+**Agent Communication**: Observe the structured handoffs:
+
+```
+TASK_REQUEST → Agent Processing → TASK_RESULT
+- Deliverables: Completed work artifacts
+- Metrics: Reflection scores and measurements
+- Status: COMPLETE | NEEDS_ITERATION | BLOCKED | YIELD_TO_CALLER
+```
+
+**Autonomous Recovery**: Agents handle challenges independently:
+
+- **Yielding Protocol**: Sub-agents yield to callers when uncertain (no user interruption)
+- **Error Recovery**: Graceful degradation and alternative routing
+- **Quality Iteration**: Continuous refinement until 100% standards achieved
+
+#### 🎯 Final Validation
+
+**At the end of the agent workflow**, the system automatically ensures:
+
+- ✅ **Complete Implementation**: All use cases implemented with proper method bodies
+- ✅ **100% Test Coverage**: Unit, integration, and E2E testing across all layers
+- ✅ **Zero Errors/Warnings**: Clean builds with comprehensive code comments
+- ✅ **Design Alignment**: UI/UX matches frontend design specifications
+- ✅ **Production Readiness**: Enterprise-grade quality with performance optimization
+
+**Manual Validation** (Optional): Run the finalization prompt for additional refinement:
 
 ```
 [FINALIZE|VERIFY|POLISH]

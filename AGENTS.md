@@ -6,7 +6,10 @@ Gaia 5 introduces a sophisticated agent orchestration system that ensures consis
 
 - **Spec-Driven Development**: All work follows design documentation in `.gaia/designs` as the source of truth
 - **100% Quality Standards**: No compromises on testing, coverage, or quality metrics
+- **100% Plan Completion**: Workloads are NEVER complete until ALL tasks in the master plan are marked complete via MCP tools
+- **Linting Excellence**: Comprehensive linting systems for all frontend and backend projects with build integration
 - **Agent Specialization**: Each agent has specific expertise and clear responsibilities
+- **Agent Response Protocol**: All agent responses must be prefixed with `[agent_name]:` for clear identification
 - **Orchestrated Collaboration**: Agents work together through defined protocols and handoffs
 - **Regression Prevention**: Mandatory validation that new features don't break existing functionality
 - **Autonomous Operation**: Agents operate without user feedback, assuming full user backing at all decision points
@@ -106,12 +109,15 @@ Gaia 5 introduces a sophisticated agent orchestration system that ensures consis
 ### Mandatory Requirements
 
 - **100% Test Coverage**: Unit, integration, and E2E testing with no exceptions
+- **100% Plan Completion**: ALL tasks in the master plan must be marked complete via MCP tools before workload completion
+- **100% Linting Compliance**: All frontend and backend projects must pass linting with zero violations integrated into builds
 - **Zero Regression Tolerance**: New features cannot break existing functionality
 - **Design Document Alignment**: All tasks must reference `.gaia/designs` files
 - **Real Data Testing**: No mocks or static data in integration testing
 - **Performance Compliance**: All benchmarks must be met or exceeded
 - **Zero Test Skipping**: Never skip tests due to external dependencies, complexity, or feature scope
 - **Autonomous Infrastructure**: Agents set up all necessary test infrastructure and dependencies independently
+- **Build Integration**: Linting checks must run on every build and fail fast on violations
 
 ### Reflection Process
 
@@ -128,25 +134,59 @@ Every agent must achieve 100% on their reflection metrics before task completion
 ### MCP Tool Integration
 
 - **Exclusive MCP Usage**: All plan and task management through MCP Gaia tools
+- **NEVER Alter JSON Directly**: CRITICAL - Never modify plan JSON files directly - this violates the MCP architecture and breaks system integrity
+- **Single Plan per Workload**: One master plan per user request/project with hierarchical task structure
+- **Dynamic Task Creation**: Add sub-tasks on-demand as implementation details emerge (3-level nesting maximum)
 - **No File Creation**: Never create plan documents or progress files
 - **Real-time Tracking**: Task status updates as work progresses
 - **Session Resumption**: Query existing plans through MCP tools for continuation
+- **Tool-Only Operations**: All create, read, update operations must use MCP tools exclusively
 
 ### Plan Lifecycle
 
-1. **Creation**: Cartographer designs, Ledger captures via MCP tools
+1. **Creation**: Cartographer designs, Ledger captures **ONE master plan** via MCP tools
 2. **Execution**: Agents mark tasks complete through MCP tools as work progresses
-3. **Tracking**: Real-time status updates via MCP tool queries
-4. **Completion**: Plans maintained in MCP system for retrospectives
+3. **Dynamic Expansion**: Ledger adds sub-tasks on-demand as implementation details emerge
+4. **Tracking**: Real-time status updates via MCP tool queries
+5. **Completion**: Plans maintained in MCP system for retrospectives
+
+**CRITICAL**: At no point should any agent modify plan JSON files directly. All plan operations must use MCP tools exclusively.
+
+### Single Plan Architecture
+
+**Hierarchical Structure**:
+
+- **Level 1**: Major phases (Analysis, Design, Implementation, Testing, Deployment)
+- **Level 2**: Feature epics or component areas
+- **Level 3**: Specific implementation tasks and sub-tasks
+
+**Progressive Elaboration**:
+
+- Start with high-level tasks during initial planning
+- Add detailed sub-tasks as agents identify specific implementation needs
+- Maintain single plan integrity throughout project lifecycle
+- Use parent-child task relationships to preserve hierarchy
 
 ### Task Completion Protocol
 
 - **Agent Responsibility**: Each agent must mark their tasks complete using `mcp_gaia_mark_task_as_completed`
 - **Progress Coordination**: Ledger coordinates with agents for proper task completion marking
 - **Quality Validation**: Tasks marked complete only after meeting acceptance criteria
+- **100% Completion Mandatory**: Workload completion requires ALL tasks (including sub-tasks) marked complete
 - **Continuous Updates**: Task status updated in real-time as work progresses
+- **Final Validation**: Cerberus validates 100% plan completion before workload approval
 
 ## Agent Communication Protocol
+
+### Response Identification Protocol
+
+**Mandatory Agent Prefixing**: All agent responses must be prefixed with `[agent_name]:` for clear identification and tracking during orchestration.
+
+**Examples**:
+
+- `[Gaia-Conductor]: Analyzing repository state and routing to Hestia for classification...`
+- `[Builder]: Implementing authentication system with linting configuration...`
+- `[Zeus]: Coordinating comprehensive testing strategy across all QA agents...`
 
 ### Task Request Format
 
@@ -228,12 +268,23 @@ When a sub-agent encounters uncertainty or cannot determine the next appropriate
 - Performance monitoring and optimization requirements
 - Autonomous infrastructure setup for all testing requirements
 
+### For Code Quality and Linting
+
+- **Frontend Standards**: ESLint + Prettier with TypeScript support for all React projects
+- **Backend Standards**: StyleCop + EditorConfig for .NET, ESLint + Prettier for Node.js projects
+- **Build Integration**: Linting must run on every build and fail fast on violations
+- **Zero Tolerance**: All projects must achieve zero linting errors and warnings
+- **Pre-commit Validation**: Configure git hooks to prevent commits with linting violations
+- **IDE Integration**: Ensure seamless linting experience in VS Code and other development environments
+
 ### For Plan Management
 
+- **NEVER modify plan JSON files directly** - this is CRITICAL and violates MCP tool architecture
 - Use MCP Gaia tools exclusively for all plan and task management
 - Never create plan files or progress documents
 - Ensure agents mark tasks complete as work progresses using MCP tools
 - Maintain real-time task tracking through MCP tool integration
+- All plan operations (create, read, update, track) must use MCP tools only
 
 ---
 
