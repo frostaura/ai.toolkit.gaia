@@ -206,9 +206,9 @@ GAIA empowers you to manifest complete, production-ready applications across div
          "tools": ["*"],
          "transport": "stdio"
        },
-       "chakra-ui": {
+       "Ant Design Components": {
          "command": "npx",
-         "args": ["-y", "@chakra-ui/react-mcp"],
+         "args": ["-y", "mcp-antd-components"],
          "tools": ["*"],
          "transport": "stdio"
        }
@@ -223,7 +223,7 @@ GAIA empowers you to manifest complete, production-ready applications across div
 2. **Verify MCP tools load** when starting GitHub Copilot CLI:
    - ✅ Gaia MCP server (project planning and task management)
    - ✅ Playwright MCP server (E2E testing and browser automation)
-   - ✅ Chakra UI MCP server (React component library integration)
+   - ✅ Ant Design MCP server (React component library integration)
 
 ### Step 3: Launch the Gaia Agent System (1 minute)
 
@@ -341,7 +341,7 @@ Cerberus → Helmsman
 - ✅ Sequential design process (Use Cases → Class Diagrams → Sequence Flows → Frontend Design)
 - ✅ Clean architecture with proper separation of concerns
 - ✅ Battle-tested technology stacks (React/TypeScript + .NET/C# + PostgreSQL)
-- ✅ Responsive design with Tailwind CSS + Chakra UI components
+- ✅ Responsive design with Tailwind CSS + Ant Design components
 
 **🔧 Implementation Excellence**:
 

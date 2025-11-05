@@ -138,7 +138,7 @@ For enhanced visual appeal and modern UI patterns, leverage React Bits component
 - Combine with Tailwind CSS for consistent spacing, colors, and responsive design  
 - Maintain accessibility standards while enhancing visual appeal
 - Use React Bits for inspiration and direct implementation of beautiful UI patterns
-- **Fallback Hierarchy**: ReactBits (via MCP tools) → Ant Design → ChakraUI → Custom components
+- **Fallback Hierarchy**: ReactBits (via MCP tools) → Ant Design → Custom components
 
 ## Information Architecture
 
