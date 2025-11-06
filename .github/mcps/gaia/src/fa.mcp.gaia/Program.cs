@@ -2,6 +2,7 @@
 using FrostAura.MCP.Gaia.Data;
 using FrostAura.MCP.Gaia.Interfaces;
 using FrostAura.MCP.Gaia.Managers;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -26,19 +27,30 @@ builder.Configuration
         ["Logging:LogLevel:Default"] = "Warning",
         ["Logging:LogLevel:Microsoft.Hosting.Lifetime"] = "Warning",
         ["Logging:LogLevel:ModelContextProtocol"] = "Warning",
-        ["TaskPlanner:DatabasePath"] = ".gaia/Gaia.TaskPlanner.db.json",
+
         ["TaskPlanner:WebhookUrl"] = "http://localhost:5001/api/webhook"
     });
 
+// Register Entity Framework
+builder.Services.AddDbContext<TaskPlannerDbContext>(options =>
+{
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
+                          "Data Source=/Users/deanmartin/Desktop/Projects/FrostAura/ai.toolkit.gaia/.gaia/Gaia.TaskPlanner.db";
+    options.UseSqlite(connectionString);
+});
+
 // Register Task Services
 builder.Services.AddHttpClient();
-builder.Services.AddScoped<TaskPlannerDbContext>();
 builder.Services.AddScoped<ITaskPlannerRepository, TaskPlannerRepository>();
 builder.Services.AddScoped<IWebhookRepository, WebhookRepository>();
+
+// Register Memory Services
+builder.Services.AddScoped<IMemoryRepository, MemoryRepository>();
 
 // Register Managers (now includes MCP tools)
 builder.Services.AddScoped<ITaskPlannerManager, TaskPlannerManager>();
 builder.Services.AddScoped<ILocalMachineManager, LocalMachineManager>();
+builder.Services.AddScoped<IMemoryManager, MemoryManager>();
 
 // Configure MCP Server
 builder.Services
@@ -47,6 +59,13 @@ builder.Services
     .WithToolsFromAssembly();
 
 var host = builder.Build();
+
+// Ensure database is created and up to date
+using (var scope = host.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<TaskPlannerDbContext>();
+    await dbContext.Database.MigrateAsync();
+}
 
 // Start the host directly
 await host.RunAsync();

@@ -195,19 +195,13 @@ GAIA empowers you to manifest complete, production-ready applications across div
          "tools": ["*"],
          "transport": "stdio"
        },
-       "gaia": {
+       "Gaia": {
          "command": "dotnet",
          "args": [
            "run",
            "--project",
            "{{YOUR_GAIA_PATH}}/.github/mcps/gaia/src/fa.mcp.gaia/fa.mcp.gaia.csproj"
          ],
-         "tools": ["*"],
-         "transport": "stdio"
-       },
-       "Ant Design Components": {
-         "command": "npx",
-         "args": ["-y", "mcp-antd-components"],
          "tools": ["*"],
          "transport": "stdio"
        }

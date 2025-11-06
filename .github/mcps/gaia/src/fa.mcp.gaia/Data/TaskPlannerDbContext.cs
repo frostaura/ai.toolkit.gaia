@@ -1,84 +1,131 @@
 using FrostAura.MCP.Gaia.Models;
-using FrostAura.MCP.Gaia.Enums;
-using FrostAura.MCP.Gaia.Configuration;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using System.Text.Json;
 
 namespace FrostAura.MCP.Gaia.Data;
 
 /// <summary>
-/// JSON database context for Task data with hierarchical structure
+/// Entity Framework database context for Task data with hierarchical structure
 /// </summary>
-public class TaskPlannerDbContext
+public class TaskPlannerDbContext : DbContext
 {
-    private readonly string _databasePath;
-    private readonly JsonSerializerOptions _jsonOptions;
+    private readonly IConfiguration _configuration;
 
     /// <summary>
     /// Initializes a new instance of the TaskPlannerDbContext
     /// </summary>
+    /// <param name="options">DbContext options</param>
     /// <param name="configuration">Configuration instance</param>
-    public TaskPlannerDbContext(IConfiguration configuration)
+    public TaskPlannerDbContext(DbContextOptions<TaskPlannerDbContext> options, IConfiguration configuration) : base(options)
     {
-        _databasePath = configuration["TaskPlanner:DatabasePath"] ?? throw new ArgumentNullException("TaskPlanner:DatabasePath configuration is required");
-        _jsonOptions = JsonConfiguration.GetStandardOptions();
+        _configuration = configuration;
     }
 
     /// <summary>
-    /// Represents the database structure - plans with nested tasks
+    /// Project plans DbSet
     /// </summary>
-    private class TaskDatabase
-    {
-        public List<ProjectPlan> Plans { get; set; } = new List<ProjectPlan>();
-        // Tasks are now nested within plans, no separate Tasks collection needed
-    }
+    public DbSet<ProjectPlan> Plans { get; set; }
 
     /// <summary>
-    /// Gets the database content
+    /// Task items DbSet
     /// </summary>
-    /// <returns>Database content</returns>
-    private async Task<TaskDatabase> GetDatabaseAsync()
+    public DbSet<TaskItem> Tasks { get; set; }
+
+    /// <summary>
+    /// Memories DbSet
+    /// </summary>
+    public DbSet<Memory> Memories { get; set; }
+
+    /// <summary>
+    /// Configures the database connection and model
+    /// </summary>
+    /// <param name="optionsBuilder">Options builder</param>
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        if (!File.Exists(_databasePath))
+        if (!optionsBuilder.IsConfigured)
         {
-            await CreateDatabaseFileAsync();
-            return new TaskDatabase();
+            var connectionString = _configuration.GetConnectionString("DefaultConnection") ??
+                                   "Data Source=/Users/deanmartin/Desktop/Projects/FrostAura/ai.toolkit.gaia/.gaia/Gaia.TaskPlanner.db";
+            optionsBuilder.UseSqlite(connectionString);
         }
-
-        var jsonContent = await File.ReadAllTextAsync(_databasePath);
-        
-        if (string.IsNullOrWhiteSpace(jsonContent))
-        {
-            return new TaskDatabase();
-        }
-
-        var database = JsonSerializer.Deserialize<TaskDatabase>(jsonContent, _jsonOptions);
-        return database ?? new TaskDatabase();
     }
 
     /// <summary>
-    /// Saves the database content
+    /// Configures entity relationships and constraints
     /// </summary>
-    /// <param name="database">Database content to save</param>
-    private async Task SaveDatabaseAsync(TaskDatabase database)
+    /// <param name="modelBuilder">Model builder</param>
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Ensure directory exists
-        var directory = Path.GetDirectoryName(_databasePath);
-        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+        // Configure ProjectPlan entity
+        modelBuilder.Entity<ProjectPlan>(entity =>
         {
-            Directory.CreateDirectory(directory);
-        }
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasMaxLength(36);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.Description).IsRequired();
+            entity.Property(e => e.AiAgentBuildContext).IsRequired();
+            entity.Property(e => e.CreatorIdentity).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
 
-        var jsonContent = JsonSerializer.Serialize(database, _jsonOptions);
-        await File.WriteAllTextAsync(_databasePath, jsonContent);
-    }
+            // Configure relationship with TaskItem
+            entity.HasMany(e => e.Tasks)
+                  .WithOne(e => e.Plan)
+                  .HasForeignKey(e => e.PlanId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
 
-    /// <summary>
-    /// Creates an empty database file
-    /// </summary>
-    private async Task CreateDatabaseFileAsync()
-    {
-        await SaveDatabaseAsync(new TaskDatabase());
+        // Configure TaskItem entity
+        modelBuilder.Entity<TaskItem>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasMaxLength(36);
+            entity.Property(e => e.PlanId).IsRequired().HasMaxLength(36);
+            entity.Property(e => e.ParentTaskId).HasMaxLength(36);
+            entity.Property(e => e.Title).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.Description).IsRequired();
+            entity.Property(e => e.AcceptanceCriteria).IsRequired();
+            entity.Property(e => e.Status).IsRequired();
+            entity.Property(e => e.EstimateHours).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+            entity.Property(e => e.CompletedAt);
+
+            // Configure JSON columns for Tags and Groups
+            entity.Property(e => e.TagsJson).HasColumnName("Tags");
+            entity.Property(e => e.GroupsJson).HasColumnName("Groups");
+
+            // Configure self-referencing relationship for parent/child tasks
+            entity.HasOne(e => e.ParentTask)
+                  .WithMany(e => e.ChildTasks)
+                  .HasForeignKey(e => e.ParentTaskId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            // Configure relationship with ProjectPlan
+            entity.HasOne(e => e.Plan)
+                  .WithMany(e => e.Tasks)
+                  .HasForeignKey(e => e.PlanId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Configure Memory entity
+        modelBuilder.Entity<Memory>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasMaxLength(36);
+            entity.Property(e => e.Title).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.Content).IsRequired();
+            entity.Property(e => e.CreatedBy).HasMaxLength(200);
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.LastAccessedAt);
+            entity.Property(e => e.AccessCount).IsRequired().HasDefaultValue(0);
+            entity.Property(e => e.Priority).IsRequired().HasDefaultValue(3);
+
+            // Configure JSON column for Tags
+            entity.Property(e => e.TagsJson).HasColumnName("Tags");
+        });
+
+        base.OnModelCreating(modelBuilder);
     }
 
     /// <summary>
@@ -87,15 +134,13 @@ public class TaskPlannerDbContext
     /// <param name="plan">Project plan to add</param>
     public async Task AddPlanAsync(ProjectPlan plan)
     {
-        var database = await GetDatabaseAsync();
-        
-        if (database.Plans.Any(s => s.Id == plan.Id))
+        if (await Plans.AnyAsync(p => p.Id == plan.Id))
         {
             throw new InvalidOperationException($"A plan with ID '{plan.Id}' already exists.");
         }
 
-        database.Plans.Add(plan);
-        await SaveDatabaseAsync(database);
+        Plans.Add(plan);
+        await SaveChangesAsync();
     }
 
     /// <summary>
@@ -104,40 +149,29 @@ public class TaskPlannerDbContext
     /// <param name="task">Task to add</param>
     public async Task AddTaskAsync(TaskItem task)
     {
-        var database = await GetDatabaseAsync();
-        
-        // Find the plan this task belongs to
-        var plan = database.Plans.FirstOrDefault(p => p.Id == task.PlanId);
-        if (plan == null)
+        // Verify plan exists
+        if (!await Plans.AnyAsync(p => p.Id == task.PlanId))
         {
             throw new ArgumentException($"Plan with ID '{task.PlanId}' not found.");
         }
 
-        // Get all tasks in the plan (flatten hierarchy to check for duplicates)
-        var allTasks = GetAllTasksFromPlan(plan);
-        if (allTasks.Any(t => t.Id == task.Id))
+        // Check if task ID already exists
+        if (await Tasks.AnyAsync(t => t.Id == task.Id))
         {
             throw new InvalidOperationException($"A task with ID '{task.Id}' already exists.");
         }
 
-        // Add task to appropriate location in hierarchy
-        if (string.IsNullOrEmpty(task.ParentTaskId))
+        // Verify parent task exists if specified
+        if (!string.IsNullOrEmpty(task.ParentTaskId))
         {
-            // Root level task - add directly to plan
-            plan.Tasks.Add(task);
-        }
-        else
-        {
-            // Child task - find parent and add to its children
-            var parentTask = FindTaskInPlan(plan, task.ParentTaskId);
-            if (parentTask == null)
+            if (!await Tasks.AnyAsync(t => t.Id == task.ParentTaskId))
             {
                 throw new ArgumentException($"Parent task with ID '{task.ParentTaskId}' not found.");
             }
-            parentTask.Children.Add(task);
         }
 
-        await SaveDatabaseAsync(database);
+        Tasks.Add(task);
+        await SaveChangesAsync();
     }
 
     /// <summary>
@@ -147,15 +181,16 @@ public class TaskPlannerDbContext
     /// <returns>Project plan with Tasks or null if not found</returns>
     public async Task<ProjectPlan?> GetPlanByIdAsync(string planId)
     {
-        var database = await GetDatabaseAsync();
-        var plan = database.Plans.FirstOrDefault(s => s.Id == planId);
-        
-        if (plan == null)
+        var plan = await Plans.Include(p => p.Tasks)
+                              .FirstOrDefaultAsync(p => p.Id == planId);
+
+        if (plan != null)
         {
-            return null;
+            // Build hierarchical structure for the Tasks property
+            var flatTasks = plan.Tasks.ToList();
+            plan.Tasks = BuildTaskHierarchy(flatTasks);
         }
 
-        // Tasks are already hierarchically structured in the plan
         return plan;
     }
 
@@ -165,10 +200,16 @@ public class TaskPlannerDbContext
     /// <returns>List of project plans with Tasks</returns>
     public async Task<List<ProjectPlan>> GetAllPlansAsync()
     {
-        var database = await GetDatabaseAsync();
-        
-        // Plans already have their tasks hierarchically structured
-        return database.Plans;
+        var plans = await Plans.Include(p => p.Tasks).ToListAsync();
+
+        // Build hierarchical structure for each plan's tasks
+        foreach (var plan in plans)
+        {
+            var flatTasks = plan.Tasks.ToList();
+            plan.Tasks = BuildTaskHierarchy(flatTasks);
+        }
+
+        return plans;
     }
 
     /// <summary>
@@ -178,16 +219,7 @@ public class TaskPlannerDbContext
     /// <returns>List of Task items for the plan</returns>
     public async Task<List<TaskItem>> GetTasksByPlanIdAsync(string planId)
     {
-        var database = await GetDatabaseAsync();
-        var plan = database.Plans.FirstOrDefault(p => p.Id == planId);
-        
-        if (plan == null)
-        {
-            return new List<TaskItem>();
-        }
-
-        // Return flattened list of all tasks in the plan
-        return GetAllTasksFromPlan(plan);
+        return await Tasks.Where(t => t.PlanId == planId).ToListAsync();
     }
 
     /// <summary>
@@ -197,129 +229,7 @@ public class TaskPlannerDbContext
     /// <returns>Task item or null if not found</returns>
     public async Task<TaskItem?> GetTaskByIdAsync(string taskId)
     {
-        var database = await GetDatabaseAsync();
-        
-        // Search across all plans for the task
-        foreach (var plan in database.Plans)
-        {
-            var task = FindTaskInPlan(plan, taskId);
-            if (task != null) return task;
-        }
-        
-        return null;
-    }
-
-    /// <summary>
-    /// Builds hierarchical structure for Tasks
-    /// </summary>
-    /// <param name="flatTasks">Flat list of Tasks</param>
-    /// <returns>List of root Tasks with children populated</returns>
-    private List<TaskItem> BuildTaskHierarchy(List<TaskItem> flatTasks)
-    {
-        var taskDict = flatTasks.ToDictionary(t => t.Id, t => 
-            new TaskItem
-            {
-                Id = t.Id,
-                PlanId = t.PlanId,
-                ParentTaskId = t.ParentTaskId,
-                Title = t.Title,
-                Description = t.Description,
-                Status = t.Status,
-                Tags = new List<string>(t.Tags),
-                Groups = new List<string>(t.Groups),
-                EstimateHours = t.EstimateHours,
-                CreatedAt = t.CreatedAt,
-                UpdatedAt = t.UpdatedAt,
-                CompletedAt = t.CompletedAt,
-                Children = new List<TaskItem>()
-            });
-        
-        var rootTasks = new List<TaskItem>();
-        
-        foreach (var task in taskDict.Values)
-        {
-            if (string.IsNullOrEmpty(task.ParentTaskId))
-            {
-                rootTasks.Add(task);
-            }
-            else
-            {
-                if (taskDict.TryGetValue(task.ParentTaskId, out var parent))
-                {
-                    parent.Children.Add(task);
-                }
-                else
-                {
-                    rootTasks.Add(task);
-                }
-            }
-        }
-        
-        return rootTasks;
-    }
-
-    /// <summary>
-    /// Gets all tasks from a plan (flattened)
-    /// </summary>
-    /// <param name="plan">The plan to get tasks from</param>
-    /// <returns>Flattened list of all tasks in the plan</returns>
-    private List<TaskItem> GetAllTasksFromPlan(ProjectPlan plan)
-    {
-        var allTasks = new List<TaskItem>();
-        foreach (var task in plan.Tasks)
-        {
-            allTasks.Add(task);
-            AddChildTasksRecursively(task, allTasks);
-        }
-        return allTasks;
-    }
-
-    /// <summary>
-    /// Recursively adds child tasks to the list
-    /// </summary>
-    /// <param name="parentTask">Parent task</param>
-    /// <param name="allTasks">List to add tasks to</param>
-    private void AddChildTasksRecursively(TaskItem parentTask, List<TaskItem> allTasks)
-    {
-        foreach (var child in parentTask.Children)
-        {
-            allTasks.Add(child);
-            AddChildTasksRecursively(child, allTasks);
-        }
-    }
-
-    /// <summary>
-    /// Finds a task by ID within a plan's hierarchy
-    /// </summary>
-    /// <param name="plan">The plan to search in</param>
-    /// <param name="taskId">ID of the task to find</param>
-    /// <returns>Task if found, null otherwise</returns>
-    private TaskItem? FindTaskInPlan(ProjectPlan plan, string taskId)
-    {
-        foreach (var task in plan.Tasks)
-        {
-            var found = FindTaskRecursively(task, taskId);
-            if (found != null) return found;
-        }
-        return null;
-    }
-
-    /// <summary>
-    /// Recursively searches for a task in the hierarchy
-    /// </summary>
-    /// <param name="currentTask">Current task to search</param>
-    /// <param name="taskId">ID of the task to find</param>
-    /// <returns>Task if found, null otherwise</returns>
-    private TaskItem? FindTaskRecursively(TaskItem currentTask, string taskId)
-    {
-        if (currentTask.Id == taskId) return currentTask;
-        
-        foreach (var child in currentTask.Children)
-        {
-            var found = FindTaskRecursively(child, taskId);
-            if (found != null) return found;
-        }
-        return null;
+        return await Tasks.FirstOrDefaultAsync(t => t.Id == taskId);
     }
 
     /// <summary>
@@ -328,17 +238,7 @@ public class TaskPlannerDbContext
     /// <param name="task">Updated task item</param>
     public async Task UpdateTaskAsync(TaskItem task)
     {
-        var database = await GetDatabaseAsync();
-        
-        // Find the plan this task belongs to
-        var plan = database.Plans.FirstOrDefault(p => p.Id == task.PlanId);
-        if (plan == null)
-        {
-            throw new ArgumentException($"Plan with ID '{task.PlanId}' not found.");
-        }
-
-        // Find the existing task in the plan
-        var existingTask = FindTaskInPlan(plan, task.Id);
+        var existingTask = await Tasks.FirstOrDefaultAsync(t => t.Id == task.Id);
         if (existingTask == null)
         {
             throw new ArgumentException($"Task with ID '{task.Id}' not found.");
@@ -355,6 +255,57 @@ public class TaskPlannerDbContext
         existingTask.UpdatedAt = task.UpdatedAt;
         existingTask.CompletedAt = task.CompletedAt;
 
-        await SaveDatabaseAsync(database);
+        await SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Builds hierarchical structure for Tasks
+    /// </summary>
+    /// <param name="flatTasks">Flat list of Tasks</param>
+    /// <returns>List of root Tasks with children populated</returns>
+    private List<TaskItem> BuildTaskHierarchy(List<TaskItem> flatTasks)
+    {
+        var taskDict = flatTasks.ToDictionary(t => t.Id, t =>
+            new TaskItem
+            {
+                Id = t.Id,
+                PlanId = t.PlanId,
+                ParentTaskId = t.ParentTaskId,
+                Title = t.Title,
+                Description = t.Description,
+                AcceptanceCriteria = t.AcceptanceCriteria,
+                Status = t.Status,
+                Tags = new List<string>(t.Tags),
+                Groups = new List<string>(t.Groups),
+                EstimateHours = t.EstimateHours,
+                CreatedAt = t.CreatedAt,
+                UpdatedAt = t.UpdatedAt,
+                CompletedAt = t.CompletedAt,
+                Children = new List<TaskItem>()
+            });
+
+        var rootTasks = new List<TaskItem>();
+
+        foreach (var task in taskDict.Values)
+        {
+            if (string.IsNullOrEmpty(task.ParentTaskId))
+            {
+                rootTasks.Add(task);
+            }
+            else
+            {
+                if (taskDict.TryGetValue(task.ParentTaskId, out var parent))
+                {
+                    parent.Children.Add(task);
+                }
+                else
+                {
+                    // Parent not found, treat as root task
+                    rootTasks.Add(task);
+                }
+            }
+        }
+
+        return rootTasks;
     }
 }

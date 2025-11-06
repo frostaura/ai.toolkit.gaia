@@ -3,7 +3,7 @@ namespace FrostAura.MCP.Gaia.Interfaces;
 /// <summary>
 /// Interface for thought critique - MCP server tools
 /// </summary>
-public interface IThoughtCritiqueManager
+public interface IThinkingManager
 {
     /// <summary>
     /// Critique thought.

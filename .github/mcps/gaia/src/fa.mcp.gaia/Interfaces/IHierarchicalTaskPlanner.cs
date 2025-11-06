@@ -1,9 +1,9 @@
 namespace FrostAura.MCP.Gaia.Interfaces;
 
 /// <summary>
-/// Interface for task planner management operations - MCP server tools
+/// Interface for hierarchical task planner operations - MCP server tools
 /// </summary>
-public interface ITaskPlannerManager
+public interface IHierarchicalTaskPlanner
 {
     /// <summary>
     /// Creates a new project plan via MCP
@@ -42,9 +42,14 @@ public interface ITaskPlannerManager
     /// <param name="parentTaskId">ID of parent Task if this is nested</param>
     /// <param name="estimateHours">Estimated hours for completing this Task</param>
     /// <returns>JSON string containing the created Task item</returns>
-    Task<string> AddNewTaskToPlanAsync(string planId, string title, string description, string acceptanceCriteria, string tags, string groups, string? parentTaskId, double estimateHours);
+    Task<string> AddTaskToPlanAsync(string planId, string title, string description, string acceptanceCriteria, string tags, string groups, string? parentTaskId, double estimateHours);
 
-
+    /// <summary>
+    /// Gets a task with all its children in a hierarchical structure
+    /// </summary>
+    /// <param name="taskId">ID of the task to retrieve</param>
+    /// <returns>JSON string containing the task with its nested children</returns>
+    Task<string> GetTaskWithChildrenByIdAsync(string taskId);
 
     /// <summary>
     /// Marks a task as completed and sets the completion timestamp. This tool updates the task status to 'Completed' and records when it was completed.

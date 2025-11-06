@@ -1,3 +1,6 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace FrostAura.MCP.Gaia.Models;
 
 /// <summary>
@@ -8,11 +11,15 @@ public class ProjectPlan
     /// <summary>
     /// Unique identifier for the project plan
     /// </summary>
+    [Key]
+    [MaxLength(36)]
     public string Id { get; set; } = Guid.NewGuid().ToString();
 
     /// <summary>
     /// Name of the project
     /// </summary>
+    [Required]
+    [MaxLength(500)]
     public string Name { get; set; } = string.Empty;
 
     /// <summary>
@@ -43,11 +50,12 @@ public class ProjectPlan
     /// <summary>
     /// Task items associated with this plan (populated when needed)
     /// </summary>
-    public List<TaskItem> Tasks { get; set; } = new List<TaskItem>();
+    public virtual List<TaskItem> Tasks { get; set; } = new List<TaskItem>();
 
     /// <summary>
     /// Calculated total estimate hours from all tasks in the plan
     /// </summary>
+    [NotMapped]
     public double EstimateHours => GetTotalEstimateHours();
 
     /// <summary>
