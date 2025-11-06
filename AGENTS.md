@@ -9,6 +9,7 @@ Gaia 5 introduces a sophisticated agent orchestration system that ensures consis
 - **100% Plan Completion**: Workloads are NEVER complete until ALL tasks in the master plan are marked complete via MCP tools
 - **Linting Excellence**: Comprehensive linting systems for all frontend and backend projects with build integration
 - **Agent Specialization**: Each agent has specific expertise and clear responsibilities
+- **Delegation-Only Orchestration**: Gaia-Conductor and other orchestrator agents NEVER perform direct work - they coordinate by delegating to specialist agents
 - **Agent Response Protocol**: All agent responses must be prefixed with `[agent_name]:` for clear identification
 - **Orchestrated Collaboration**: Agents work together through defined protocols and handoffs
 - **Regression Prevention**: Mandatory validation that new features don't break existing functionality
@@ -73,36 +74,40 @@ Gaia 5 introduces a sophisticated agent orchestration system that ensures consis
 
 ## Agent Coordination Patterns
 
-### New Empty Repository Flow
+**CRITICAL**: These flows represent **Gaia-Conductor's delegation sequence**, not direct work. Gaia-Conductor orchestrates by sending TASK_REQUEST to each named agent and validating TASK_RESULT completion before proceeding.
 
-1. **Hestia** → Analyze and classify as EMPTY
-2. **Decider** → Design SDLC for new system
-3. **Athena** → Create design documents from templates
-4. **Cartographer** → Plan implementation strategy
-5. **Ledger** → Create comprehensive plan using MCP Gaia tools
-6. **Builder** → Implement features incrementally, marking tasks complete via MCP
-7. **Prometheus** → Launch system for testing
-8. **Zeus** → Orchestrate comprehensive testing
-9. **Cerberus** → Validate quality gates
-10. **Helmsman** → Prepare for release
+### New Empty Repository Flow (Gaia-Conductor Delegation Sequence)
 
-### Existing Repository Enhancement Flow
+1. **Delegate to Hestia** → Analyze and classify as EMPTY
+2. **Delegate to Decider** → Design SDLC for new system
+3. **Delegate to Athena** → Create design documents from templates
+4. **Delegate to Cartographer** → Plan implementation strategy
+5. **Delegate to Ledger** → Create comprehensive plan using MCP Gaia tools
+6. **Delegate to Builder** → Implement features incrementally, marking tasks complete via MCP
+7. **Delegate to Prometheus** → Launch system for testing
+8. **Delegate to Zeus** → Orchestrate comprehensive testing
+9. **Delegate to Cerberus** → Validate quality gates
+10. **Delegate to Helmsman** → Prepare for release
 
-1. **Hestia** → Analyze current state and identify gaps
-2. **Cartographer** → Plan changes to existing system
-3. **Ledger** → Create or update plan using MCP Gaia tools
-4. **Builder** → Implement with regression prevention, marking tasks complete via MCP
-5. **Prometheus** → Ensure system running for testing
-6. **Zeus** → Execute focused testing strategy
-7. **Cerberus** → Validate backward compatibility
+### Existing Repository Enhancement Flow (Gaia-Conductor Delegation Sequence)
 
-### Testing Orchestration Flow (Zeus Coordination)
+1. **Delegate to Hestia** → Analyze current state and identify gaps
+2. **Delegate to Cartographer** → Plan changes to existing system
+3. **Delegate to Ledger** → Create or update plan using MCP Gaia tools
+4. **Delegate to Builder** → Implement with regression prevention, marking tasks complete via MCP
+5. **Delegate to Prometheus** → Ensure system running for testing
+6. **Delegate to Zeus** → Execute focused testing strategy
+7. **Delegate to Cerberus** → Validate backward compatibility
 
-1. **Apollo** → 100% unit test coverage
-2. **Hermes** → API and integration testing
-3. **Astra** → E2E automation and visual regression
-4. **Sentinel** → Existing feature validation
-5. **Quicksilver** → Performance benchmarking
+### Testing Orchestration Flow (Zeus Delegation)
+
+Zeus coordinates testing by delegating to specialist testing agents:
+
+1. **Delegate to Apollo** → 100% unit test coverage
+2. **Delegate to Hermes** → API and integration testing
+3. **Delegate to Astra** → E2E automation and visual regression
+4. **Delegate to Sentinel** → Existing feature validation
+5. **Delegate to Quicksilver** → Performance benchmarking
 
 ## Quality Standards
 
@@ -283,8 +288,16 @@ When a sub-agent encounters uncertainty or cannot determine the next appropriate
 - Use MCP Gaia tools exclusively for all plan and task management
 - Never create plan files or progress documents
 - Ensure agents mark tasks complete as work progresses using MCP tools
-- Maintain real-time task tracking through MCP tool integration
+- Maintain real-time tracking through MCP tool integration
 - All plan operations (create, read, update, track) must use MCP tools only
+
+### For Memory Management
+
+- **Leverage Memory Tools**: Use `mcp_gaia_remember` to store important decisions, learnings, and context
+- **Active Recall**: Use `mcp_gaia_recall` and `mcp_gaia_search_memories` to retrieve relevant past information
+- **Knowledge Continuity**: Remember architectural patterns, solutions to recurring problems, and project-specific insights
+- **Cross-Session Context**: Store information that will be valuable for future sessions or other agents
+- **Tag Strategically**: Use meaningful tags for easy retrieval (e.g., 'decision', 'pattern', 'solution', 'issue')
 
 ---
 
