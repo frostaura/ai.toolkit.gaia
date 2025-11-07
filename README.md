@@ -12,7 +12,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Status](https://img.shields.io/badge/Status-Production%20Ready-green.svg)]()
 [![AI Enhanced](https://img.shields.io/badge/AI-Enhanced%20Intelligence-purple.svg)]()
-[![Version](https://img.shields.io/badge/Version-5.0-blue.svg)]()
+[![Version](https://img.shields.io/badge/Version-5.1-blue.svg)]()
 
 ## 📋 Requirements
 
@@ -137,6 +137,20 @@ GAIA empowers you to manifest complete, production-ready applications across div
 - **Helmsman**: Deployment management
 - **Cerberus**: Quality gates
 - **Scribe**: Documentation
+
+### 🏛️ **Mythological Heritage**
+
+Each agent draws its name from Greek mythology and ancient wisdom, embodying the divine qualities of legendary figures:
+- **Gaia** - Mother Earth, orchestrating creation
+- **Hestia** - Goddess of hearth, understanding structure
+- **Athena** - Goddess of wisdom and architecture
+- **Zeus** - King of gods, commanding quality authority
+- **Apollo** - God of truth and enlightenment
+- **Hermes** - Messenger bridging realms
+- **Prometheus** - Titan bringing fire to systems
+- **Aegis** - Zeus's protective shield
+
+These names reflect each agent's essential role and expertise, drawing power from timeless archetypes of excellence.
 
 **Key Features:**
 
