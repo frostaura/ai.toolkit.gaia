@@ -28,6 +28,7 @@
         "**/coverage.*": true,
         "**/Directory.Build.*": true,
         "**/*py": true,
+        "**/*.icon.gif": true
     },
     "vscode_vibrancy.enableAutoTheme": true,
     "vscode_vibrancy.opacity": 0.1,

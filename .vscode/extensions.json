@@ -26,6 +26,8 @@
         "oderwat.indent-rainbow",
         "ritwickdey.liveserver",
         "robbowen.synthwave-vscode",
-        "tal7aouy.icons"
+        "tal7aouy.icons",
+        // Data
+        "alexcvzz.vscode-sqlite"
     ]
 }

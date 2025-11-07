@@ -11,7 +11,7 @@ Complete frontend user experience translating use cases into visual design.
 
 ## Template Guidance
 
-**Purpose**: Define user interface interactions and visual design  
+**Purpose**: Define user interface interactions and visual design
 **Focus**: User flows, design language, component specifications, responsive behavior
 **Avoid**: Implementation code, technical architecture, deployment details
 
@@ -26,7 +26,7 @@ Complete frontend user experience translating use cases into visual design.
 ```mermaid
 graph LR
     A[Entry Point] --> B[Screen 1: Action]
-    B --> C[Screen 2: Input]  
+    B --> C[Screen 2: Input]
     C --> D[Success State]
     B --> E[Alternative Path]
     C --> F[Error State]
@@ -55,14 +55,14 @@ graph LR
 - **Inspirational Elements**: Include visually striking components that create memorable experiences
 
 **Ant Design Resources**:
-- Reference Ant Design (https://ant.design/) for beautiful, production-ready components
+- Reference Ant Design (https://ant.design/) for beautiful, production-ready React components
 - Leverage comprehensive UI patterns that combine functionality with stunning visual design
 - **Use Ant Design MCP server when available** for direct component recommendations and implementations
 - Use Ant Design components as the primary choice for external component libraries
 
 **Colors**:
 - Primary: `#[HEX]` - CTAs and navigation
-- Secondary: `#[HEX]` - Accents and highlights  
+- Secondary: `#[HEX]` - Accents and highlights
 - Background: `#[HEX]` - Main backgrounds
 - Text: `#[HEX]` - Primary text
 - Error/Success/Warning: `#[HEX]` colors for states
@@ -85,7 +85,7 @@ graph LR
 **Font Family**: [Primary font choice based on brand personality]
 **Hierarchy**:
 - **Display**: 2.5rem (40px) - Hero headlines
-- **H1**: 2rem (32px) - Page titles  
+- **H1**: 2rem (32px) - Page titles
 - **H2**: 1.5rem (24px) - Section headers
 - **H3**: 1.25rem (20px) - Subsection headers
 - **Body**: 1rem (16px) - Standard content
@@ -117,7 +117,7 @@ graph LR
 
 **Core Components**:
 - Navigation: Primary nav, breadcrumbs, pagination
-- Data Display: Cards, tables, lists  
+- Data Display: Cards, tables, lists
 - Input: Forms, buttons, search with validation
 - Feedback: Notifications, loading states, empty states
 - Overlays: Modals, tooltips, dropdowns
@@ -129,13 +129,11 @@ For enhanced visual appeal and modern UI patterns, leverage Ant Design component
 - **Beautiful Pre-built Components**: Access comprehensive, production-ready React components that combine functionality with stunning visual design
 - **Modern Design Patterns**: Utilize contemporary UI patterns with enterprise-grade quality
 - **Enhanced User Experience**: Incorporate professionally designed elements that inspire and impress while maintaining functionality
-- **Seamless Integration**: Components work harmoniously with Tailwind CSS and existing design systems
 - **Professional Polish**: Elevate standard business interfaces to visually stunning applications
 
 **Usage Guidelines**:
 - **Tool-First Approach**: When Ant Design MCP server is available, use it for component discovery and recommendations before manual selection
 - Prioritize Ant Design components for hero sections, feature showcases, and key user interactions
-- Combine with Tailwind CSS for consistent spacing, colors, and responsive design  
 - Maintain accessibility standards while enhancing visual appeal
 - Use Ant Design for professional and comprehensive UI patterns
 - **Fallback Hierarchy**: Ant Design → Custom components
@@ -152,9 +150,9 @@ For enhanced visual appeal and modern UI patterns, leverage Ant Design component
 **Performance**: FCP < 1.5s, LCP < 2.5s, Lighthouse 90+
 **Quality**: Cross-browser testing, responsive validation, error testing
 
-**Instructions**: 
+**Instructions**:
 1. Map use cases to user flows with interface requirements
-2. Define consistent design language for target audience  
+2. Define consistent design language for target audience
 3. Specify component requirements for all UI elements
 4. Include responsive behavior for all device types
 5. Plan accessibility from design stage
@@ -174,7 +172,7 @@ For enhanced visual appeal and modern UI patterns, leverage Ant Design component
 ### Notification System
 **Toast Notifications**:
 - **Success**: Confirm successful actions (green)
-- **Error**: Alert users to problems (red) 
+- **Error**: Alert users to problems (red)
 - **Warning**: Caution about potential issues (amber)
 - **Info**: Provide helpful information (blue)
 
@@ -216,7 +214,7 @@ For enhanced visual appeal and modern UI patterns, leverage Ant Design component
    - **Responsive Behavior**: Smooth transitions between breakpoints, no broken layouts
    - **Professional Polish**: No unstyled components, placeholder content, or debug elements
 
-3. **Iterative Refinement**: 
+3. **Iterative Refinement**:
    - **REPEAT** screenshot → analysis → fixes until **ALL** criteria score 100%
    - Document specific issues found and fixes applied
    - Never settle for "good enough" - achieve visual excellence
@@ -253,7 +251,7 @@ For enhanced visual appeal and modern UI patterns, leverage Ant Design component
 
 **Automated Regression Suite**:
 - **Test Suite Execution**: Run complete Playwright test suite for all existing features
-- **100% Pass Requirement**: All existing automated tests must pass before new feature is considered complete  
+- **100% Pass Requirement**: All existing automated tests must pass before new feature is considered complete
 - **Coverage Maintenance**: Ensure test coverage doesn't decrease when adding new features
 - **Continuous Validation**: Set up automated triggers to run regression tests on every code change
 

@@ -230,7 +230,7 @@ These names reflect each agent's essential role and expertise, drawing power fro
 2. **Verify MCP tools load** when starting GitHub Copilot CLI:
    - ✅ Gaia MCP server (project planning and task management)
    - ✅ Playwright MCP server (E2E testing and browser automation)
-   - ✅ Ant Design MCP server (React component library integration)
+  - ✅ Ant Design MCP server (React component library integration)
 
 ### Step 3: Launch the Gaia Agent System (1 minute)
 
@@ -492,7 +492,7 @@ GAIA's divine wisdom automatically perceives your soul's intention and weaves th
 
 - **Screenshot divine apps**: GAIA channels these to manifest beautiful, transcendent interfaces
 - **Invoke specific sacred styles**: "Clean like the heavens" or "Rich like divine abundance"
-- **Share color essence**: Brand chakras or general palette vibrations
+- **Share color essence**: Brand design tokens or general palette vibrations
 - **Reference successful apps**: "Social features like Discord" or "Dashboard like Vercel"
 
 ### Project Description Tips
