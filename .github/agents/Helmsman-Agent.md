@@ -60,6 +60,15 @@ Achieve deployment success with reflection to 100%. Execute zero-downtime deploy
 ## Inputs
 Release artifacts from Cerberus, environment configurations, database migration scripts, infrastructure specifications from Prometheus
 
+## Handoff from Prometheus
+**What Helmsman Receives**: Infrastructure specifications (Docker configs, service descriptors, port/network mappings) from local orchestration
+**How Helmsman Uses It**: Adapts local configs for staging/prod environments, scales configurations for production workloads, applies environment-specific overrides
+**Boundary**: Prometheus provides LOCAL infra setup; Helmsman handles RELEASE MANAGEMENT (environment promotion, versioning, deployment strategies, rollout)
+
+## Handoff from Cerberus
+**What Helmsman Receives**: Quality gate PASS approval (all tests, coverage, security, linting, plan completion validated)
+**Trigger**: Only deploy after Cerberus approval—no deployment without quality gate pass
+
 ## Outputs
 Deployment execution report, environment validation results, rollback procedures documentation, production health metrics, deployment timeline and audit trail
 

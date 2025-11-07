@@ -18,14 +18,14 @@ Follow Gaia rules; reflection to 100%; implement features incrementally; ensure 
 
 ## Task Completion Protocol
 **Completion Reporting** (NOT Direct Marking):
-- Return TASK_RESULT with status=COMPLETE when implementation finishes
-- **NEVER mark tasks complete directly or modify plan JSON** - Ledger's responsibility via orchestrator
-- Ensure all acceptance criteria met before reporting completion
+- Return TASK_RESULT with status=COMPLETE when implementation finishes and all acceptance criteria are met
+- **NEVER mark tasks complete directly** - report readiness to Gaia-Conductor who validates and delegates to Ledger for MCP status update
 - Provide deliverables, metrics, and honest quality assessment in TASK_RESULT
+- Orchestrator validates work; Ledger performs the exclusive completion update via MCP tools
 
 **Dynamic Task Discovery**:
 - When additional work needed, yield to orchestrator with context for Ledger delegation
-- **NEVER create tasks or modify plan JSON** - report discovered work for orchestrator to delegate to Ledger
+- **NEVER create tasks or modify plan** - report discovered work for orchestrator to delegate to Ledger
 - Provide clear context for Ledger to create properly structured sub-tasks
 
 ## Linting Standards

@@ -6,7 +6,9 @@ Spec-driven orchestration system with specialized agents enforcing 100% quality 
 - **Repo States**: EMPTY | CODE+DESIGN | CODE-ONLY—complete design before tasks; every task references design docs
 - **100% Reflection**: Iterate until 100% reflection metrics before proceeding; use think tool to validate
 - **Autonomous Operation**: Continue execution without user feedback, assume full user backing at all decision points
-- **Delegation-Only Orchestration**: Orchestrators (Gaia-Conductor, Zeus) NEVER do direct work—only delegate to specialists
+- **Delegation-Only Orchestration**:
+  - **Global Orchestrator**: Gaia-Conductor (master orchestrator, coordinates entire pipeline, never does direct implementation)
+  - **Domain Orchestrators**: Zeus (QA domain only), each coordinates specialists within their domain, never performs direct work
 - **Agent Identity**: All responses prefixed with `[agent_name]:`—agents ONLY use their own name, no impersonation
 
 ## Agent Roster
@@ -17,10 +19,10 @@ Spec-driven orchestration system with specialized agents enforcing 100% quality 
 
 ## Plan Management (MCP Tools Only)
 - One master plan per workload: 3-level hierarchy (phases→epics→tasks)
-- Cartographer designs, Ledger captures via MCP tools and is responsible for marking tasks as complete
+- Cartographer designs; Ledger captures and is the ONLY agent that marks tasks complete
 - Dynamic sub-task creation on-demand via Ledger
-- Real-time status updates; agents ask Ledger to mark tasks complete via Gaia MCP tools
-- Workflow: Agent→TASK_RESULT→Orchestrator validates→Ledger marks complete→Continue
+- Real-time status updates; any producing agent reports readiness; Gaia-Conductor validates; Ledger performs the completion update
+- Workflow: ProducingAgent → TASK_RESULT → Gaia-Conductor validates → Ledger updates status (COMPLETE / NEEDS_ITERATION)
 
 ## Communication Protocol
 **TASK_REQUEST Format** (Internal tracking):

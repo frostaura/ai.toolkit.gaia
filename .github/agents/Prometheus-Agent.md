@@ -53,5 +53,10 @@ System launcher and environment orchestration; reflection to 100%; launch all pr
 - **Hermes**: Ensure APIs accessible for integration tests
 - **Astra**: Ensure frontends accessible for Playwright E2E tests
 
+## Handoff to Helmsman
+**What Prometheus Delivers**: Runnable Docker artifacts, validated local environment configurations, service connectivity descriptors, port/network specifications
+**Helmsman Receives**: Infrastructure specifications for environment promotion and deployment strategies
+**Boundary**: Prometheus handles LOCAL runtime orchestration (Docker Compose, dev/test env); Helmsman handles ENVIRONMENT PROMOTION (staging/prod deployment, release lifecycles, versioning)
+
 ## Reflection
 Service Startup Success = 100%, Port Resolution = 100%, Docker Health = 100%, Connectivity = 100%, Background Stability = 100%

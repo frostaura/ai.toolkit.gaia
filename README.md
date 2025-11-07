@@ -100,43 +100,45 @@ GAIA empowers you to manifest complete, production-ready applications across div
 
 **20 Specialized AI Agents** working in perfect orchestration to build your application:
 
+> **For complete agent specifications, workflows, and handoff protocols**, see [AGENTS.md](./AGENTS.md) and individual agent files in [`.github/agents/`](./.github/agents/).
+
 ### 🎯 **Core Orchestration**
 
-- **Gaia-Conductor**: Master orchestrator managing the entire pipeline
+- **Gaia-Conductor**: Master orchestrator coordinating the entire pipeline
 
 ### 🔍 **Analysis & Planning**
 
-- **Hestia**: Repository analysis and classification
-- **Decider**: SDLC strategy selection
-- **Cartographer**: Implementation planning
-- **Ledger**: Task management via MCP tools
+- **Hestia**: Repository state analysis (EMPTY | CODE+DESIGN | CODE-ONLY)
+- **Decider**: SDLC strategy selection (Agile/Waterfall/hybrid)
+- **Cartographer**: Implementation planning and task breakdown
+- **Ledger**: Task lifecycle management via MCP tools (exclusive task completion authority)
 
 ### 🏗️ **Design & Architecture**
 
-- **Athena**: Design system architecture
-- **SchemaForge**: Database design
-- **Iris**: API contracts
-- **Aegis**: Security implementation
+- **Athena**: Design system architecture and specifications
+- **SchemaForge**: Database schema design and migrations
+- **Iris**: API contract definition and validation
+- **Aegis**: Security architecture and implementation
 
 ### 🔨 **Implementation**
 
-- **Builder**: Feature development
-- **Prometheus**: Infrastructure orchestration
+- **Builder**: Feature development with regression prevention
+- **Prometheus**: Local infrastructure orchestration (Docker, dev/test environments)
 
 ### 🧪 **Quality Assurance**
 
-- **Zeus**: Testing orchestration
-- **Apollo**: Unit testing (100% coverage)
-- **Hermes**: Integration testing
-- **Astra**: E2E automation
-- **Sentinel**: Regression testing
-- **Quicksilver**: Performance analysis
+- **Zeus**: QA domain orchestrator (coordinates all testing agents)
+- **Apollo**: Unit testing with 100% coverage requirements
+- **Hermes**: Integration testing with Playwright
+- **Astra**: E2E automation and visual regression testing
+- **Sentinel**: Regression validation and compatibility checks
+- **Quicksilver**: Performance analysis and optimization
 
 ### 🚀 **Operations**
 
-- **Helmsman**: Deployment management
-- **Cerberus**: Quality gates
-- **Scribe**: Documentation
+- **Helmsman**: Release management and environment promotion
+- **Cerberus**: Quality gate enforcement (validates all metrics before deployment)
+- **Scribe**: Documentation generation and maintenance
 
 ### 🏛️ **Mythological Heritage**
 
@@ -378,7 +380,7 @@ Cerberus → Helmsman
 **Real-time Visibility**: Watch the agent orchestra in action:
 
 - 📋 **Task Planning**: Ledger creates and tracks tasks via MCP Gaia tools
-- 🏗️ **Implementation Progress**: Builder marks tasks complete as features develop
+- 🏗️ **Implementation Progress**: Builder reports readiness; Gaia-Conductor validates; Ledger marks tasks complete via MCP tools
 - 🧪 **Testing Coordination**: Zeus orchestrates comprehensive testing across all agents
 - 📊 **Quality Metrics**: Each agent reports reflection scores (targeting 100%)
 - 🎯 **Quality Gates**: Cerberus validates all standards before progression

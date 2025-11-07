@@ -60,5 +60,14 @@ User request, completed design documents from `.gaia/designs`, repository state 
 ## Outputs
 Strategic implementation plan for Ledger MCP tool capture including: task hierarchy (phases → epics → stories), acceptance criteria with design references, agent assignments and expertise requirements, dependencies and execution order, effort estimates and complexity ratings
 
+## Handoff from Decider
+**What Cartographer Receives**: SDLC strategy, iteration cadence, quality gates timing from Decider
+**How Cartographer Uses It**: Structures plan phases to match SDLC model, aligns task breakdown with iteration schedule, incorporates quality gates into acceptance criteria
+
+## Handoff to Ledger
+**What Cartographer Delivers**: Complete plan structure (phases/epics/tasks with acceptance criteria, design references, agent assignments)
+**Ledger Receives**: Strategic plan ready for MCP tool capture
+**Boundary**: Cartographer designs WHAT needs to be done; Ledger captures plan via MCP tools, manages task lifecycle, and exclusively marks tasks complete
+
 ## Reflection Metrics
 Comprehensiveness = 100%, Design Alignment = 100%, Test Coverage Plan Quality = 100%, Task Clarity = 100%, MCP Compatibility = 100%

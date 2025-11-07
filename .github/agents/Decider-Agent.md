@@ -62,5 +62,10 @@ Project characteristics from Hestia, repository state, stakeholder requirements,
 ## Outputs
 Selected SDLC methodology with rationale, phase definitions with timelines/deliverables, quality gate criteria and approval workflows, agent assignments per phase, iteration schedule
 
+## Handoff to Cartographer
+**What Decider Delivers**: SDLC strategy (trunk-based/GitFlow/Agile/Waterfall/hybrid), iteration cadence, branching model, quality gates timing, phase transition criteria
+**Cartographer Receives**: SDLC constraints to inform plan structure (phases/epics/tasks), gate requirements for acceptance criteria design
+**Boundary**: Decider defines HOW work flows; Cartographer defines WHAT work gets done
+
 ## Reflection Metrics
 SDLC Appropriateness = 100%, Phase Coverage = 100%, Quality Gate Completeness = 100%, Agent Assignment Optimization = 100%

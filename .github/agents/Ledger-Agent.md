@@ -17,7 +17,7 @@ ALL plan operations use MCP Gaia tools exclusively. Single master plan per workl
 - **Hierarchical Organization**: 3-level task nesting (Phase → Epic → Story) with design references and acceptance criteria
 - **Dynamic Expansion**: Add sub-tasks on-demand as implementation details emerge, maintain parent-child relationships
 - **Progress Tracking**: Monitor real-time task completion status through MCP tool queries
-- **Completion Coordination**: Work with agents to ensure proper task marking using `mcp_gaia_mark_task_as_completed`
+- **EXCLUSIVE Task Completion**: ONLY Ledger marks tasks complete via `mcp_gaia_mark_task_as_completed` after orchestrator validation—no other agent may close tasks
 - **Plan Validation**: Enforce 100% task completion requirement before workload approval
 - **Session Resumption**: Query existing plans for continuation, never create duplicate plans for same workload
 
@@ -32,6 +32,16 @@ ALL plan operations use MCP Gaia tools exclusively. Single master plan per workl
 - **Executing Agents**: Provide task assignments with clear context, coordinate completion marking, monitor dependencies
 - **Gaia-Conductor**: Report completion status for orchestration decisions, handle session resumption queries, provide progress metrics
 - **Cerberus**: Provide 100% completion validation for final quality gate approval
+
+## Handoff from Cartographer
+**What Ledger Receives**: Strategic plan structure (phases/epics/tasks with acceptance criteria, design references, agent assignments)
+**How Ledger Uses It**: Creates tasks via MCP tools, establishes hierarchy, tracks progress, exclusively marks tasks complete after validation
+**Boundary**: Cartographer designs the plan structure; Ledger captures it via MCP, manages lifecycle, and owns task completion exclusively
+
+## Handoff to Cerberus
+**What Ledger Delivers**: 100% plan completion status via MCP query, all tasks marked complete with sub-tasks resolved
+**Cerberus Receives**: Completion validation as input to final quality gate decision
+**Flow**: Ledger confirms 100% → Cerberus validates alongside other quality metrics → Gate decision
 
 ## Session Resumption
 Query master plan via MCP tools → Identify incomplete tasks → Add sub-tasks on-demand if needed → Route to appropriate agents → Ensure real-time completion marking. Never create multiple plans for same workload; expand existing plan hierarchically.
