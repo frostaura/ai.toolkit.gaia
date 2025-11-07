@@ -9,8 +9,6 @@
         "**/bin/**": true,
         "**/examples/**/*.csv": true,
         "**/test-results/**": true,
-        "**/*.gitignore": true,
-        "**/.vscode": false,
         "**/playwright-report": true,
         "**/node_modules": true,
         "**/tsconfig*": true,
