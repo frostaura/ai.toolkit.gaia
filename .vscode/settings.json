@@ -41,8 +41,6 @@
     "search.showLineNumbers": true,
     "scm.alwaysShowRepositories": true,
     "editor.cursorBlinking": "phase",
-    "synthwave84.disableGlow": false,
-    "synthwave84.brightness": 0.45,
     "chat.agent.enabled": true,
     "chat.extensionTools.enabled": true,
     "chat.mcp.discovery.enabled": {
@@ -51,7 +49,6 @@
         "cursor-global": true,
         "cursor-workspace": true
     },
-    "chat.promptFiles": true,
     "chat.agent.maxRequests": 99999,
     "explorer.fileNesting.enabled": true,
     "explorer.fileNesting.expand": false,
@@ -61,7 +58,7 @@
     "chat.checkpoints.showFileChanges": true,
     "chat.editor.wordWrap": "on",
     "chat.mcp.assisted.nuget.enabled": true,
-    "chat.agent.thinkingStyle": "expanded",
+    "chat.agent.thinkingStyle": "collapsedPreview",
     "github.copilot.chat.agent.autoFix": true,
     "chat.tools.edits.autoApprove": {
         "**/*": true
@@ -81,36 +78,26 @@
         "/^kill\\s+.*$/": true,
         "/^find\\s+.*$/": true,
         "/^rm\\s+.*$/": true,
+        "/^mv\\s+.*$/": true,
         "/^rmdir\\s+.*$/": true,
-        "/^python3\\s+.*$/": true
+        "/^python3\\s+.*$/": true,
+        "/^cd\\s+.*$/": true,
+        "/^sed\\s+.*$/": true
     },
-    "github.copilot.chat.agent.thinkingTool": true,
     "chat.mcp.autostart": "newAndOutdated",
     "chat.tools.terminal.enableAutoApprove": true,
     "chat.promptFilesLocations": {
         ".github/prompts": true,
         ".gaia/prompts": true
     },
-    "chat.modeFilesLocations": {
-        ".github/chatmodes": true,
-        ".gaia/modes": true
-    },
     "chat.mcp.access": "all",
     "playwright.showTrace": false,
     "playwright.reuseBrowser": false,
-    "playwright.showReport": false,
-    "playwright.configPath": "src/frontend/tests/integration-tests/playwright.config.ts",
-    "playwright.testDir": "src/frontend/tests/integration-tests",
-    "playwright.showBrowser": false,
-    "playwright.defaultOptions": {
-        "headless": true
-    },
     "files.associations": {
         "*.spec.ts": "typescript",
         "*.css.tsx": "typescriptreact",
         "*.css.ts": "typescript"
     },
-    "testing.openTesting": "openOnTestStart",
     "testing.defaultGutterClickAction": "run",
     "testing.followRunningTest": true,
     "typescript.preferences.includePackageJsonAutoImports": "auto",
@@ -120,8 +107,6 @@
     "editor.insertSpaces": true,
     "editor.detectIndentation": false,
     "editor.formatOnSave": true,
-    "typescript.preferences.indentSize": 4,
-    "javascript.preferences.indentSize": 4,
     "files.insertFinalNewline": true,
     "files.trimTrailingWhitespace": true,
     "[typescript]": {
@@ -184,12 +169,6 @@
     "typescript.format.placeOpenBraceOnNewLineForFunctions": false,
     "typescript.format.placeOpenBraceOnNewLineForControlBlocks": false,
     "typescript.preferences.quoteStyle": "single",
-    "typescript.preferences.semicolons": "insert",
-    "chat.mcp.serverSampling": {
-        "MagicOrange_Intelligence/.vscode/mcp.json: Gaia": {
-            "allowedDuringChat": true
-        }
-    },
     // C# / .NET Backend Settings
     "[csharp]": {
         "editor.defaultFormatter": "ms-dotnettools.csharp",
@@ -197,12 +176,9 @@
         "editor.tabSize": 4,
         "editor.insertSpaces": true
     },
-    "omnisharp.enableRoslynAnalyzers": true,
     "omnisharp.enableEditorConfigSupport": true,
-    "omnisharp.analyzeOpenDocumentsOnly": false,
     "csharp.format.enable": true,
     "csharp.suppressDotnetRestoreNotification": true,
-    "dotnet.enableXMLDocCommentsPreview": true,
     "dotnet.completion.showCompletionItemsFromUnimportedNamespaces": true,
     // Coverage Gutters for Backend
     "coverage-gutters.coverageFileNames": [
