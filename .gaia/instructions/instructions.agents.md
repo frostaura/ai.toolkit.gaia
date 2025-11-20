@@ -20,30 +20,30 @@ Spec-driven orchestration system with specialized agents enforcing 100% quality 
 
 ## Spec-Driven Workflow (Mandatory)
 
-**Phase 1: ANALYZE** (Hestia)
+**Phase 1: ANALYZE** (Repository-Analyst)
 - Comprehensively analyze entire repository (structure, tech stack, architecture, health)
 - Classify repository state (EMPTY | CODE+DESIGN | CODE-ONLY)
 - Identify gaps, technical debt, anti-patterns (quantitative metrics)
 - Provide data-driven recommendations
 
-**Phase 2: DESIGN** (Athena + Specialists)
+**Phase 2: DESIGN** (Design-Architect + Specialists)
 - UPDATE existing `.gaia/designs/*.md` templates with project-specific content (NEVER create new files)
 - Replace template placeholders while keeping template guidance intact
 - Ensure 100% requirement capture and design completeness
 - Validate all design documents align and specifications are unambiguous
-- SchemaForge/Iris/Aegis refine specialized sections within existing templates if needed
+- Database-Designer/UI-Designer/Security-Specialist refine specialized sections within existing templates if needed
 
-**Phase 3: PLAN** (Cartographer + Ledger)
+**Phase 3: PLAN** (Plan-Designer + Task-Manager)
 - Transform design docs into hierarchical master plan (Phase→Epic→Story)
 - Create acceptance criteria tied directly to design specifications
 - Assign owners to all tasks (agent accountability)
 - Capture plan via MCP tools (never JSON files)
 
-**Phase 4: IMPLEMENT** (Builder + Prometheus + Testing)
-- Builder implements features per design specs exactly
-- Prometheus orchestrates infrastructure and services
+**Phase 4: IMPLEMENT** (Code-Implementer + Infrastructure-Manager + Testing)
+- Code-Implementer implements features per design specs exactly
+- Infrastructure-Manager orchestrates infrastructure and services
 - Testing agents validate 100% coverage and quality
-- Cerberus enforces quality gates before deployment
+- Quality-Gate enforces quality gates before deployment
 
 **Critical Rules**:
 - ❌ NEVER skip to implementation without complete designs
@@ -57,29 +57,29 @@ Spec-driven orchestration system with specialized agents enforcing 100% quality 
 
 ## Agent Roster
 
-| Agent              | Category       | Description                                 |
-| ------------------ | -------------- | ------------------------------------------- |
-| **Gaia-Conductor** | Orchestration  | Master orchestrator of specialized agents   |
-| **Hestia**         | Planning       | Repository analyst and state assessor       |
-| **Decider**        | Planning       | SDLC decision maker and process coordinator |
-| **Athena**         | Design         | Design documentation architect              |
-| **Cartographer**   | Planning       | Strategic planning and roadmap architect    |
-| **Ledger**         | Planning       | MCP task manager and completion tracker     |
-| **Builder**        | Implementation | Feature implementation specialist           |
-| **Prometheus**     | Implementation | Project launcher and infrastructure setup   |
-| **Zeus**           | QA             | QA lead and testing coordinator             |
-| **Cerberus**       | Ops            | Quality gates and deployment validation     |
-| **Helmsman**       | Ops            | Release management and deployment           |
-| **Apollo**         | Testing        | Unit testing specialist                     |
-| **Hermes**         | Testing        | Integration testing specialist              |
-| **Astra**          | Testing        | End-to-end testing specialist               |
-| **Sentinel**       | Testing        | Regression testing specialist               |
-| **Quicksilver**    | Testing        | Performance testing specialist              |
-| **Argus**          | Ops            | Observability and monitoring specialist     |
-| **Scribe**         | Support        | Documentation specialist                    |
-| **Aegis**          | Support        | Security specialist                         |
-| **SchemaForge**    | Support        | Database design specialist                  |
-| **Iris**           | Support        | UI/UX design specialist                     |
+| Agent                       | Category       | Description                                 |
+| --------------------------- | -------------- | ------------------------------------------- |
+| **Gaia**                    | Orchestration  | Master orchestrator of specialized agents   |
+| **Repository-Analyst**      | Planning       | Repository analyst and state assessor       |
+| **Process-Coordinator**     | Planning       | SDLC decision maker and process coordinator |
+| **Design-Architect**        | Design         | Design documentation architect              |
+| **Plan-Designer**           | Planning       | Strategic planning and roadmap architect    |
+| **Task-Manager**            | Planning       | MCP task manager and completion tracker     |
+| **Code-Implementer**        | Implementation | Feature implementation specialist           |
+| **Infrastructure-Manager**  | Implementation | Project launcher and infrastructure setup   |
+| **QA-Coordinator**          | QA             | QA lead and testing coordinator             |
+| **Quality-Gate**            | Ops            | Quality gates and deployment validation     |
+| **Release-Manager**         | Ops            | Release management and deployment           |
+| **Unit-Tester**             | Testing        | Unit testing specialist                     |
+| **Integration-Tester**      | Testing        | Integration testing specialist              |
+| **E2E-Tester**              | Testing        | End-to-end testing specialist               |
+| **Regression-Tester**       | Testing        | Regression testing specialist               |
+| **Performance-Tester**      | Testing        | Performance testing specialist              |
+| **Monitoring-Specialist**   | Ops            | Observability and monitoring specialist     |
+| **Documentation-Specialist**| Support        | Documentation specialist                    |
+| **Security-Specialist**     | Support        | Security specialist                         |
+| **Database-Designer**       | Support        | Database design specialist                  |
+| **UI-Designer**             | Support        | UI/UX design specialist                     |
 
 ## Quality Standards
 
@@ -89,64 +89,64 @@ Spec-driven orchestration system with specialized agents enforcing 100% quality 
 
 - One master plan per workload: 3-level hierarchy (phases→epics→tasks)
 - Every task requires owner assignment (agent name) for clear accountability
-- Cartographer designs; Ledger captures and is the ONLY agent that marks tasks complete
-- Dynamic sub-task creation on-demand via Ledger
-- Real-time status updates; any producing agent reports readiness; Gaia-Conductor validates; Ledger performs the completion update
-- Workflow: ProducingAgent → TASK_RESULT → Gaia-Conductor validates → Ledger updates status (COMPLETE / NEEDS_ITERATION)
+- Plan-Designer designs; Task-Manager captures and is the ONLY agent that marks tasks complete
+- Dynamic sub-task creation on-demand via Task-Manager
+- Real-time status updates; any producing agent reports readiness; Gaia validates; Task-Manager performs the completion update
+- Workflow: ProducingAgent → TASK_RESULT → Gaia validates → Task-Manager updates status (COMPLETE / NEEDS_ITERATION)
 
 ## Agent Handoff Protocols
 
-**Hestia → Athena/Decider**:
+**Repository-Analyst → Design-Architect/Process-Coordinator**:
 - Deliverable: Comprehensive repository analysis with quantitative metrics
 - Trigger: Repository state classified, gaps identified
 - Handoff: TASK_RESULT with analysis bundle (state, tech stack, health scores, recommendations)
 
-**Athena → Cartographer**:
+**Design-Architect → Plan-Designer**:
 - Deliverable: Complete `.gaia/designs` documentation (100% reflection metrics achieved)
 - Trigger: All design templates completed, cross-validation passed
 - Handoff: TASK_RESULT confirming design completeness and unambiguous specifications
 
-**Cartographer → Ledger**:
+**Plan-Designer → Task-Manager**:
 - Deliverable: Hierarchical master plan design (Phase→Epic→Story structure)
 - Trigger: Plan structure designed from design docs, acceptance criteria defined
-- Handoff: TASK_REQUEST to Ledger to capture plan via MCP tools
+- Handoff: TASK_REQUEST to Task-Manager to capture plan via MCP tools
 
-**Ledger → Builder**:
+**Task-Manager → Code-Implementer**:
 - Deliverable: MCP-captured master plan with tasks assigned
 - Trigger: Plan created, first implementation tasks ready
-- Handoff: TASK_REQUEST to Builder with design doc references and acceptance criteria
+- Handoff: TASK_REQUEST to Code-Implementer with design doc references and acceptance criteria
 
-**Builder → Zeus**:
+**Code-Implementer → QA-Coordinator**:
 - Deliverable: Feature implementation complete with linting passed
 - Trigger: All acceptance criteria met, code ready for testing
-- Handoff: TASK_RESULT to orchestrator → Zeus coordinates testing
+- Handoff: TASK_RESULT to Gaia → QA-Coordinator coordinates testing
 
-**Zeus → Cerberus**:
+**QA-Coordinator → Quality-Gate**:
 - Deliverable: Aggregated QA metrics bundle (100% coverage, zero failures)
 - Trigger: All testing agents completed, metrics validated
 - Handoff: TASK_RESULT with comprehensive testing results
 
 ## Agent Responsibility Boundaries
 
-**Builder vs Prometheus**:
-- Builder: Project structure, code dependencies (npm/pip/nuget), build configs, linting setup
-- Prometheus: Runtime orchestration (Docker, service startup, port management, health checks)
+**Code-Implementer vs Infrastructure-Manager**:
+- Code-Implementer: Project structure, code dependencies (npm/pip/nuget), build configs, linting setup
+- Infrastructure-Manager: Runtime orchestration (Docker, service startup, port management, health checks)
 
-**Athena vs Specialists**:
-- Athena: Creates all initial design documents, ensures cross-document consistency, integrates refinements
-- SchemaForge/Iris/Aegis: Refine specialized sections (database/UI/security) when complexity warrants
+**Design-Architect vs Specialists**:
+- Design-Architect: Creates all initial design documents, ensures cross-document consistency, integrates refinements
+- Database-Designer/UI-Designer/Security-Specialist: Refine specialized sections (database/UI/security) when complexity warrants
 
-**Zeus vs Testing Agents**:
-- Zeus: Coordinates testing strategy, aggregates metrics, never executes tests directly
-- Apollo/Hermes/Astra/Sentinel/Quicksilver: Execute specialized testing, report results to Zeus
+**QA-Coordinator vs Testing Agents**:
+- QA-Coordinator: Coordinates testing strategy, aggregates metrics, never executes tests directly
+- Unit-Tester/Integration-Tester/E2E-Tester/Regression-Tester/Performance-Tester: Execute specialized testing, report results to QA-Coordinator
 
-**Zeus vs Builder (Linting)**:
-- Builder: Runs linters, fixes violations, configures tools, reports compliance
-- Zeus: Verifies Builder's linting compliance report, never runs linters directly
+**QA-Coordinator vs Code-Implementer (Linting)**:
+- Code-Implementer: Runs linters, fixes violations, configures tools, reports compliance
+- QA-Coordinator: Verifies Code-Implementer's linting compliance report, never runs linters directly
 
-**Scribe vs Builder (Documentation)**:
-- Scribe: `.gaia/designs` docs, README.md, external documentation
-- Builder: Inline code comments, JSDoc/TSDoc, function-level documentation
+**Documentation-Specialist vs Code-Implementer (Documentation)**:
+- Documentation-Specialist: `.gaia/designs` docs, README.md, external documentation
+- Code-Implementer: Inline code comments, JSDoc/TSDoc, function-level documentation
 
 ## Best Practices
 

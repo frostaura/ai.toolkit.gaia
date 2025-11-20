@@ -25,10 +25,6 @@
         }
     },
     "servers": {
-        "github": {
-            "type": "http",
-            "url": "https://api.githubcopilot.com/mcp/"
-        },
         "playwright-mcp": {
             "type": "stdio",
             "command": "npx",

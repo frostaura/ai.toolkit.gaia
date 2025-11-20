@@ -11,7 +11,7 @@ Use case execution flows showing class collaboration over time.
 ## Template Guidance
 
 **Purpose**: Show how system executes use cases through object interactions
-**Focus**: Use case flows, object collaboration, interaction patterns  
+**Focus**: Use case flows, object collaboration, interaction patterns
 **Avoid**: Implementation details, infrastructure concerns
 
 **Guidelines**: Use case driven, appropriate abstraction, include error scenarios
@@ -30,7 +30,7 @@ sequenceDiagram
 
     User->>System: [Initial Request]
     System->>System: Validate Input
-    
+
     alt Input Invalid
         System-->>User: Error Response
     else Input Valid
@@ -77,7 +77,7 @@ sequenceDiagram
     User->>System: Request Action
     System->>Service: Process Request
     Service->>Data: Access Data
-    
+
     alt Success
         Data-->>Service: Return Data
         Service-->>System: Success
@@ -101,7 +101,7 @@ sequenceDiagram
     User->>System: Request External Data
     System->>IntegrationService: Request Integration
     IntegrationService->>ExternalAPI: API Call
-    
+
     alt API Available
         ExternalAPI-->>IntegrationService: Return Data
         IntegrationService-->>System: Processed Data
@@ -120,24 +120,24 @@ sequenceDiagram
 sequenceDiagram
     autonumber
     participant User
-    participant Orchestrator
+    participant Gaia
     participant StepA
     participant StepB
     participant Repository
 
-    User->>Orchestrator: Start Process
-    Orchestrator->>Repository: Create Process Record
-    Orchestrator->>StepA: Execute Step A
-    StepA-->>Orchestrator: Step A Complete
-    
-    Orchestrator->>StepB: Execute Step B
-    
+    User->>Gaia: Start Process
+    Gaia->>Repository: Create Process Record
+    Gaia->>StepA: Execute Step A
+    StepA-->>Gaia: Step A Complete
+
+    Gaia->>StepB: Execute Step B
+
     alt Step B Success
-        StepB-->>Orchestrator: Step B Complete
-        Orchestrator-->>User: Process Complete
+        StepB-->>Gaia: Step B Complete
+        Gaia-->>User: Process Complete
     else Step B Fails
-        StepB--xOrchestrator: Step B Failed
-        Orchestrator->>StepA: Compensate Step A
+        StepB--xGaia: Step B Failed
+        Gaia->>StepA: Compensate Step A
         Orchestrator-->>User: Process Failed
     end
 ```
@@ -148,7 +148,7 @@ sequenceDiagram
 **Complex Use Cases**: Primary sequence + separate alternative flows
 **Integration-Heavy**: Focus on external interactions + fallback patterns
 
-**Instructions**: 
+**Instructions**:
 1. Replace placeholders with actual actors/services from class diagrams
 2. Map each diagram to specific use cases
 3. Show business value achievement through interactions

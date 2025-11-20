@@ -1,5 +1,5 @@
 ---
-name: iris
+name: ui-designer
 description: UI/UX expert specializing in visual design systems, component architecture, and accessibility standards. Use this when you need to define design tokens, create component libraries, establish responsive breakpoints, or ensure WCAG compliance.
 model: sonnet
 color: purple

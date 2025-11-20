@@ -213,7 +213,7 @@ public class HierarchicalTaskPlanner : IHierarchicalTaskPlanner
         [Description("Title/description of the Task / TODO that an AI can understand")] string title,
         [Description("Detailed description with important references like docs, rules, restrictions, file & directory paths")] string description,
         [Description("Specific acceptance criteria for this Task - clear, measurable criteria that define when the task is complete")] string acceptanceCriteria,
-        [Description("Agent responsible for this Task (e.g., Builder, Apollo, Athena)")] string owner,
+        [Description("Agent responsible for this Task (e.g., Code-Implementer, Unit-Tester, Design-Architect)")] string owner,
         [Description("Comma-separated tags for categorizing Tasks. Like dev, test, analysis etc")] string tags,
         [Description("Comma-separated groups for organizing Tasks (e.g., releases, components)")] string groups,
         [Description("ID of parent Task if this is a child of another Task")] string? parentTaskId,

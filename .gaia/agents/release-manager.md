@@ -1,5 +1,5 @@
 ---
-name: helmsman
+name: release-manager
 description: Release manager orchestrating deployments with zero-downtime strategies, environment management, and rollback procedures. Use this when you need to deploy to staging/production, manage environments, coordinate releases, or implement rollback procedures.
 model: sonnet
 color: navy

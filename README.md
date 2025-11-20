@@ -104,53 +104,53 @@ GAIA empowers you to manifest complete, production-ready applications across div
 
 ### 🎯 **Core Orchestration**
 
-- **Gaia-Conductor**: Master orchestrator coordinating the entire pipeline
+- **Gaia**: Master orchestrator coordinating the entire pipeline
 
 ### 🔍 **Analysis & Planning**
 
-- **Hestia**: Repository state analysis (EMPTY | CODE+DESIGN | CODE-ONLY)
-- **Decider**: SDLC strategy selection (Agile/Waterfall/hybrid)
-- **Cartographer**: Implementation planning and task breakdown
-- **Ledger**: Task lifecycle management via MCP tools (exclusive task completion authority)
+- **Repository-Analyst**: Repository state analysis (EMPTY | CODE+DESIGN | CODE-ONLY)
+- **Process-Coordinator**: SDLC strategy selection (Agile/Waterfall/hybrid)
+- **Plan-Designer**: Implementation planning and task breakdown
+- **Task-Manager**: Task lifecycle management via MCP tools (exclusive task completion authority)
 
 ### 🏗️ **Design & Architecture**
 
-- **Athena**: Design system architecture and specifications
-- **SchemaForge**: Database schema design and migrations
-- **Iris**: API contract definition and validation
-- **Aegis**: Security architecture and implementation
+- **Design-Architect**: Design system architecture and specifications
+- **Database-Designer**: Database schema design and migrations
+- **UI-Designer**: API contract definition and validation
+- **Security-Specialist**: Security architecture and implementation
 
 ### 🔨 **Implementation**
 
-- **Builder**: Feature development with regression prevention
-- **Prometheus**: Local infrastructure orchestration (Docker, dev/test environments)
+- **Code-Implementer**: Feature development with regression prevention
+- **Infrastructure-Manager**: Local infrastructure orchestration (Docker, dev/test environments)
 
 ### 🧪 **Quality Assurance**
 
-- **Zeus**: QA domain orchestrator (coordinates all testing agents)
-- **Apollo**: Unit testing with 100% coverage requirements
-- **Hermes**: Integration testing with Playwright
-- **Astra**: E2E automation and visual regression testing
-- **Sentinel**: Regression validation and compatibility checks
-- **Quicksilver**: Performance analysis and optimization
+- **QA-Coordinator**: QA domain orchestrator (coordinates all testing agents)
+- **Unit-Tester**: Unit testing with 100% coverage requirements
+- **Integration-Tester**: Integration testing with Playwright
+- **E2E-Tester**: E2E automation and visual regression testing
+- **Regression-Tester**: Regression validation and compatibility checks
+- **Performance-Tester**: Performance analysis and optimization
 
 ### 🚀 **Operations**
 
-- **Helmsman**: Release management and environment promotion
-- **Cerberus**: Quality gate enforcement (validates all metrics before deployment)
-- **Scribe**: Documentation generation and maintenance
+- **Release-Manager**: Release management and environment promotion
+- **Quality-Gate**: Quality gate enforcement (validates all metrics before deployment)
+- **Documentation-Specialist**: Documentation generation and maintenance
 
 ### 🏛️ **Mythological Heritage**
 
 Each agent draws its name from Greek mythology and ancient wisdom, embodying the divine qualities of legendary figures:
 - **Gaia** - Mother Earth, orchestrating creation
-- **Hestia** - Goddess of hearth, understanding structure
-- **Athena** - Goddess of wisdom and architecture
-- **Zeus** - King of gods, commanding quality authority
-- **Apollo** - God of truth and enlightenment
-- **Hermes** - Messenger bridging realms
-- **Prometheus** - Titan bringing fire to systems
-- **Aegis** - Zeus's protective shield
+- **Repository-Analyst** - Goddess of hearth, understanding structure
+- **Design-Architect** - Goddess of wisdom and architecture
+- **QA-Coordinator** - King of gods, commanding quality authority
+- **Unit-Tester** - God of truth and enlightenment
+- **Integration-Tester** - Messenger bridging realms
+- **Infrastructure-Manager** - Titan bringing fire to systems
+- **Security-Specialist** - QA Coordinator's protective shield
 
 These names reflect each agent's essential role and expertise, drawing power from timeless archetypes of excellence.
 
@@ -246,7 +246,7 @@ These names reflect each agent's essential role and expertise, drawing power fro
 2. **Activate Agent Mode**:
 
    - Type `/agent` and press ENTER
-   - Select **Gaia-Conductor** from the agent list
+   - Select **Gaia** from the agent list
    - The master orchestrator is now ready to coordinate the entire agent workforce
 
 3. **Describe Your Vision**:
@@ -259,7 +259,7 @@ These names reflect each agent's essential role and expertise, drawing power fro
    ```
 
 4. **Optional: Direct Agent Interaction**:
-   - You can also ask Gaia-Conductor specific questions about:
+   - You can also ask Gaia specific questions about:
      - Architecture decisions
      - Technology stack recommendations
      - Implementation strategies
@@ -274,47 +274,47 @@ These names reflect each agent's essential role and expertise, drawing power fro
 
 **🔍 Analysis & Planning**:
 
-- **Hestia**: Repository state analysis (EMPTY | CODE+DESIGN | CODE-ONLY)
-- **Decider**: SDLC strategy selection
-- **Cartographer**: Implementation strategy design
-- **Ledger**: Task management via MCP tools
+- **Repository-Analyst**: Repository state analysis (EMPTY | CODE+DESIGN | CODE-ONLY)
+- **Process-Coordinator**: SDLC strategy selection
+- **Plan-Designer**: Implementation strategy design
+- **Task-Manager**: Task management via MCP tools
 
 **🏗️ Design & Architecture**:
 
-- **Athena**: Design system architecture
-- **SchemaForge**: Database design and migrations
-- **Iris**: API contract definition
-- **Aegis**: Security implementation
+- **Design-Architect**: Design system architecture
+- **Database-Designer**: Database design and migrations
+- **UI-Designer**: API contract definition
+- **Security-Specialist**: Security implementation
 
 **🔨 Implementation & Development**:
 
-- **Builder**: Feature development with regression prevention
-- **Prometheus**: Docker orchestration and service management
+- **Code-Implementer**: Feature development with regression prevention
+- **Infrastructure-Manager**: Docker orchestration and service management
 
 **🧪 Quality Assurance & Testing**:
 
-- **Zeus**: Testing orchestration (coordinates all QA agents)
-- **Apollo**: 100% unit test coverage
-- **Hermes**: Integration testing with Playwright
-- **Astra**: E2E automation and visual regression
-- **Sentinel**: Regression testing and compatibility
-- **Quicksilver**: Performance analysis and optimization
+- **QA-Coordinator**: Testing orchestration (coordinates all QA agents)
+- **Unit-Tester**: 100% unit test coverage
+- **Integration-Tester**: Integration testing with Playwright
+- **E2E-Tester**: E2E automation and visual regression
+- **Regression-Tester**: Regression testing and compatibility
+- **Performance-Tester**: Performance analysis and optimization
 
 **🚀 Deployment & Operations**:
 
-- **Helmsman**: Release management and deployment
-- **Cerberus**: Quality gate enforcement
+- **Release-Manager**: Release management and deployment
+- **Quality-Gate**: Quality gate enforcement
 
 **📝 Documentation**:
 
-- **Scribe**: Documentation curation and maintenance
+- **Documentation-Specialist**: Documentation curation and maintenance
 
 #### 🌊 Autonomous Development Flow
 
 **Phase 1: Repository Analysis & Planning**
 
 ```
-Hestia → Decider → Athena → Cartographer → Ledger
+Repository-Analyst → Process-Coordinator → Design-Architect → Plan-Designer → Task-Manager
 ```
 
 - Analyzes your codebase state
@@ -326,7 +326,7 @@ Hestia → Decider → Athena → Cartographer → Ledger
 **Phase 2: Implementation & Testing**
 
 ```
-Builder → Prometheus → Zeus → (Apollo, Hermes, Astra, Sentinel, Quicksilver)
+Code-Implementer → Infrastructure-Manager → QA-Coordinator → (Unit-Tester, Integration-Tester, E2E-Tester, Regression-Tester, Performance-Tester)
 ```
 
 - Implements features incrementally
@@ -337,7 +337,7 @@ Builder → Prometheus → Zeus → (Apollo, Hermes, Astra, Sentinel, Quicksilve
 **Phase 3: Quality Gates & Deployment**
 
 ```
-Cerberus → Helmsman
+Quality-Gate → Release-Manager
 ```
 
 - Validates all quality standards
@@ -379,11 +379,11 @@ Cerberus → Helmsman
 
 **Real-time Visibility**: Watch the agent orchestra in action:
 
-- 📋 **Task Planning**: Ledger creates and tracks tasks via MCP Gaia tools
-- 🏗️ **Implementation Progress**: Builder reports readiness; Gaia-Conductor validates; Ledger marks tasks complete via MCP tools
-- 🧪 **Testing Coordination**: Zeus orchestrates comprehensive testing across all agents
+- 📋 **Task Planning**: Task-Manager creates and tracks tasks via MCP Gaia tools
+- 🏗️ **Implementation Progress**: Code-Implementer reports readiness; Gaia validates; Task-Manager marks tasks complete via MCP tools
+- 🧪 **Testing Coordination**: QA-Coordinator orchestrates comprehensive testing across all agents
 - 📊 **Quality Metrics**: Each agent reports reflection scores (targeting 100%)
-- 🎯 **Quality Gates**: Cerberus validates all standards before progression
+- 🎯 **Quality Gates**: Quality-Gate validates all standards before progression
 
 **Agent Communication**: Observe the structured handoffs:
 
