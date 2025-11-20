@@ -11,7 +11,7 @@
         "ms-dotnettools.csharp",
         "ms-dotnettools.csdevkit",
         // Code Coverage
-        "ryanluker.vscode-coverage-gutters",
+        // "ryanluker.vscode-coverage-gutters",
         // Frontend Development
         "dbaeumer.vscode-eslint",
         "orta.vscode-jest",
@@ -25,7 +25,6 @@
         "illixion.vscode-vibrancy-continued",
         "oderwat.indent-rainbow",
         "ritwickdey.liveserver",
-        "robbowen.synthwave-vscode",
         "tal7aouy.icons",
         // Data
         "alexcvzz.vscode-sqlite"

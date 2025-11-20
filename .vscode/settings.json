@@ -216,5 +216,6 @@
     "coverage-gutters.watchOnActivate": true,
     "coverage-gutters.showLineCoverage": true,
     "coverage-gutters.showRulerCoverage": true,
-    "dotnet.formatting.organizeImportsOnFormat": true
+    "dotnet.formatting.organizeImportsOnFormat": true,
+    "git.ignoreLimitWarning": true
 }

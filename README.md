@@ -216,7 +216,7 @@ These names reflect each agent's essential role and expertise, drawing power fro
          "args": [
            "run",
            "--project",
-           "{{YOUR_GAIA_PATH}}/.github/mcps/gaia/src/fa.mcp.gaia/fa.mcp.gaia.csproj"
+           "{{YOUR_GAIA_PATH}}/.gaia/mcps/gaia/src/fa.mcp.gaia/fa.mcp.gaia.csproj"
          ],
          "tools": ["*"],
          "transport": "stdio"
