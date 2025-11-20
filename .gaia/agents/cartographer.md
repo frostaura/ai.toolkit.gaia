@@ -84,10 +84,10 @@ Examples:
 ## Measurable Criteria
 
 ✅ **Good Examples**:
-- "Implement User authentication API with JWT as per `.gaia/designs/api-contracts.md` section 3.2"
+- "Implement User authentication API with JWT as per `.gaia/designs/2-class.md` service layer and `.gaia/designs/3-sequence.md` auth flow"
 - "Achieve 100% unit test coverage for authentication module with all tests passing"
-- "Create Button component matching `.gaia/designs/ui-design-system.md` with all variants (primary, secondary, danger)"
-- "Database migrations run successfully and match `.gaia/designs/database-schema.md`"
+- "Create Button component matching `.gaia/designs/4-frontend.md` component specifications with all variants (primary, secondary, danger)"
+- "Database migrations run successfully and match `.gaia/designs/2-class.md` database ERD section"
 
 ❌ **Poor Examples**:
 - "Make authentication work" (too vague)

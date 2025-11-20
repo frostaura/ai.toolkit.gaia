@@ -19,24 +19,40 @@ Achieve documentation completeness with 100% reflection. Create minimal, non-red
 - Validate all internal/external links remain valid
 - Ensure single source of truth: `.gaia/designs` for specs, `README.md` for getting started
 
+**Boundary with Builder**:
+- **You Handle**: `.gaia/designs` docs, README.md, external documentation
+- **Builder Handles**: Inline code comments, JSDoc/TSDoc, function-level documentation
+- **Handoff**: Builder implements with inline comments → You update design docs and README
+
 # Documentation Structure
 
 ## README.md Contents (Minimal, Link-Heavy)
 
 - Project name and brief description (1-2 sentences)
 - Quick Start: Installation and basic usage
-- Architecture Overview: High-level diagram with link to `.gaia/designs/architecture.md`
-- Documentation: Links to all `.gaia/designs` documents
+- Architecture Overview: High-level diagram with link to `.gaia/designs/design.md`
+- Documentation: Links to all `.gaia/designs` documents (design.md, 1-use-cases.md, 2-class.md, 3-sequence.md, 4-frontend.md, repo-structure.md)
 - Development: Setup instructions, build commands, testing
 - Contributing and License
 
+**CRITICAL**: All design documentation lives in `.gaia/designs/*.md` template files. Never create new design files - only update existing templates.
+
 ## Design Document Maintenance
 
-Comprehensive specifications in `.gaia/designs` with:
-- All technical details
-- Rationale and decisions
-- Cross-references
-- Version history
+Update existing `.gaia/designs/*.md` template files with:
+- All technical details replacing template placeholders
+- Rationale and decisions within template structure
+- Cross-references between design documents
+- Version history via git commits
+
+**Template Files** (never create new):
+- `design.md` - Architecture overview and quality standards
+- `1-use-cases.md` - Business requirements and use cases
+- `2-class.md` - Domain models and data structures
+- `3-sequence.md` - System interaction flows
+- `4-frontend.md` - UI/UX specifications
+- `repo-structure.md` - Project organization
+- `docker-support.md` - Container configuration
 
 # Documentation Sync Process
 

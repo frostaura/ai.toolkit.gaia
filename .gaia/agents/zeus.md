@@ -54,6 +54,9 @@ Orchestrate testing specialists in optimal sequence:
 **Plan Completion**: All tasks in master plan marked complete
 
 **Linting Compliance**: Zero violations (frontend and backend)
+  - **You Verify**: Builder confirms linting passed before you begin testing
+  - **Builder Owns**: Running linters, fixing violations, configuring pre-commit hooks
+  - **You Never**: Run linters directly, fix linting issues, configure linting tools
 
 **Build Success**: All projects build without errors/warnings
 

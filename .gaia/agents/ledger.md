@@ -197,7 +197,7 @@ When resuming work:
 mcp_gaia_create_new_plan:
   projectName: "User Authentication System"
   description: "Implement secure auth with JWT and RBAC"
-  aiAgentBuildContext: "Key design docs: api-contracts.md sec 3, security-model.md"
+  aiAgentBuildContext: "Key design docs: 2-class.md service layer, 3-sequence.md auth flow, design.md security standards"
   creatorIdentity: "Ledger-Agent"
 ```
 
@@ -206,7 +206,7 @@ mcp_gaia_create_new_plan:
 mcp_gaia_add_new_task_to_plan:
   planId: "[plan-id-from-create]"
   title: "Implement JWT Middleware"
-  description: "Create Express middleware for JWT validation per .gaia/designs/security-model.md"
+  description: "Create Express middleware for JWT validation per .gaia/designs/3-sequence.md authentication flow and .gaia/designs/design.md security standards"
   acceptanceCriteria: "JWT tokens validated, expired tokens rejected, invalid signatures rejected, 100% unit test coverage"
   tags: "dev,security"
   groups: "authentication,backend"
