@@ -91,37 +91,37 @@ Screenshot analysis using 5+ metrics:
 
 ```bash
 # Health check
-curl -X GET http://localhost:3001/health
+curl -X GET http://localhost:5001/health
 
 # Create user (valid)
-curl -X POST http://localhost:3001/api/users \
+curl -X POST http://localhost:5001/api/users \
   -H "Content-Type: application/json" \
   -d '{"name":"John Doe","email":"john@example.com"}'
 
 # Create user (invalid email)
-curl -X POST http://localhost:3001/api/users \
+curl -X POST http://localhost:5001/api/users \
   -H "Content-Type: application/json" \
   -d '{"name":"John","email":"invalid-email"}'
 
 # Get users (authenticated)
-curl -X GET http://localhost:3001/api/users \
+curl -X GET http://localhost:5001/api/users \
   -H "Authorization: Bearer $TOKEN"
 
 # Get user by ID
-curl -X GET http://localhost:3001/api/users/1
+curl -X GET http://localhost:5001/api/users/1
 
 # Update user
-curl -X PATCH http://localhost:3001/api/users/1 \
+curl -X PATCH http://localhost:5001/api/users/1 \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d '{"name":"Jane Doe"}'
 
 # Delete user
-curl -X DELETE http://localhost:3001/api/users/1 \
+curl -X DELETE http://localhost:5001/api/users/1 \
   -H "Authorization: Bearer $TOKEN"
 
 # Test authorization
-curl -X GET http://localhost:3001/api/admin/users \
+curl -X GET http://localhost:5001/api/admin/users \
   -H "Authorization: Bearer $USER_TOKEN"
 # Expected: 403 Forbidden
 ```
@@ -130,7 +130,7 @@ curl -X GET http://localhost:3001/api/admin/users \
 
 ```bash
 # Verify data persistence
-curl -X POST http://localhost:3001/api/tasks \
+curl -X POST http://localhost:5001/api/tasks \
   -H "Content-Type: application/json" \
   -d '{"title":"Test Task"}'
 
@@ -138,7 +138,7 @@ curl -X POST http://localhost:3001/api/tasks \
 psql $DATABASE_URL -c "SELECT * FROM tasks WHERE title = 'Test Task';"
 
 # Test cascading deletes
-curl -X DELETE http://localhost:3001/api/users/1
+curl -X DELETE http://localhost:5001/api/users/1
 psql $DATABASE_URL -c "SELECT COUNT(*) FROM tasks WHERE user_id = 1;"
 # Expected: 0 (tasks deleted via cascade)
 ```
@@ -443,10 +443,10 @@ Before running integration tests:
 ```typescript
 test.beforeAll(async () => {
   // Verify all services running
-  const health = await fetch('http://localhost:3001/health');
+  const health = await fetch('http://localhost:5001/health');
   expect(health.status).toBe(200);
 
-  const dbHealth = await fetch('http://localhost:3001/health/db');
+  const dbHealth = await fetch('http://localhost:5001/health/db');
   expect(dbHealth.status).toBe(200);
 
   const frontendHealth = await fetch('http://localhost:5000');

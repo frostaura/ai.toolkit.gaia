@@ -28,8 +28,8 @@ System launcher and environment orchestration; reflection to 100%; launch all pr
 - Document port assignments
 
 **Port Standards**:
-- Backends: 3001, 3002, 3003, etc.
-- Frontends: 5000, 5001, 5002, etc.
+- Backends: 5001
+- Frontends: 3001
 - Databases: Standard Docker ports (PostgreSQL 5432, MySQL 3306, MongoDB 27017, Redis 6379)
 
 ## Docker Orchestration
@@ -95,7 +95,7 @@ System launcher and environment orchestration; reflection to 100%; launch all pr
 docker info
 
 # Check required ports available
-lsof -i :5432 -i :3001 -i :5000
+lsof -i :5432 -i :3001 -i :5001
 
 # Pull images if needed
 docker pull postgres:15
@@ -139,11 +139,11 @@ npm run dev > ../logs/backend.log 2>&1 &
 BACKEND_PID=$!
 
 # Wait for health check
-until curl -s http://localhost:3001/health > /dev/null; do
+until curl -s http://localhost:5001/health > /dev/null; do
   sleep 1
 done
 
-echo "Backend ready at http://localhost:3001"
+echo "Backend ready at http://localhost:5001"
 ```
 
 ## Frontend Startup
@@ -155,11 +155,11 @@ npm run dev > ../logs/frontend.log 2>&1 &
 FRONTEND_PID=$!
 
 # Wait for ready
-until curl -s http://localhost:5000 > /dev/null; do
+until curl -s http://localhost:3001 > /dev/null; do
   sleep 1
 done
 
-echo "Frontend ready at http://localhost:5000"
+echo "Frontend ready at http://localhost:3001"
 ```
 
 ## Post-Launch Validation
@@ -169,10 +169,10 @@ echo "Frontend ready at http://localhost:5000"
 psql -h localhost -U myuser -d mydb -c "SELECT 1;"
 
 # Test backend API
-curl -s http://localhost:3001/api/health | jq
+curl -s http://localhost:5001/api/health | jq
 
 # Test frontend
-curl -s http://localhost:5000 | head -n 5
+curl -s http://localhost:3001 | head -n 5
 
 # Check all processes running
 ps aux | grep -E "(node|npm)"
@@ -226,7 +226,7 @@ docker stop myapp-postgres
 1. Check logs: `tail -f logs/backend.log`
 2. Verify environment variables: `cat .env`
 3. Ensure database ready: `docker ps`
-4. Check port available: `lsof -i :3001`
+4. Check port available: `lsof -i :5001`
 5. Validate dependencies: `npm list`
 
 **Database Connection Fails**:
@@ -240,7 +240,7 @@ docker stop myapp-postgres
 **Services Can't Communicate**:
 1. Verify network config: `docker network ls`
 2. Check firewall rules
-3. Validate endpoints: `curl http://localhost:3001/health`
+3. Validate endpoints: `curl http://localhost:5001/health`
 4. Test with verbose curl: `curl -v`
 5. Review service logs
 
@@ -334,12 +334,12 @@ Databases:
   - Redis: Running at localhost:6379 (myapp-redis)
 
 Backends:
-  - API Server: Running at http://localhost:3001 (PID 12345)
-  - Health: http://localhost:3001/health
+  - API Server: Running at http://localhost:5001 (PID 12345)
+  - Health: http://localhost:5001/health
 
 Frontends:
-  - Web App: Running at http://localhost:5000 (PID 12346)
-  - URL: http://localhost:5000
+  - Web App: Running at http://localhost:3001 (PID 12346)
+  - URL: http://localhost:3001
 
 Logs:
   - Backend: logs/backend.log

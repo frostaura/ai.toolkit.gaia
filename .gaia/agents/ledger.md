@@ -15,7 +15,7 @@ Transform comprehensive plans into granular, traceable tasks with design alignme
 
 **Absolute Rule**: ALL plan operations use MCP Gaia tools exclusively.
 
-- ✅ Use: `mcp_gaia_create_new_plan`, `mcp_gaia_add_task_to_plan`, `mcp_gaia_mark_task_as_completed`, `mcp_gaia_get_tasks_from_plan`
+- ✅ Use: `mcp_gaia_create_new_plan`, `mcp_gaia_add_new_task_to_plan`, `mcp_gaia_mark_task_as_completed`, `mcp_gaia_get_tasks_from_plan`
 - ❌ NEVER: Create JSON files, manual database entries, file-based tracking
 - ⚠️ Impact: Violating this breaks system integrity and real-time tracking
 
@@ -29,7 +29,7 @@ Transform Cartographer's strategic plans into comprehensive task structures via 
 **Process**:
 1. Receive strategic plan from Cartographer
 2. Create master plan using `mcp_gaia_create_new_plan`
-3. Add all phases/epics/stories using `mcp_gaia_add_task_to_plan`
+3. Add all phases/epics/stories using `mcp_gaia_add_new_task_to_plan`
 4. Establish hierarchical relationships (parent-child)
 5. Validate all tasks properly structured
 
@@ -203,7 +203,7 @@ mcp_gaia_create_new_plan:
 
 ## Adding Tasks
 ```
-mcp_gaia_add_task_to_plan:
+mcp_gaia_add_new_task_to_plan:
   planId: "[plan-id-from-create]"
   title: "Implement JWT Middleware"
   description: "Create Express middleware for JWT validation per .gaia/designs/security-model.md"

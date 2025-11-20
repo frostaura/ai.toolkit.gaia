@@ -37,12 +37,13 @@ public interface IHierarchicalTaskPlanner
     /// <param name="title">Title/description of the Task</param>
     /// <param name="description">Detailed description with acceptance criteria</param>
     /// <param name="acceptanceCriteria">Specific acceptance criteria for this Task</param>
+    /// <param name="owner">Agent responsible for this Task</param>
     /// <param name="tags">Comma-separated tags for grouping</param>
     /// <param name="groups">Comma-separated groups for organizing Tasks (e.g., releases, components)</param>
     /// <param name="parentTaskId">ID of parent Task if this is nested</param>
     /// <param name="estimateHours">Estimated hours for completing this Task</param>
     /// <returns>JSON string containing the created Task item</returns>
-    Task<string> AddTaskToPlanAsync(string planId, string title, string description, string acceptanceCriteria, string tags, string groups, string? parentTaskId, double estimateHours);
+    Task<string> AddTaskToPlanAsync(string planId, string title, string description, string acceptanceCriteria, string owner, string tags, string groups, string? parentTaskId, double estimateHours);
 
     /// <summary>
     /// Gets a task with all its children in a hierarchical structure

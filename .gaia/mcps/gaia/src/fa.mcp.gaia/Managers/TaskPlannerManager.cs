@@ -170,6 +170,7 @@ public class TaskPlannerManager : ITaskPlannerManager
     /// <param name="planId">ID of the project plan</param>
     /// <param name="title">Title/description of the Task</param>
     /// <param name="description">Detailed description with acceptance criteria</param>
+    /// <param name="owner">Agent responsible for this Task</param>
     /// <param name="tags">Comma-separated tags for grouping</param>
     /// <param name="groups">Comma-separated groups for organizing Tasks (e.g., releases, components)</param>
     /// <param name="parentTaskId">ID of parent Task if this is nested</param>
@@ -182,6 +183,7 @@ public class TaskPlannerManager : ITaskPlannerManager
         [Description("Title/description of the Task / TODO that an AI can understand")] string title,
         [Description("Detailed description with important references like docs, rules, restrictions, file & directory paths")] string description,
         [Description("Specific acceptance criteria for this Task - clear, measurable criteria that define when the task is complete")] string acceptanceCriteria,
+        [Description("Agent responsible for this Task (e.g., Builder, Apollo, Athena)")] string owner,
         [Description("Comma-separated tags for categorizing Tasks. Like dev, test, analysis etc")] string tags,
         [Description("Comma-separated groups for organizing Tasks (e.g., releases, components)")] string groups,
         [Description("ID of parent Task if this is a child of another Task")] string? parentTaskId,
@@ -194,6 +196,7 @@ public class TaskPlannerManager : ITaskPlannerManager
             _logger?.LogInformation("title: '{Title}'", title);
             _logger?.LogInformation("description: '{Description}'", description);
             _logger?.LogInformation("acceptanceCriteria: '{AcceptanceCriteria}'", acceptanceCriteria);
+            _logger?.LogInformation("owner: '{Owner}'", owner);
             _logger?.LogInformation("tags: '{Tags}'", tags);
             _logger?.LogInformation("groups: '{Groups}'", groups);
             _logger?.LogInformation("parentTaskId: '{ParentTaskId}' (IsNull: {IsNull}, IsEmpty: {IsEmpty})",
@@ -209,6 +212,8 @@ public class TaskPlannerManager : ITaskPlannerManager
                 throw new ArgumentNullException(nameof(description));
             if (acceptanceCriteria == null)
                 throw new ArgumentNullException(nameof(acceptanceCriteria));
+            if (string.IsNullOrWhiteSpace(owner))
+                throw new ArgumentException("Owner cannot be null or empty.", nameof(owner));
             if (tags == null)
                 throw new ArgumentNullException(nameof(tags));
             if (groups == null)
@@ -231,6 +236,7 @@ public class TaskPlannerManager : ITaskPlannerManager
                 Title = title,
                 Description = description,
                 AcceptanceCriteria = acceptanceCriteria,
+                Owner = owner,
                 Tags = tagList,
                 Groups = groupList,
                 ParentTaskId = cleanParentTaskId,
@@ -273,6 +279,7 @@ public class TaskPlannerManager : ITaskPlannerManager
                     title,
                     description,
                     acceptanceCriteria,
+                    owner,
                     tags,
                     groups,
                     parentTaskId,
@@ -421,6 +428,7 @@ public class TaskPlannerManager : ITaskPlannerManager
             title = t.Title,
             description = t.Description,
             acceptanceCriteria = t.AcceptanceCriteria,
+            owner = t.Owner,
             tags = t.Tags,
             groups = t.Groups,
             parentTaskId = t.ParentTaskId,
@@ -498,6 +506,7 @@ public class TaskPlannerManager : ITaskPlannerManager
                     title = ((dynamic)task).title,
                     description = ((dynamic)task).description,
                     acceptanceCriteria = ((dynamic)task).acceptanceCriteria,
+                    owner = ((dynamic)task).owner,
                     tags = ((dynamic)task).tags,
                     groups = ((dynamic)task).groups,
                     parentTaskId = ((dynamic)task).parentTaskId,

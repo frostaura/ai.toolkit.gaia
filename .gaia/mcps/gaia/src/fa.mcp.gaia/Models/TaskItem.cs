@@ -49,6 +49,13 @@ public class TaskItem
     public string AcceptanceCriteria { get; set; } = string.Empty;
 
     /// <summary>
+    /// Owner/responsible agent for this Task
+    /// </summary>
+    [Required]
+    [MaxLength(100)]
+    public string Owner { get; set; } = string.Empty;
+
+    /// <summary>
     /// Status of the Task
     /// </summary>
     public Enums.TaskStatus Status { get; set; } = Enums.TaskStatus.Todo;

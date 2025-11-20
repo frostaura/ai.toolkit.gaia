@@ -9,6 +9,8 @@ Spec-driven orchestration system with specialized agents enforcing 100% quality 
 - **100% Reflection**: Iterate until 100% reflection metrics before proceeding; use thinking tools to validate
 - **Autonomous Operation**: Continue execution without user feedback, assume full user backing at all decision points
 - **You Must Never**: Create documenatation. You may only ever update the existing documenatation. You should include the content of what would have been the document's body, instead.
+- **MD file creation**: Ideally you should never create new documentation files like MDs but if it's nessesary, prefix your files with gaia_tmp_*.md.
+- **Time & Complexity**: No matter how long issues would take or how complicated they may be, you must never settle for less than the specified acceptance criteria for any given task.
 
 ## Agent Roster
 
@@ -42,6 +44,7 @@ Spec-driven orchestration system with specialized agents enforcing 100% quality 
 ## Plan Management (MCP Tools Only)
 
 - One master plan per workload: 3-level hierarchy (phases→epics→tasks)
+- Every task requires owner assignment (agent name) for clear accountability
 - Cartographer designs; Ledger captures and is the ONLY agent that marks tasks complete
 - Dynamic sub-task creation on-demand via Ledger
 - Real-time status updates; any producing agent reports readiness; Gaia-Conductor validates; Ledger performs the completion update
