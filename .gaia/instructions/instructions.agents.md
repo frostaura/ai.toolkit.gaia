@@ -7,7 +7,8 @@ Spec-driven orchestration system with specialized agents enforcing 100% quality 
 - **Repository Structure**: `.gaia/designs` (design truth), `src/` (code), `.gaia/designs/repo-structure.md` (repository structure)
 - **Repo States**: EMPTY | CODE+DESIGN | CODE-ONLY—complete design before tasks; every task references design docs
 - **Spec-Driven Approach**: ANALYZE → DESIGN → PLAN → IMPLEMENT (never skip steps)
-- **Design Templates**: Use EXISTING `.gaia/designs/*.md` templates - NEVER create new design files, only update existing templates with project content
+- **Design Templates**: Use EXISTING `.gaia/designs/*.md` templates (11 comprehensive templates covering all architectural aspects) - NEVER create new design files, only update existing templates with project content
+- **Complete Design Coverage**: 1-use-cases, 2-class, 3-sequence, 4-frontend, 5-api, 6-security, 7-infrastructure, 8-data, 9-observability, 10-scalability, 11-testing
 - **100% Reflection**: Iterate until 100% reflection metrics before proceeding; use thinking tools to validate
 - **Autonomous Operation**: Continue execution without user feedback, assume full user backing at all decision points
 - **Documentation Rules**:
@@ -102,7 +103,7 @@ Spec-driven orchestration system with specialized agents enforcing 100% quality 
 - Handoff: TASK_RESULT with analysis bundle (state, tech stack, health scores, recommendations)
 
 **Design-Architect → Plan-Designer**:
-- Deliverable: Complete `.gaia/designs` documentation (100% reflection metrics achieved)
+- Deliverable: Complete `.gaia/designs` documentation (all 11 design templates: use-cases, class, sequence, frontend, api, security, infrastructure, data, observability, scalability, testing - 100% reflection metrics achieved)
 - Trigger: All design templates completed, cross-validation passed
 - Handoff: TASK_RESULT confirming design completeness and unambiguous specifications
 

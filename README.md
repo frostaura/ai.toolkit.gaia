@@ -457,7 +457,8 @@ Communicate with GAIA using natural language to guide any changes or enhancement
 
 - **🐛 Issues & Questions**: [GitHub Issues](https://github.com/frostaura/fa.templates.vibe-coding/issues)
 - **💡 Feature Requests**: [GitHub Discussions](https://github.com/frostaura/fa.templates.vibe-coding/discussions)
-- **📖 Documentation**: Browse the `./.docs/` directory for detailed guides
+- **📖 Documentation**: Browse the `.gaia/designs/` directory for detailed design specifications
+- **🏗️ Architecture**: [Repository Structure](.gaia/designs/repo-structure.md) | [Design System](.gaia/designs/design.md)
 
 ## 🌍 GAIA's Intelligence (What Makes This Special)
 
@@ -613,9 +614,9 @@ For additional support, visit our [Community & Support](#-community--support) se
 
 - **🐛 Report Issues**: [GitHub Issues](https://github.com/frostaura/fa.templates.vibe-coding/issues) - Found a bug or have a question?
 - **💡 Feature Requests**: [GitHub Discussions](https://github.com/frostaura/fa.templates.vibe-coding/discussions) - Share your ideas
-- **📖 Documentation**: Comprehensive guides in the `./.docs/` directory
-- **🐳 Containerization**: [Docker Setup Guide](./.docs/docker-support.md)
-- **🏗️ Architecture**: [Design Principles](./.docs/design.md) | [Repository Structure](./.docs/repo-structure.md)
+- **📖 Documentation**: Comprehensive design specifications in `.gaia/designs/` (11 templates covering all architectural aspects)
+- **🐳 Containerization**: [Docker Support](.gaia/designs/docker-support.md)
+- **🏗️ Architecture**: [Design System](.gaia/designs/design.md) | [Repository Structure](.gaia/designs/repo-structure.md)
 
 **Contributing to GAIA:**
 

@@ -8,7 +8,7 @@ System architecture following iDesign architectural principles.
 
 **3-Layer Hierarchical Structure**:
 - **Managers** (🟢): Orchestration, use case coordination
-- **Engines** (🟠): Business logic, domain algorithms  
+- **Engines** (🟠): Business logic, domain algorithms
 - **Data Access** (⚫): I/O operations, persistence
 - **Models** (🟣): DTOs, entities, contracts
 
@@ -26,6 +26,13 @@ System architecture following iDesign architectural principles.
 | [Class Diagrams](./2-class.md) | Data models and class structure |
 | [Sequence Diagrams](./3-sequence.md) | Use case execution flows |
 | [Frontend](./4-frontend.md) | UI/UX specifications |
+| [API & Integration](./5-api.md) | API contracts, versioning, integration patterns |
+| [Security Architecture](./6-security.md) | Threat modeling, auth, encryption, compliance |
+| [Infrastructure & DevOps](./7-infrastructure.md) | CI/CD, environments, IaC, deployments |
+| [Data Architecture](./8-data.md) | Database schema, migrations, caching, backup |
+| [Observability](./9-observability.md) | Logging, metrics, tracing, alerting, runbooks |
+| [Scalability & Performance](./10-scalability.md) | Load balancing, scaling, async patterns |
+| [Testing Strategy](./11-testing.md) | Unit, integration, E2E, regression, performance |
 
 ### Quality Standards
 
