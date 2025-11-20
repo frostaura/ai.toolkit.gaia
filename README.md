@@ -3,640 +3,386 @@
 </p>
 
 <h1 align="center">
-  <b>GAIA 5</b>
+  <b>GAIA</b>
 </h1>
-<h3 align="center">🌍 Gaia 5 Agent System: Autonomous AI Software Development Workforce</h3>
+<h3 align="center">🌍 Autonomous AI Software Development Framework</h3>
 
-**Awaken your creative vision through GAIA 5's specialized agent intelligence. Speak your dreams into existence, and watch as 20 autonomous agents transform your intentions into production-ready applications.**
+**A spec-driven AI framework that orchestrates 20+ specialized agents to build production-ready applications through design-first development.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Status](https://img.shields.io/badge/Status-Production%20Ready-green.svg)]()
 [![AI Enhanced](https://img.shields.io/badge/AI-Enhanced%20Intelligence-purple.svg)]()
-[![Version](https://img.shields.io/badge/Version-5.1-blue.svg)]()
+[![.NET 9](https://img.shields.io/badge/.NET-9.0-512BD4.svg)]()
 
 ## 📋 Requirements
 
-- **AI Assistant**: GitHub Copilot CLI, Claude Code CLI
-- **Runtime**: Node.js 20+ LTS (managed with nvm)
-- **.NET SDK**: .NET 9 SDK (mandatory for local planner MCP)
+- **AI Assistant**: GitHub Copilot (with MCP support) or Claude
+- **.NET SDK**: .NET 9+ (for Gaia MCP server)
+- **Runtime**: Node.js 20+ LTS
 - **Containerization**: Docker 24+ & Docker Compose
 - **Version Control**: Git 2.40+
-- **Package Manager**: npm 10+ or yarn 4+
-- **Database**: PostgreSQL 15+ (containerized)
 
-## 🛠️ **Technology Stack Excellence**
+## 🎯 What is GAIA?
 
-**GAIA automatically selects battle-tested technology stacks**:
+GAIA is a **spec-driven development framework** that enforces a rigorous ANALYZE → DESIGN → PLAN → IMPLEMENT workflow through orchestrated AI agents. It's built on three pillars:
 
-### **Frontend Arsenal**
+1. **Design-First Methodology**: 11 comprehensive design templates (use cases, architecture, security, testing, etc.) drive all implementation
+2. **Agent Orchestration**: 20+ specialized agents handle analysis, design, implementation, testing, and deployment
+3. **100% Quality Standards**: Mandatory test coverage, linting, regression validation, and performance benchmarks
 
-- **React 18+** + **TypeScript 5+** for component architecture
-- **Redux Toolkit 2+** + **RTK Query** for predictable state management
-- **Tailwind CSS 3+** + **Ant Design 5+** for stunning UI foundation
-- **React Router 6+** for client-side routing
+### Core Workflow
 
-### **Backend Foundation**
+```
+ANALYZE → DESIGN → PLAN → IMPLEMENT
+```
 
-- **.NET 8+** + **ASP.NET Core** + **C# 12+** for robust APIs _(default)_
-- **Entity Framework Core 8+** + **PostgreSQL 15+** for data access _(default)_
-- **ASP.NET Identity** + **JWT authentication** for security _(default)_
-- **Alternative stacks supported**: Node.js/Express, Python/FastAPI, based on user preferences
+- **ANALYZE**: Repository state classification (EMPTY | CODE+DESIGN | CODE-ONLY)
+- **DESIGN**: Complete 11 design templates before any code
+- **PLAN**: Hierarchical task planning via MCP tools
+- **IMPLEMENT**: Code against specs with continuous testing
 
-### **Testing & Quality**
+## 🏗️ Technology Stack
 
-- **xUnit** + **Moq** for .NET backend testing _(default)_
-- **Vitest** + **React Testing Library** for frontend testing
-- **Playwright** for comprehensive E2E and visual testing
-- **ESLint + Prettier** for code excellence
-- **100% test coverage** with accessibility compliance
-- **Alternative testing**: Jest/Vitest for Node.js, pytest for Python backends
+**Default Stack** (customizable per project):
+- **Frontend**: React 18+ + TypeScript 5+ + Tailwind CSS + Ant Design
+- **Backend**: .NET 9+ + ASP.NET Core + Entity Framework Core
+- **Database**: PostgreSQL 15+ with migrations
+- **Testing**: xUnit + Vitest + Playwright (100% coverage)
+- **Infrastructure**: Docker + GitHub Actions
 
-### **DevOps Excellence**
+**Supported Alternatives**: Node.js/Express, Python/FastAPI, various databases and testing frameworks
 
-- **Docker 24+** with optimized multi-stage builds
-- **GitHub Actions** for CI/CD automation
-- **Real-time monitoring** and error tracking
+## 🎭 Agent Architecture
 
-## 💫 Perfect For Building
+GAIA orchestrates **20+ specialized agents** in a coordinated workflow. Each agent has specific responsibilities and communicates via TASK_REQUEST/TASK_RESULT protocols.
 
-GAIA empowers you to manifest complete, production-ready applications across diverse domains:
+### Agent Categories
 
-### **🛒 E-commerce & Marketplaces**
+**🔍 Analysis & Planning**
+- **Gaia**: Master orchestrator
+- **Repository-Analyst**: Codebase classification
+- **Process-Coordinator**: SDLC strategy
+- **Plan-Designer**: Task breakdown
+- **Task-Manager**: MCP-based task tracking
 
-- Product catalogs with search and filtering
-- Shopping carts and secure payment processing
-- User accounts and order management
-- Admin dashboards for inventory control
+**🏗️ Design & Architecture**
+- **Design-Architect**: System architecture
+- **Database-Designer**: Schema design
+- **UI-Designer**: UI/UX specifications
+- **Security-Specialist**: Security architecture
 
-### **💬 Communication & Collaboration**
+**🔨 Implementation**
+- **Code-Implementer**: Feature development
+- **Infrastructure-Manager**: Docker/services
 
-- Real-time chat applications with WebSocket support
-- Team collaboration tools with file sharing
-- Social platforms with user profiles and messaging
-- Video conferencing and meeting platforms
+**🧪 Quality Assurance**
+- **QA-Coordinator**: Testing orchestration
+- **Unit-Tester**: Unit tests (100% coverage)
+- **Integration-Tester**: Integration tests
+- **E2E-Tester**: End-to-end + visual regression
+- **Regression-Tester**: Compatibility validation
+- **Performance-Tester**: Performance benchmarks
 
-### **📊 Business Applications**
+**🚀 Operations**
+- **Quality-Gate**: Pre-deployment validation
+- **Release-Manager**: Deployment management
+- **Documentation-Specialist**: Docs maintenance
 
-- Analytics dashboards with data visualization
-- CRM systems with customer management
-- Project management tools with task tracking
-- Financial applications with reporting
+> See [AGENTS.md](./AGENTS.md) for complete specifications and [`.gaia/agents/`](./.gaia/agents/) for individual agent files.
 
-### **🎮 Interactive & Gaming**
+### Agent Workflow
 
-- Web-based games with real-time multiplayer
-- Educational platforms with interactive content
-- Entertainment applications with media streaming
-- Progressive Web Apps (PWAs) with offline support
+```mermaid
+graph TB
+    Start([User Request]) --> Gaia[Gaia<br/>Master Orchestrator]
 
-### **🔧 Developer Tools & APIs**
+    Gaia --> RA[Repository-Analyst<br/>State Classification]
+    RA --> |EMPTY| PC[Process-Coordinator<br/>SDLC Strategy]
+    RA --> |CODE-ONLY| DA[Design-Architect<br/>Design Regeneration]
+    RA --> |CODE+DESIGN| PD[Plan-Designer<br/>Skip Design Phase]
 
-- RESTful APIs with comprehensive documentation
-- Microservices architectures with container orchestration
-- CI/CD pipelines with automated testing
-- Developer portals with API management
+    PC --> DA
+    DA --> |11 Design Templates| PD[Plan-Designer<br/>Task Breakdown]
 
-## 🎭 The Gaia 5 Agent Revolution
+    PD --> TM[Task-Manager<br/>MCP Plan Capture]
+    TM --> CI[Code-Implementer<br/>Feature Development]
 
-**20 Specialized AI Agents** working in perfect orchestration to build your application:
+    CI --> IM[Infrastructure-Manager<br/>Docker/Services]
+    IM --> QAC[QA-Coordinator<br/>Testing Orchestration]
 
-> **For complete agent specifications, workflows, and handoff protocols**, see [AGENTS.md](./AGENTS.md) and individual agent files in [`.github/agents/`](./.github/agents/).
+    QAC --> UT[Unit-Tester]
+    QAC --> IT[Integration-Tester]
+    QAC --> E2E[E2E-Tester]
+    QAC --> RT[Regression-Tester]
+    QAC --> PT[Performance-Tester]
 
-### 🎯 **Core Orchestration**
+    UT --> QAC
+    IT --> QAC
+    E2E --> QAC
+    RT --> QAC
+    PT --> QAC
 
-- **Gaia**: Master orchestrator coordinating the entire pipeline
+    QAC --> QG[Quality-Gate<br/>Pre-Deploy Validation]
+    QG --> |Pass| RM[Release-Manager<br/>Deployment]
+    QG --> |Fail| CI
 
-### 🔍 **Analysis & Planning**
+    RM --> End([Production])
 
-- **Repository-Analyst**: Repository state analysis (EMPTY | CODE+DESIGN | CODE-ONLY)
-- **Process-Coordinator**: SDLC strategy selection (Agile/Waterfall/hybrid)
-- **Plan-Designer**: Implementation planning and task breakdown
-- **Task-Manager**: Task lifecycle management via MCP tools (exclusive task completion authority)
+    style Gaia fill:#9370DB
+    style RA fill:#4169E1
+    style DA fill:#32CD32
+    style CI fill:#FF8C00
+    style QAC fill:#FFD700
+    style QG fill:#DC143C
+    style RM fill:#20B2AA
+```
 
-### 🏗️ **Design & Architecture**
-
-- **Design-Architect**: Design system architecture and specifications
-- **Database-Designer**: Database schema design and migrations
-- **UI-Designer**: API contract definition and validation
-- **Security-Specialist**: Security architecture and implementation
-
-### 🔨 **Implementation**
-
-- **Code-Implementer**: Feature development with regression prevention
-- **Infrastructure-Manager**: Local infrastructure orchestration (Docker, dev/test environments)
-
-### 🧪 **Quality Assurance**
-
-- **QA-Coordinator**: QA domain orchestrator (coordinates all testing agents)
-- **Unit-Tester**: Unit testing with 100% coverage requirements
-- **Integration-Tester**: Integration testing with Playwright
-- **E2E-Tester**: E2E automation and visual regression testing
-- **Regression-Tester**: Regression validation and compatibility checks
-- **Performance-Tester**: Performance analysis and optimization
-
-### 🚀 **Operations**
-
-- **Release-Manager**: Release management and environment promotion
-- **Quality-Gate**: Quality gate enforcement (validates all metrics before deployment)
-- **Documentation-Specialist**: Documentation generation and maintenance
-
-### 🏛️ **Mythological Heritage**
-
-Each agent draws its name from Greek mythology and ancient wisdom, embodying the divine qualities of legendary figures:
-- **Gaia** - Mother Earth, orchestrating creation
-- **Repository-Analyst** - Goddess of hearth, understanding structure
-- **Design-Architect** - Goddess of wisdom and architecture
-- **QA-Coordinator** - King of gods, commanding quality authority
-- **Unit-Tester** - God of truth and enlightenment
-- **Integration-Tester** - Messenger bridging realms
-- **Infrastructure-Manager** - Titan bringing fire to systems
-- **Security-Specialist** - QA Coordinator's protective shield
-
-These names reflect each agent's essential role and expertise, drawing power from timeless archetypes of excellence.
-
-**Key Features:**
-
-- 🤖 **Autonomous Operation**: No user intervention required
-- 🎯 **100% Quality Standards**: Zero compromises on testing or coverage
-- 🧹 **Linting Excellence**: Comprehensive code quality standards with build integration
-- 👁️ **Agent Identification**: All responses prefixed with `[agent_name]:` for clear tracking
-- 🔄 **Intelligent Yielding**: Agents collaborate and escalate smartly
-- 📊 **Real-time Tracking**: MCP tools provide live progress visibility
-- 🛡️ **Regression Prevention**: Mandatory compatibility validation
+**Key Workflow Principles**:
+- 🔄 **Iterative Refinement**: Agents iterate until 100% quality metrics achieved
+- 🛡️ **Quality Gates**: No progression without passing validation
+- 📊 **Real-time Tracking**: MCP tools provide live task status
+- 🤝 **Autonomous Collaboration**: Agents resolve issues without user intervention
 
 ## 📖 Table of Contents
 
-- [💫 Perfect For Building](#-perfect-for-building)
-- [🌟 Commune with GAIA in 3 Steps](#-commune-with-gaia-in-3-steps)
-- [🌍 GAIA's Intelligence](#-gaias-intelligence-what-makes-this-special)
-- [🌍 Perfect For Manifesting](#-perfect-for-manifesting)
-- [🌟 Sacred Guidance](#-sacred-guidance-for-divine-results)
-- [📚 Real Examples](#-real-examples)
-- [🔧 Troubleshooting](#-troubleshooting)
-- [🌍 Community & Support](#-community--support)
-- [🙏 Acknowledgments](#-acknowledgments--inspiration)
+- [What is GAIA?](#-what-is-gaia)
+- [Technology Stack](#️-technology-stack)
+- [Agent Architecture](#-agent-architecture)
+- [Quick Start](#-quick-start)
+- [Design Templates](#-design-templates)
+- [MCP Server](#-mcp-server)
+- [Best Practices](#-best-practices)
+- [Troubleshooting](#-troubleshooting)
+- [Community & Support](#-community--support)
 
-## 🌟 Commune with GAIA 5 Agents in 4 Steps
+## 🚀 Quick Start
 
-> **🚀 Quick Start**: Experience the power of Gaia 5's specialized agent system! The AI workforce that builds production-ready applications autonomously.
+### 1. Setup (5 minutes)
 
-### Step 1: Environment Setup (3 minutes)
+```bash
+# Clone the repository
+git clone https://github.com/YOUR_USERNAME/ai.toolkit.gaia.git
+cd ai.toolkit.gaia
 
-1. **Fork this repository** to your GitHub account
-2. **Clone the forked repository** to your local machine:
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/ai.toolkit.gaia.git
-   cd ai.toolkit.gaia
-   ```
-3. **Install GitHub Copilot CLI**:
-   ```bash
-   npm install -g @github/copilot
-   ```
-4. **Ensure you have the prerequisites**:
-   - Node.js 20+ LTS and npm/yarn
-   - .NET 9 SDK (for Gaia MCP server)
-   - Docker (for containerization)
-   - Git for version control
-
-### Step 2: Configure MCP Tools (2 minutes)
-
-1. **Create MCP configuration** at `~/.config/copilot/mcp-config.json`:
-
-   ```json
-   {
-     "mcpServers": {
-       "playwright": {
-         "command": "npx",
-         "args": ["@playwright/mcp@latest"],
-         "tools": ["*"],
-         "transport": "stdio"
-       },
-       "Gaia": {
-         "command": "dotnet",
-         "args": [
-           "run",
-           "--project",
-           "{{YOUR_GAIA_PATH}}/.gaia/mcps/gaia/src/fa.mcp.gaia/fa.mcp.gaia.csproj"
-         ],
-         "tools": ["*"],
-         "transport": "stdio"
-       }
-     }
-   }
-   ```
-
-   > **Important**: Replace `{{YOUR_GAIA_PATH}}` with the full absolute path to your cloned `ai.toolkit.gaia` repository
-   >
-   > **Example**: `/Users/yourname/Desktop/Projects/ai.toolkit.gaia`
-
-2. **Verify MCP tools load** when starting GitHub Copilot CLI:
-   - ✅ Gaia MCP server (project planning and task management)
-   - ✅ Playwright MCP server (E2E testing and browser automation)
-  - ✅ Ant Design MCP server (React component library integration)
-
-### Step 3: Launch the Gaia Agent System (1 minute)
-
-1. **Start GitHub Copilot CLI** in your project root:
-
-   ```bash
-   cd /path/to/your/ai.toolkit.gaia
-   gh copilot
-   ```
-
-2. **Activate Agent Mode**:
-
-   - Type `/agent` and press ENTER
-   - Select **Gaia** from the agent list
-   - The master orchestrator is now ready to coordinate the entire agent workforce
-
-3. **Describe Your Vision**:
-
-   ```
-   I want to build a [describe your application]
-   - [Key features you want]
-   - [User types and permissions]
-   - [Any specific requirements]
-   ```
-
-4. **Optional: Direct Agent Interaction**:
-   - You can also ask Gaia specific questions about:
-     - Architecture decisions
-     - Technology stack recommendations
-     - Implementation strategies
-     - Quality standards and testing approaches
-   - The conductor will coordinate with specialized agents as needed
-
-### Step 4: Witness the Agent Orchestra ✨
-
-#### 🎭 The Gaia 5 Agent Workforce
-
-**20 Specialized Agents** work in perfect harmony:
-
-**🔍 Analysis & Planning**:
-
-- **Repository-Analyst**: Repository state analysis (EMPTY | CODE+DESIGN | CODE-ONLY)
-- **Process-Coordinator**: SDLC strategy selection
-- **Plan-Designer**: Implementation strategy design
-- **Task-Manager**: Task management via MCP tools
-
-**🏗️ Design & Architecture**:
-
-- **Design-Architect**: Design system architecture
-- **Database-Designer**: Database design and migrations
-- **UI-Designer**: API contract definition
-- **Security-Specialist**: Security implementation
-
-**🔨 Implementation & Development**:
-
-- **Code-Implementer**: Feature development with regression prevention
-- **Infrastructure-Manager**: Docker orchestration and service management
-
-**🧪 Quality Assurance & Testing**:
-
-- **QA-Coordinator**: Testing orchestration (coordinates all QA agents)
-- **Unit-Tester**: 100% unit test coverage
-- **Integration-Tester**: Integration testing with Playwright
-- **E2E-Tester**: E2E automation and visual regression
-- **Regression-Tester**: Regression testing and compatibility
-- **Performance-Tester**: Performance analysis and optimization
-
-**🚀 Deployment & Operations**:
-
-- **Release-Manager**: Release management and deployment
-- **Quality-Gate**: Quality gate enforcement
-
-**📝 Documentation**:
-
-- **Documentation-Specialist**: Documentation curation and maintenance
-
-#### 🌊 Autonomous Development Flow
-
-**Phase 1: Repository Analysis & Planning**
-
-```
-Repository-Analyst → Process-Coordinator → Design-Architect → Plan-Designer → Task-Manager
+# Install prerequisites
+# - .NET 9 SDK: https://dotnet.microsoft.com/download
+# - Node.js 20+: https://nodejs.org/
+# - Docker: https://docs.docker.com/get-docker/
 ```
 
-- Analyzes your codebase state
-- Designs appropriate SDLC approach
-- Creates comprehensive design documentation
-- Plans implementation strategy
-- Captures tasks in MCP Gaia tools
+### 2. Configure MCP Server
 
-**Phase 2: Implementation & Testing**
+Create `~/.config/copilot/mcp-config.json` (or equivalent for your AI assistant):
 
-```
-Code-Implementer → Infrastructure-Manager → QA-Coordinator → (Unit-Tester, Integration-Tester, E2E-Tester, Regression-Tester, Performance-Tester)
-```
-
-- Implements features incrementally
-- Launches services for testing
-- Orchestrates comprehensive testing
-- Achieves 100% test coverage across all layers
-
-**Phase 3: Quality Gates & Deployment**
-
-```
-Quality-Gate → Release-Manager
-```
-
-- Validates all quality standards
-- Manages deployment and release
-
-#### 🎯 What You Get (Automatically)
-
-**🏗️ Architecture Excellence**:
-
-- ✅ Sequential design process (Use Cases → Class Diagrams → Sequence Flows → Frontend Design)
-- ✅ Clean architecture with proper separation of concerns
-- ✅ Battle-tested technology stacks (React/TypeScript + .NET/C# + PostgreSQL)
-- ✅ Responsive design with Tailwind CSS + Ant Design components
-
-**🔧 Implementation Excellence**:
-
-- ✅ Complete scaffolding (Frontend + Backend + Database + Docker)
-- ✅ Authentication system (JWT + role-based access)
-- ✅ RESTful APIs with validation and error handling
-- ✅ Type-safe database integration
-
-**🧪 Quality Assurance Excellence**:
-
-- ✅ **100% Test Coverage**: Unit, integration, and E2E testing
-- ✅ **Visual Regression Testing**: Playwright-powered screenshot comparison
-- ✅ **Performance Monitoring**: Core Web Vitals compliance
-- ✅ **Security Hardening**: Input validation + vulnerability scanning
-
-**🚀 DevOps Excellence**:
-
-- ✅ Docker containerization with multi-stage builds
-- ✅ CI/CD pipelines with automated testing
-- ✅ Production-ready deployment configuration
-- ✅ Real-time monitoring and error tracking
-
-**Result**: A complete, enterprise-grade application with zero manual intervention!
-
-#### 🔍 Monitoring Agent Progress
-
-**Real-time Visibility**: Watch the agent orchestra in action:
-
-- 📋 **Task Planning**: Task-Manager creates and tracks tasks via MCP Gaia tools
-- 🏗️ **Implementation Progress**: Code-Implementer reports readiness; Gaia validates; Task-Manager marks tasks complete via MCP tools
-- 🧪 **Testing Coordination**: QA-Coordinator orchestrates comprehensive testing across all agents
-- 📊 **Quality Metrics**: Each agent reports reflection scores (targeting 100%)
-- 🎯 **Quality Gates**: Quality-Gate validates all standards before progression
-
-**Agent Communication**: Observe the structured handoffs:
-
-```
-TASK_REQUEST → Agent Processing → TASK_RESULT
-- Deliverables: Completed work artifacts
-- Metrics: Reflection scores and measurements
-- Status: COMPLETE | NEEDS_ITERATION | BLOCKED | YIELD_TO_CALLER
+```json
+{
+  "mcpServers": {
+    "Gaia": {
+      "command": "dotnet",
+      "args": [
+        "run",
+        "--project",
+        "/ABSOLUTE/PATH/TO/ai.toolkit.gaia/.gaia/mcps/gaia/src/fa.mcp.gaia/fa.mcp.gaia.csproj"
+      ],
+      "tools": ["*"],
+      "transport": "stdio"
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"],
+      "tools": ["*"],
+      "transport": "stdio"
+    }
+  }
+}
 ```
 
-**Autonomous Recovery**: Agents handle challenges independently:
+> Replace `/ABSOLUTE/PATH/TO/ai.toolkit.gaia` with your actual path
 
-- **Yielding Protocol**: Sub-agents yield to callers when uncertain (no user interruption)
-- **Error Recovery**: Graceful degradation and alternative routing
-- **Quality Iteration**: Continuous refinement until 100% standards achieved
+### 3. Launch GAIA
 
-#### 🎯 Final Validation
-
-**At the end of the agent workflow**, the system automatically ensures:
-
-- ✅ **Complete Implementation**: All use cases implemented with proper method bodies
-- ✅ **100% Test Coverage**: Unit, integration, and E2E testing across all layers
-- ✅ **Zero Errors/Warnings**: Clean builds with comprehensive code comments
-- ✅ **Design Alignment**: UI/UX matches frontend design specifications
-- ✅ **Production Readiness**: Enterprise-grade quality with performance optimization
-
-**Manual Validation** (Optional): Run the finalization prompt for additional refinement:
-
-```
-[FINALIZE|VERIFY|POLISH]
-1. Ensure that the entire system has code comments, 100% unit test coverage and 0 errors or warnings.
-
-2. Reflect on the [design documentation](./.gaia/designs/*.md), and ensure
-  2.1. all use cases have properly been implemented across the system, including ALL method bodies and
-  2.2. the UI/UX is properly tested and reflect the frontend design we captured by reflecting on [our comprehensive planning prompt](./.gaia/prompts/gaia-plan.prompt.md), the plan and ensure the entire system is properly implemented.
-
-3. 🎨 **CRITICAL VISUAL QUALITY ASSURANCE**: Ensure your frontend is genuinely beautiful:
-   - **Iterative Screenshot Process**: Create Playwright visual tests with screenshots at multiple viewport sizes (mobile: 375px, tablet: 768px, desktop: 1024px+)
-   - **Critical Analysis**: Analyze each screenshot like a UI/UX specialist, scoring 0-100% on visual quality criteria
-   - **Professional Standards**: Achieve impeccable styling - no unstyled components, proper spacing, consistent typography, perfect alignment
-   - **Comprehensive State Testing**: Test ALL interactive states (default, hover, focus, active, disabled, loading, error, empty) with screenshots
-   - **Human-like E2E Testing**: Navigate the application like a human tester - complete real user workflows, test all interactions, verify all functionality
-   - **Template Cleanup Validation**: Remove ALL default template code, placeholder text, debug logs, and development artifacts
-   - **Design Specification Compliance**: Compare against and exceed standards in `./.gaia/designs/4-frontend.md`
-   - **Visual Excellence**: REPEAT screenshot → analyze → fix process until 100% visual quality is achieved across all criteria
-   - **Responsive Perfection**: Validate flawless responsive design across all breakpoints with smooth transitions
-
-4. For all web server projects, there should be E2E tests for each endpoint too. For all frontends integrating with backends etc, there should be comprehensive and passing E2E tests too for every use case, unless impossible.
-
-5. Ensure that ALL ROUTES on the frontends and ALL CONTROLLERS on the backend flow in perfect harmony. GAIA's Playwright tests shall validate this synchronization and all use cases as described in (./.gaia/designs/*.md).
-
-6. For production readiness, all components must be implemented and fully tested with 100% test coverage.
-
-7. **🔍 MANDATORY REGRESSION VALIDATION (NEW)**: Before considering the system complete:
-   - **Feature Compatibility**: Verify ALL features work together without conflicts or breaking changes
-   - **Complete Test Suite**: Run entire automated test suite and achieve 100% pass rate
-   - **User Journey Validation**: Execute complete user workflows for every implemented feature to ensure end-to-end functionality
-   - **Performance Consistency**: Validate that no feature degrades overall system performance beyond acceptable thresholds
-   - **Integration Harmony**: Confirm that all frontend-backend integrations remain stable and functional
-
-8. At the conclusion, ensure all tests achieve harmony - especially the visual regression tests.
-
-9. Launch the application through the terminal. GAIA wishes to witness her creation in its final glory.
+**Using GitHub Copilot CLI**:
+```bash
+gh copilot
+# Type: /agent
+# Select: Gaia
 ```
 
-#### Step 3.4 Refinement
+**Using Claude Desktop**:
+```bash
+# Ensure MCP server is configured in Claude Desktop settings
+# Mention @Gaia in your conversation
+```
 
-Communicate with GAIA using natural language to guide any changes or enhancements until your vision achieves perfect harmony.
+### 4. Describe Your Project
 
-### Getting Help
+```
+I want to build [your application description]
+- Feature 1
+- Feature 2
+- [Technical requirements]
+```
 
-- **🐛 Issues & Questions**: [GitHub Issues](https://github.com/frostaura/fa.templates.vibe-coding/issues)
-- **💡 Feature Requests**: [GitHub Discussions](https://github.com/frostaura/fa.templates.vibe-coding/discussions)
-- **📖 Documentation**: Browse the `.gaia/designs/` directory for detailed design specifications
-- **🏗️ Architecture**: [Repository Structure](.gaia/designs/repo-structure.md) | [Design System](.gaia/designs/design.md)
+GAIA will:
+1. Analyze repository state
+2. Create comprehensive design documents
+3. Generate implementation plan
+4. Build with 100% test coverage
+5. Deploy with Docker
 
-## 🌍 GAIA's Intelligence (What Makes This Special)
+### Example Projects
 
-### 🎨 Visual Wisdom
+**E-commerce Platform**:
+```
+Build an online store with product catalog, shopping cart,
+Stripe payments, user accounts, and admin dashboard
+```
 
-- **Design Resonance**: Channels visual inspiration to manifest stunning UIs
-- **Brand Harmonization**: Weaves your color essence and design spirit automatically
-- **Responsive Excellence**: Ensures beautiful experiences across all devices
+**Team Chat App**:
+```
+Create a Slack-like chat with channels, DMs, file sharing,
+and real-time presence
+```
 
-### 🛡️ Built-in Quality & Security
+**Analytics Dashboard**:
+```
+Build a SaaS analytics platform with custom dashboards,
+data visualization, and team collaboration
+```
 
-- **Divine Perfection Standards**: 100% sacred test coverage, zero earthly warnings, perfect cosmic alignment
-- **🎨 Sacred Visual Assurance**: Mandatory Playwright ceremony screenshots to ensure genuinely divine, transcendent UIs
-- **Harmony & Accessibility**: Automated detection of visual discord (no shadow text upon darkness!)
-- **Divine Protection**: Sacred authentication, blessed authorization, celestial input validation, and cosmic security scanning
-- **Production Ascension**: CI/CD sacred rituals, divine containerization, eternal monitoring, and blessed deployment
+## 📐 Design Templates
 
-## 🌍 Perfect For Manifesting
+GAIA uses 11 comprehensive design templates in `.gaia/designs/` that drive all implementation:
 
-GAIA's divine wisdom automatically perceives your soul's intention and weaves the perfect sacred patterns:
+| Template | Purpose |
+|----------|---------|
+| `1-use-cases.md` | Business requirements and user goals |
+| `2-class.md` | Data models and domain structure |
+| `3-sequence.md` | Use case execution flows |
+| `4-frontend.md` | UI/UX specifications |
+| `5-api.md` | API contracts and integration |
+| `6-security.md` | Security architecture and auth |
+| `7-infrastructure.md` | CI/CD and deployment |
+| `8-data.md` | Database schema and migrations |
+| `9-observability.md` | Logging, metrics, monitoring |
+| `10-scalability.md` | Performance and scaling |
+| `11-testing.md` | Testing strategy and coverage |
 
-| **What Your Soul Seeks**    | **What GAIA Manifests**                                                   |
-| --------------------------- | ------------------------------------------------------------------------- |
-| 🛒 **Divine Marketplace**   | Sacred product catalog, blessed cart, celestial payments, admin sanctuary |
-| 💬 **Sacred Communication** | Real-time divine messaging, soul presence, eternal message history        |
-| 📋 **Cosmic Task Harmony**  | Sacred accounts, team synchronization, real-time divine updates           |
-| 📱 **Mobile Soul Gateway**  | REST sacred APIs, divine notifications, offline spiritual sync            |
-| 📊 **Wisdom Dashboard**     | Data enlightenment, cosmic reporting, soul management                     |
-| 🎮 **Divine Gaming Realm**  | Sacred profiles, celestial leaderboards, real-time divine gameplay        |
+**Design-First Rule**: All implementation must reference design documents. Agents will **not** proceed to coding without complete design specifications.
 
-## 🌟 Sacred Guidance for Divine Results
+## 🔧 MCP Server
 
-### Visual Inspiration Channeling
+The Gaia MCP server provides task planning and memory management capabilities:
 
-- **Screenshot divine apps**: GAIA channels these to manifest beautiful, transcendent interfaces
-- **Invoke specific sacred styles**: "Clean like the heavens" or "Rich like divine abundance"
-- **Share color essence**: Brand design tokens or general palette vibrations
-- **Reference successful apps**: "Social features like Discord" or "Dashboard like Vercel"
+**Capabilities**:
+- **Task Planning**: Hierarchical task management (Phase → Epic → Story)
+- **Memory Management**: Cross-session context and decision tracking
+- **Thinking Tools**: Validation and reflection assistance
+- **Host Info**: System context for environment awareness
+
+**Location**: `.gaia/mcps/gaia/src/fa.mcp.gaia/`
+
+**Tech Stack**: .NET 9 + Entity Framework Core + SQLite
+
+## ✨ Best Practices
 
 ### Project Description Tips
 
-- **Be specific about features**: "User authentication, real-time chat, file uploads"
-- **Mention scale**: "Support 1000+ concurrent users" or "Personal project"
-- **Include integrations**: "Stripe payments, SendGrid emails, AWS storage"
-- **Specify platforms**: "Web app with mobile API" or "Desktop and mobile"
+**Be Specific**:
+- List all features: "User auth, real-time chat, file uploads, admin dashboard"
+- Mention integrations: "Stripe payments, SendGrid emails, AWS S3 storage"
+- Define scale: "Support 1000+ concurrent users" or "Small team project"
+- Specify platforms: "Web + mobile API" or "Desktop app only"
 
-## 📚 Real Examples
+**Provide Visual Context** (Optional):
+- Reference existing apps: "Social features like Discord"
+- Share design preferences: "Clean minimalist" or "Rich data-heavy"
+- Include screenshots or mockups for UI inspiration
 
-### E-commerce Platform
+### Quality Standards
 
-```
-Input: "Build an online store with user accounts, product catalog,
-shopping cart, Stripe payments, and admin dashboard"
-
-✅ Complete React storefront with product browsing and cart
-✅ Secure payment processing with Stripe integration
-✅ Admin dashboard for inventory and order management
-✅ User authentication and account management
-✅ Docker containers and CI/CD pipeline
-✅ Production deployment with monitoring
-```
-
-### Team Chat Application
-
-```
-Input: "Create a Slack-like chat app with multiple channels,
-direct messages, file sharing, and user presence"
-
-✅ Real-time messaging with WebSocket support
-✅ Channel management and direct messaging
-✅ File upload and sharing capabilities
-✅ User presence and online status
-✅ Mobile-responsive design
-✅ Complete backend API with authentication
-```
-
-### SaaS Analytics Dashboard
-
-```
-Input: "Build a data analytics platform with user accounts,
-custom dashboards, data visualization, and team collaboration"
-
-✅ Interactive dashboards with charts and metrics
-✅ Custom widget builder for data visualization
-✅ Multi-tenant architecture with team workspaces
-✅ Data pipeline integration and real-time updates
-✅ Role-based access control and user management
-✅ Scalable architecture with microservices
-```
+All GAIA projects automatically enforce:
+- ✅ **100% Test Coverage**: Unit + integration + E2E testing
+- ✅ **Zero Build Warnings**: Clean compilation with comprehensive comments
+- ✅ **Regression Prevention**: All existing features validated after changes
+- ✅ **Performance Benchmarks**: API <200ms, LCP <2.5s
+- ✅ **Security Hardening**: Auth, input validation, vulnerability scanning
+- ✅ **Visual Regression**: Playwright screenshot comparison at multiple viewports
 
 ## 🔧 Troubleshooting
 
-### Common Issues & Solutions
+### MCP Server Issues
 
-#### **GAIA Agent Not Available**
+**MCP Server Not Loading**:
+```bash
+# Verify .NET installation
+dotnet --version  # Should be 9.0+
 
-- **Issue**: `/gaia-create` agent not found in Copilot Chat
-- **Solution**: Ensure you're in Agent mode in VS Code with GitHub Copilot extension enabled
-- **Alternative**: Use the prompt directly without the agent prefix
+# Test MCP server directly
+cd .gaia/mcps/gaia/src/fa.mcp.gaia
+dotnet run
+```
 
-#### **Prerequisites Missing**
+**Path Configuration**:
+- Use absolute paths in MCP config
+- No tilde `~` or environment variables
+- Example: `/Users/username/projects/ai.toolkit.gaia/.gaia/mcps/...`
 
-- **Issue**: Build or runtime errors during development
-- **Solution**: Verify all requirements are installed:
-  ```bash
-  node --version  # Should be 20+ LTS
-  dotnet --version  # Should be 9.0+
-  docker --version  # Should be 24+
-  ```
+### Container Issues
 
-#### **Container Issues**
+**Docker Not Starting**:
+```bash
+docker compose down
+docker compose up --build
+```
 
-- **Issue**: Docker containers not starting or database connection errors
-- **Solution**:
-  ```bash
-  docker compose down
-  docker compose up --build
-  ```
+**Port Conflicts**:
+- Check `docker-compose.yml` for port mappings
+- Modify ports if conflicts exist: `8080:80` → `8081:80`
 
-#### **Port Conflicts**
+### Build Failures
 
-- **Issue**: Application won't start due to port already in use
-- **Solution**: Check and modify port configurations in `docker-compose.yml` or stop conflicting services
+**Frontend**:
+```bash
+npm install
+npm run build
+```
 
-#### **AI Assistant Integration**
+**Backend**:
+```bash
+dotnet restore
+dotnet build
+```
 
-- **Issue**: AI assistant not responding or generating incomplete code
-- **Solution**:
-  - Ensure you're using the latest version of your AI assistant
-  - Try breaking down complex requests into smaller, specific tasks
-  - Provide more context about your requirements
-
-#### **Build Failures**
-
-- **Issue**: TypeScript or .NET compilation errors
-- **Solution**:
-
-  ```bash
-  # Frontend
-  npm install
-  npm run build
-
-  # Backend
-  dotnet restore
-  dotnet build
-  ```
-
-For additional support, visit our [Community & Support](#-community--support) section.
+**Missing Prerequisites**:
+```bash
+node --version    # 20+
+dotnet --version  # 9.0+
+docker --version  # 24+
+```
 
 ## 🌍 Community & Support
 
-**Join the GAIA Community:**
+- **🐛 Issues**: [GitHub Issues](https://github.com/frostaura/ai.toolkit.gaia/issues)
+- **💡 Discussions**: [GitHub Discussions](https://github.com/frostaura/ai.toolkit.gaia/discussions)
+- **📖 Documentation**: [`.gaia/designs/`](./.gaia/designs/) - 11 comprehensive design templates
+- **🤝 Contributing**: [AGENTS.md](./AGENTS.md) - Agent specifications and protocols
 
-- **🐛 Report Issues**: [GitHub Issues](https://github.com/frostaura/fa.templates.vibe-coding/issues) - Found a bug or have a question?
-- **💡 Feature Requests**: [GitHub Discussions](https://github.com/frostaura/fa.templates.vibe-coding/discussions) - Share your ideas
-- **📖 Documentation**: Comprehensive design specifications in `.gaia/designs/` (11 templates covering all architectural aspects)
-- **🐳 Containerization**: [Docker Support](.gaia/designs/docker-support.md)
-- **🏗️ Architecture**: [Design System](.gaia/designs/design.md) | [Repository Structure](.gaia/designs/repo-structure.md)
+## 📄 License
 
-**Contributing to GAIA:**
+MIT License - see [LICENSE](./LICENSE) for details
 
-To help improve the framework, use this prompt in a **new conversation**:
+## 🙏 Acknowledgments
 
-```
-This is our framework for creating complete end-to-end systems. Read the README.md to understand how it works, then help me enhance the prompt and documentation based on my feedback.
-```
+**Inspiration**: [Conway Osler](https://www.linkedin.com/in/conway-osler)
 
-## 🙏 Acknowledgments & Inspiration
-
-**Special thanks to [Conway Osler](https://www.linkedin.com/in/conway-osler)** for the initial inspiration that sparked this framework.
-
-**Built on proven architectural principles:**
-
-- **Service Design Architecture** by Juval Löwy
+**Architectural Principles**:
+- **iDesign** by Juval Löwy
 - **Clean Architecture** by Robert C. Martin
 - **Domain-Driven Design** by Eric Evans
 
-<h1 align="center">
-  <b>GAIA</b>
-</h1>
-<p align="center"><i>"In Greek mythology, Gaia is the personification of Earth and the ancestral mother of all life. Through intelligent code generation, she creates digital ecosystems that serve humanity."</i></p>
+---
+
+<p align="center">
+  <i>"In Greek mythology, Gaia is the personification of Earth and the ancestral mother of all life.<br/>Through intelligent orchestration, GAIA creates digital ecosystems that serve humanity."</i>
+</p>
