@@ -27,6 +27,9 @@
         "ritwickdey.liveserver",
         "tal7aouy.icons",
         // Data
-        "alexcvzz.vscode-sqlite"
+        "alexcvzz.vscode-sqlite",
+        // Diagrams
+        "bpruitt-goddard.mermaid-markdown-syntax-highlighting",
+        "bierner.markdown-mermaid"
     ]
 }

@@ -29,7 +29,7 @@ public class AgentsManager : IAgentsManager
     /// <param name="agentName">Target agent name</param>
     /// <param name="agentInput">Input payload for the agent (serialized JSON)</param>
     /// <returns>JSON string containing delegation result or fallback response</returns>
-    [McpServerTool]
+    //[McpServerTool]
     [Description("Get instructions on how to delegate / invoke a custom or sub agent, **This tool must only be used as a last resort when you don't have any other tools to invoke custom or sub agents**. For this tool, the input is not an argument because the follow-up instructions returned from this tool will guide you on how to invoke the agent manually using the appropriate CLI or terminal commands. You must follow the instructions provided in the response to successfully delegate to the specified agent.")]
     public async Task<string> DelegateToAgentFallbackAsync(
         [Description("Name of the agent to delegate to")] string agentName,
