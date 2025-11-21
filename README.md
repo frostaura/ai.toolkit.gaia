@@ -7,9 +7,10 @@
 </h1>
 <h3 align="center">🌍 Autonomous AI Software Development Framework</h3>
 
-**A spec-driven AI framework that orchestrates 20+ specialized agents to build production-ready applications through design-first development.**
+**A spec-driven AI framework that orchestrates 22 specialized agents to build production-ready applications through design-first development.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Version](https://img.shields.io/badge/Version-5.0.0-blue.svg)]()
 [![Status](https://img.shields.io/badge/Status-Production%20Ready-green.svg)]()
 [![AI Enhanced](https://img.shields.io/badge/AI-Enhanced%20Intelligence-purple.svg)]()
 [![.NET 9](https://img.shields.io/badge/.NET-9.0-512BD4.svg)]()
@@ -26,8 +27,8 @@
 
 GAIA is a **spec-driven development framework** that enforces a rigorous ANALYZE → DESIGN → PLAN → IMPLEMENT workflow through orchestrated AI agents. It's built on three pillars:
 
-1. **Design-First Methodology**: 11 comprehensive design templates (use cases, architecture, security, testing, etc.) drive all implementation
-2. **Agent Orchestration**: 20+ specialized agents handle analysis, design, implementation, testing, and deployment
+1. **Design-First Methodology**: 11 comprehensive design templates drive all implementation
+2. **Agent Orchestration**: 22 specialized agents handle analysis, design, implementation, testing, and deployment
 3. **100% Quality Standards**: Mandatory test coverage, linting, regression validation, and performance benchmarks
 
 ### Core Workflow
@@ -54,7 +55,7 @@ ANALYZE → DESIGN → PLAN → IMPLEMENT
 
 ## 🎭 Agent Architecture
 
-GAIA orchestrates **20+ specialized agents** in a coordinated workflow. Each agent has specific responsibilities and communicates via TASK_REQUEST/TASK_RESULT protocols.
+GAIA orchestrates **22 specialized agents** in a coordinated workflow. Each agent has specific responsibilities and communicates via TASK_REQUEST/TASK_RESULT protocols.
 
 ### Agent Categories
 
@@ -86,9 +87,10 @@ GAIA orchestrates **20+ specialized agents** in a coordinated workflow. Each age
 **🚀 Operations**
 - **Quality-Gate**: Pre-deployment validation
 - **Release-Manager**: Deployment management
+- **Monitoring-Specialist**: Observability & monitoring
 - **Documentation-Specialist**: Docs maintenance
 
-> See [AGENTS.md](./AGENTS.md) for complete specifications and [`.gaia/agents/`](./.gaia/agents/) for individual agent files.
+> See [AGENTS.md](./AGENTS.md) for complete specifications and [`.gaia/agents/`](./.gaia/agents/) for 22 individual agent files.
 
 ### Agent Workflow
 
