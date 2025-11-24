@@ -2,6 +2,20 @@
 
 Spec-driven orchestration system with specialized agents enforcing 100% quality standards, comprehensive testing, linting excellence, and autonomous operation without user feedback.
 
+## 🚨 CRITICAL RULES - READ FIRST 🚨
+
+Before doing ANYTHING, understand these non-negotiable rules:
+
+1. **NEVER IMPERSONATE OTHER AGENTS**: You must ONLY perform work within your designated role. Doing another agent's work is strictly forbidden. See "Anti-Impersonation Rules" below.
+
+2. **ALWAYS DELEGATE PROPERLY**: When another agent's expertise is needed, you MUST use the delegation protocol (bash/claude commands). See "Mandatory Delegation Protocol" below.
+
+3. **ALWAYS USE MCP PLANNING TOOLS**: Plans and tasks MUST be managed via MCP tools (`mcp_gaia_*`). Never use JSON files, manual tracking, or skip task tracking. See "Mandatory Plan Management" below.
+
+4. **MARK TASKS COMPLETE PROGRESSIVELY**: After EVERY completed task, delegate to Task-Manager to mark it complete via MCP tools. Never batch completions.
+
+These rules are the foundation of the Gaia system. Violating them breaks system integrity.
+
 ## Core Principles
 
 - **Repository Structure**: `.gaia/designs` (design truth), `src/` (code), `.gaia/designs/repo-structure.md` (repository structure)
@@ -19,22 +33,115 @@ Spec-driven orchestration system with specialized agents enforcing 100% quality 
   - ❌ Only create temporary files if absolutely necessary: prefix with `gaia_tmp_*.md`
 - **Time & Complexity**: No matter how long issues would take or how complicated they may be, you must never settle for less than the specified acceptance criteria for any given task.
 
-## Steps for Delegation
-- Find and read the respective agent md file for the agent you want to invoke. All agent definitions live in .gaia/agents.
-    - Understand the agent instructions and expected input/output.
-    - Understand the model that is required by the agent.
-- Build up the agent's instructions for it's system prompt.
-    - Find and read the respective project-level instructions here: .gaia/instructions/instructions.project.md
-    - Find and read the respective agent-level instructions here: .gaia/instructions/instructions.agents.md
-    - Combine these instructions with the agent's own instructions from the agents file, in the following order:
-        - Project-level instructions
-        - Agent-level instructions
-        - Agent's own instructions from the agents file
-- Use your bash or terminal tool to invoke the agent using the appropriate model and the constructed system prompt. You should try the following terminal commands in order of priority. If the one fails, you should try the next one. If all of them fail, you should report an error. Make sure to replace <the agent's instructions from the agents file> with the actual instructions you constructed in the previous step, and replace <the input you want to provide to the agent> with the actual input you want to provide to the agent, serialized as a JSON string.
-    - `claude --dangerously-skip-permissions --model <sonnet | opus>` --system-prompt '<the agent's instructions from the agents file>' -p '<the input you want to provide to the agent, serialized as JSON>'
-    - copilot -p 'Fix the bug in main.js' --allow-all-tools --allow-all-paths
-        - In the case where you resort to Copilot, make sure to provide the agent's instructions and input in the prompt (-p) argument.
-- Capture the output from the agent invocation and use it as needed.
+## ⚠️ CRITICAL: ANTI-IMPERSONATION RULES ⚠️
+
+**ABSOLUTE PROHIBITION**: You MUST NEVER impersonate another agent or perform work outside your designated role.
+
+### What Impersonation Looks Like (FORBIDDEN):
+- ❌ Pretending to be another agent in your responses
+- ❌ Performing tasks that belong to another agent's domain
+- ❌ Saying "As [Agent-Name], I will..." when you are not that agent
+- ❌ Implementing code when you are not Code-Implementer
+- ❌ Creating designs when you are not Design-Architect
+- ❌ Writing tests when you are not a Testing agent
+- ❌ Marking tasks complete when you are not Task-Manager
+- ❌ Doing ANY work that belongs to another specialized agent
+
+### What Proper Delegation Looks Like (REQUIRED):
+- ✅ Using the delegation protocol defined below to invoke the correct agent
+- ✅ Waiting for the delegated agent's actual response
+- ✅ Using the agent's output to inform your next steps
+- ✅ Staying strictly within your own agent's defined responsibilities
+- ✅ Calling the appropriate tool for the agent you need to delegate to
+
+### Why This Matters:
+- **System Integrity**: The entire Gaia framework depends on proper agent specialization
+- **Quality Assurance**: Each agent is tuned for specific expertise - impersonation degrades quality
+- **Traceability**: Proper delegation creates an audit trail; impersonation breaks it
+- **Tool Usage**: MCP planning tools require actual agent invocation, not simulation
+
+### Consequences of Impersonation:
+- **IMMEDIATE FAILURE**: Any task where impersonation is detected must be redone
+- **QUALITY BREACH**: 100% reflection metrics cannot be achieved through impersonation
+- **PLAN CORRUPTION**: Task tracking breaks when agents don't properly delegate
+
+## ✅ MANDATORY DELEGATION PROTOCOL ✅
+
+**YOU MUST DELEGATE TO OTHER AGENTS - NEVER DO THEIR WORK YOURSELF**
+
+This is the ONLY acceptable way to involve another agent. Any other approach is impersonation and is strictly forbidden.
+
+### Step 1: Identify the Correct Agent
+- Find and read the respective agent md file for the agent you want to invoke
+- All agent definitions live in `.gaia/agents/`
+- Understand the agent's instructions and expected input/output
+- Understand the model that is required by the agent (sonnet or opus)
+
+### Step 2: Build the Agent's System Prompt
+The agent must receive the complete instruction set in this EXACT order:
+1. **Project-level instructions** from: `.gaia/instructions/instructions.project.md`
+2. **Agent-level instructions** from: `.gaia/instructions/instructions.agents.md`
+3. **Agent's own instructions** from: `.gaia/agents/[agent-name].md`
+
+Combine ALL THREE instruction sets - this is MANDATORY for proper agent behavior.
+
+### Step 3: Invoke the Agent (REQUIRED - DO NOT SKIP)
+Use your bash or terminal tool to invoke the agent. Try commands in this priority order:
+
+**Option 1 (Preferred)**: Claude CLI with explicit model
+```bash
+claude --dangerously-skip-permissions --model <sonnet|opus> --system-prompt '<COMBINED_INSTRUCTIONS>' -p '<INPUT_AS_JSON>'
+```
+
+**Option 2 (Fallback)**: GitHub Copilot CLI
+```bash
+copilot -p '<AGENT_INSTRUCTIONS_AND_INPUT>' --allow-all-tools --allow-all-paths
+```
+
+**CRITICAL**: 
+- Replace `<COMBINED_INSTRUCTIONS>` with the full instruction set from Step 2
+- Replace `<INPUT_AS_JSON>` with the actual input serialized as JSON
+- For Copilot, include both agent instructions and input in the `-p` argument
+- If all commands fail, you MUST report an error - DO NOT proceed without delegation
+
+### Step 4: Capture and Use the Response
+- Wait for the agent's actual output
+- Use the agent's response to inform your next actions
+- NEVER fabricate or simulate an agent's response
+
+### Step 5: Track Completion via Task-Manager
+After an agent completes work:
+1. Validate the agent's deliverable against acceptance criteria
+2. Delegate to Task-Manager to mark tasks complete via MCP tools
+3. NEVER mark tasks complete yourself unless you ARE Task-Manager
+
+## Examples of Proper Delegation
+
+### ✅ CORRECT: Actual Delegation
+```bash
+# Read agent file
+cat .gaia/agents/code-implementer.md
+
+# Build full instruction set
+INSTRUCTIONS="$(cat .gaia/instructions/instructions.project.md)\n\n$(cat .gaia/instructions/instructions.agents.md)\n\n$(cat .gaia/agents/code-implementer.md)"
+
+# Invoke agent
+claude --dangerously-skip-permissions --model opus --system-prompt "$INSTRUCTIONS" -p '{"task": "Implement user authentication", "design_ref": ".gaia/designs/2-class.md"}'
+
+# Wait for and capture actual response
+```
+
+### ❌ WRONG: Impersonation
+```
+"As Code-Implementer, I will now implement the authentication system..."
+# This is IMPERSONATION - you are NOT Code-Implementer
+```
+
+### ❌ WRONG: Simulated Response
+```
+"I'm delegating to Code-Implementer... [proceeds to write code without actually invoking the agent]"
+# This is IMPERSONATION - you didn't actually invoke the agent
+```
 
 ## Spec-Driven Workflow (Mandatory)
 
@@ -103,14 +210,57 @@ Spec-driven orchestration system with specialized agents enforcing 100% quality 
 
 - All tasks reference `.gaia/designs`; all agents iterate to 100% reflection metrics
 
-## Plan Management (MCP Tools Only)
+## 🎯 MANDATORY PLAN MANAGEMENT (MCP Tools Only)
 
-- One master plan per workload: 3-level hierarchy (phases→epics→tasks)
-- Every task requires owner assignment (agent name) for clear accountability
-- Plan-Designer designs; Task-Manager captures and is the ONLY agent that marks tasks complete
-- Dynamic sub-task creation on-demand via Task-Manager
-- Real-time status updates; any producing agent reports readiness; Gaia validates; Task-Manager performs the completion update
-- Workflow: ProducingAgent → TASK_RESULT → Gaia validates → Task-Manager updates status (COMPLETE / NEEDS_ITERATION)
+**CRITICAL RULE**: ALL planning MUST use Gaia MCP tools. NO exceptions. NO alternatives.
+
+### Why MCP Tools Are Mandatory:
+- **Real-time Tracking**: Enables live status updates across sessions
+- **System Integrity**: File-based or manual tracking breaks the Gaia framework
+- **Agent Coordination**: All agents reference the same source of truth
+- **Resumption Support**: Allows picking up work after interruptions
+
+### MCP Tool Requirements:
+- ✅ **ALWAYS** use `mcp_gaia_create_new_plan` to create plans
+- ✅ **ALWAYS** use `mcp_gaia_add_new_task_to_plan` to add tasks
+- ✅ **ALWAYS** use `mcp_gaia_mark_task_as_completed` to mark tasks complete
+- ✅ **ALWAYS** use `mcp_gaia_get_tasks_from_plan` to query plan status
+- ❌ **NEVER** create JSON files for plans
+- ❌ **NEVER** use database files directly
+- ❌ **NEVER** track plans manually in markdown or text files
+- ❌ **NEVER** skip task tracking
+
+### Plan Structure (Mandatory 3-Level Hierarchy):
+1. **Phase** → High-level milestone (e.g., "Implementation Phase")
+2. **Epic** → Feature/component area (e.g., "Authentication System")
+3. **Story** → Specific task (e.g., "Implement JWT middleware")
+
+### Who Does What:
+- **Plan-Designer**: Designs the plan structure and task breakdown
+- **Task-Manager**: EXCLUSIVELY captures plans via MCP tools and marks tasks complete
+- **All Other Agents**: Report completion to Gaia, who delegates to Task-Manager for marking
+
+### Task Completion Workflow (MANDATORY):
+1. Executing agent completes work and reports TASK_RESULT to Gaia
+2. Gaia validates deliverable against acceptance criteria
+3. Gaia delegates to Task-Manager with completed task IDs
+4. Task-Manager marks tasks complete via `mcp_gaia_mark_task_as_completed`
+5. Task-Manager confirms completion back to Gaia
+6. Gaia proceeds to next task
+
+**NEVER SKIP TASK TRACKING**: Every task MUST be marked complete as it's finished. This is not optional.
+
+### Real-Time Tracking Principles:
+- Mark tasks complete IMMEDIATELY after validation, not in batches
+- Update task status as work progresses (not-started → in-progress → completed)
+- Query plan status regularly to maintain situational awareness
+- Create sub-tasks dynamically as new work is discovered during implementation
+
+### Consequences of Bypassing MCP Tools:
+- ❌ **SYSTEM FAILURE**: Plan state becomes inconsistent
+- ❌ **LOST PROGRESS**: Work cannot be resumed after interruptions
+- ❌ **BROKEN COORDINATION**: Agents work without shared truth
+- ❌ **INVALID COMPLETION**: Cannot validate 100% task completion
 
 ## Agent Handoff Protocols
 
@@ -168,10 +318,25 @@ Spec-driven orchestration system with specialized agents enforcing 100% quality 
 
 ## Best Practices
 
+**Delegation & Anti-Impersonation**:
+- ALWAYS use the delegation protocol when another agent's expertise is needed
+- NEVER pretend to be another agent or do their work
+- NEVER simulate agent responses - always invoke them for real
+- NEVER skip the delegation steps to save time
+- Stay strictly within your defined role and responsibilities
+
 **Agents**: Clear specialization, defined protocols, comprehensive error handling, transparent reflection
 **QA**: Never skip tests, real data, mandatory regression testing, autonomous infrastructure
 **Linting**: ESLint+Prettier (frontend), StyleCop+EditorConfig (backend), build integration, zero tolerance, pre-commit hooks
-**Plans**: MCP tools only, never JSON or DB files, real-time tracking, mark tasks as complete progressively
+
+**Plans & Task Tracking (MANDATORY)**:
+- MCP tools ONLY - never JSON files, manual tracking, or skip tracking
+- Mark tasks complete IMMEDIATELY after validation, not in batches
+- Real-time tracking at all times for accurate status
+- One master plan per workload with dynamic sub-task expansion
+- ONLY Task-Manager marks tasks complete via MCP tools
+- All agents report completion → Gaia validates → Gaia delegates to Task-Manager → Task-Manager marks complete
+
 **Memory**: Use Gaia MCP memory tools for decisions, patterns, cross-session context with strategic tags
 **Spec-Driven**: ANALYZE → DESIGN → PLAN → IMPLEMENT (never skip phases)
 
