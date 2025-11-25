@@ -2,13 +2,13 @@
 
 ## Repository Structure
 
-This repository uses a streamlined AI-enhanced development workflow with 6 specialized agents.
+This repository uses a streamlined AI-enhanced development workflow with 7 specialized agents.
 
 ### Core Directories
 
 **`.gaia/`** - AI Framework Core
-- `agents/` - 6 specialized agent specifications (Explorer, Architect, Builder, Tester, Reviewer, Deployer, Documenter)
-- `designs/` - Adaptive design documents (grow with project maturity)
+- `agents/` - 7 specialized agent specifications (Explorer, Architect, Builder, Tester, Reviewer, Deployer, Documenter)
+- `designs/` - Progressive design docs (start with README, add only when needed)
 - `mcps/` - Core MCP server with 4 essential tools
 - `tasks.jsonl` - Task tracking in JSONL format
 - `memory.jsonl` - Decision and context storage
@@ -32,15 +32,18 @@ This repository uses a streamlined AI-enhanced development workflow with 6 speci
 - `backend/` - API and business logic
 - `frontend/` - UI applications
 
-### Streamlined Workflow
+### Spec-Driven Workflow (MANDATORY)
 
 1. **EXPLORE** - Use @Explorer to understand the codebase
-2. **ARCHITECT** - Use @Architect for design decisions (only as needed)
-3. **BUILD** - Use @Builder to implement features
-4. **TEST** - @Builder delegates to @Tester for validation
-5. **REVIEW** - Use @Reviewer for quality checks
-6. **DEPLOY** - Use @Deployer for git operations and deployments
-7. **DOCUMENT** - Use @Documenter to keep docs current
+2. **DESIGN** - Update `.gaia/designs/` specs BEFORE coding
+3. **ARCHITECT** - Use @Architect for new design decisions
+4. **BUILD** - Use @Builder to implement FROM SPECS
+5. **TEST** - Use @Tester for validation
+6. **REVIEW** - Use @Reviewer for quality checks
+7. **DEPLOY** - Use @Deployer for git operations
+8. **DOCUMENT** - Use @Documenter to keep docs current
+
+**CRITICAL**: Never skip step 2. All features require design updates first.
 
 ### Agent Coordination
 
@@ -54,12 +57,24 @@ Since agents cannot call other agents, the main AI instance coordinates workflow
 
 See `.gaia/prompts/gaia.prompt.md` for orchestration instructions.
 
-### MCP Tools (Just 4)
+### MCP Tools (Just 4) - USE THESE EXCLUSIVELY
 
-1. `read_tasks` - Get current tasks from JSONL
-2. `update_task` - Update task status
-3. `remember` - Store important decisions
-4. `recall` - Search previous decisions
+**IMPORTANT**: Use ONLY these MCP tools for ALL task and memory management:
+1. `read_tasks(hideCompleted?)` - Get current tasks from JSONL
+2. `update_task(taskId, description, status, assignedTo?)` - Update task status
+3. `remember(category, key, value)` - Store important decisions
+4. `recall(query, maxResults?)` - Search previous decisions with fuzzy matching
+
+**DO NOT (CRITICAL)**:
+- Create TODO.md, TASKS.md, or any markdown files for task tracking
+- Use Write/Edit tools to create task lists in files
+- Track tasks anywhere except via MCP tools
+- Create memory/decision files outside of MCP tools
+- **NEVER directly edit .gaia/tasks.jsonl or .gaia/memory.jsonl files**
+- **NEVER use Read/Write/Edit tools on JSONL files**
+
+All task and memory management MUST go through the GAIA MCP server.
+The MCP server handles file creation, corruption recovery, and all JSONL operations.
 
 ### Progressive Design
 
@@ -71,8 +86,9 @@ Start simple, add complexity only when needed:
 
 ### Key Principles
 
-- **No orchestrator** - Agents communicate directly
-- **JSONL storage** - Git tracks everything
+- **Main AI as orchestrator** - Agents cannot call each other, main AI coordinates
+- **JSONL storage** - Git tracks everything via MCP tools
 - **Model optimization** - Haiku for simple tasks (10x cheaper)
-- **Parallel execution** - Run independent tasks simultaneously
+- **Parallel execution** - Run independent agents simultaneously
 - **Minimal documentation** - Only what developers actually use
+- **MCP tools only** - No markdown files for tasks/memories

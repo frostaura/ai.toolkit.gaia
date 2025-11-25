@@ -1,4 +1,0 @@
-{"timestamp": "2024-11-25", "type": "system", "key": "simplification", "value": "Reduced agent count from 22 to 6 core agents for better efficiency"}
-{"timestamp": "2024-11-25", "type": "architecture", "key": "task_management", "value": "Replaced SQLite database with simple markdown file for task tracking"}
-{"timestamp": "2024-11-25", "type": "design", "key": "delegation", "value": "Removed JSON protocol overhead in favor of direct markdown commands"}
-{"timestamp": "2024-11-25", "type": "optimization", "key": "model_selection", "value": "Use Haiku for simple tasks (10x cheaper), Sonnet for complex tasks, Opus only when critical"}

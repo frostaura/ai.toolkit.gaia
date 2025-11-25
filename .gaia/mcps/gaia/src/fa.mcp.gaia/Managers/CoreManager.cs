@@ -26,6 +26,56 @@ namespace FrostAura.MCP.Gaia.Managers
 
             // Ensure .gaia directory exists
             Directory.CreateDirectory(".gaia");
+
+            // Initialize files if they don't exist or are corrupt
+            InitializeFilesIfNeeded();
+        }
+
+        private void InitializeFilesIfNeeded()
+        {
+            // Check and initialize tasks file
+            if (!IsFileValid(_tasksPath))
+            {
+                _logger.LogWarning($"Tasks file missing or corrupt, creating new file: {_tasksPath}");
+                File.WriteAllText(_tasksPath, string.Empty);
+            }
+
+            // Check and initialize memory file
+            if (!IsFileValid(_memoryPath))
+            {
+                _logger.LogWarning($"Memory file missing or corrupt, creating new file: {_memoryPath}");
+                File.WriteAllText(_memoryPath, string.Empty);
+            }
+        }
+
+        private bool IsFileValid(string path)
+        {
+            if (!File.Exists(path))
+                return false;
+
+            try
+            {
+                // Validate JSONL format by attempting to parse each line
+                var lines = File.ReadAllLines(path);
+                foreach (var line in lines.Where(l => !string.IsNullOrWhiteSpace(l)))
+                {
+                    JsonSerializer.Deserialize<Dictionary<string, object>>(line);
+                }
+                return true;
+            }
+            catch
+            {
+                // File exists but is corrupt
+                // Back it up before recreating
+                var backupPath = $"{path}.corrupt.{DateTime.UtcNow:yyyyMMddHHmmss}";
+                try
+                {
+                    File.Move(path, backupPath);
+                    _logger.LogWarning($"Corrupt file backed up to: {backupPath}");
+                }
+                catch { }
+                return false;
+            }
         }
 
         /// <summary>
@@ -38,10 +88,6 @@ namespace FrostAura.MCP.Gaia.Managers
         {
             try
             {
-                if (!File.Exists(_tasksPath))
-                {
-                    await InitializeTasksFileAsync();
-                }
 
                 var lines = await File.ReadAllLinesAsync(_tasksPath);
                 var tasks = new List<object>();
@@ -300,23 +346,6 @@ namespace FrostAura.MCP.Gaia.Managers
                 _logger.LogError(ex, "Error recalling memories");
                 return $"Error recalling memories: {ex.Message}";
             }
-        }
-
-        private async Task InitializeTasksFileAsync()
-        {
-            var initialTasks = new[]
-            {
-                new Dictionary<string, object>
-                {
-                    ["id"] = "init",
-                    ["description"] = "System initialized with core MCP tools",
-                    ["status"] = "completed",
-                    ["updated"] = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss")
-                }
-            };
-
-            var lines = initialTasks.Select(t => JsonSerializer.Serialize(t));
-            await File.WriteAllLinesAsync(_tasksPath, lines);
         }
     }
 }
