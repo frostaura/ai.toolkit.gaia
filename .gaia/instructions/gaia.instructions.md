@@ -295,7 +295,6 @@ mcp__gaia__remember("reflection", "phase_X_attempts", "2")
 ### Frontend
 - **Framework**: React 18+ with TypeScript 5+
 - **State**: Redux Toolkit + RTK Query
-- **UI Components**: ReactBits (via MCP) → ChakraUI → Ant Design
 - **PWA**: MANDATORY (Service Workers, IndexedDB, Offline-first)
 - **Linting**: ESLint + Prettier
 
@@ -349,7 +348,6 @@ mcp__gaia__remember("reflection", "phase_X_attempts", "2")
 - ❌ Skip regression testing
 - ❌ Create TODO.md or any markdown task files
 - ❌ Modify .gaia/tasks.jsonl or memory.jsonl directly
-- ❌ Build custom components when libraries exist
 - ❌ Create separate test scripts
 - ❌ Proceed with <100% on critical metrics
 

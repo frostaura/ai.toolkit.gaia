@@ -128,7 +128,6 @@ gh copilot
 - **Frontend**: React + TypeScript + Redux (PWA mandatory)
 - **Database**: PostgreSQL
 - **Testing**: Playwright (direct use only)
-- **Components**: ReactBits → ChakraUI → Ant Design
 
 ## ✅ Success Criteria
 
@@ -164,7 +163,6 @@ Every phase requires **100% on ALL metrics**:
 - Skip design phase
 - Create TODO.md files
 - Modify .jsonl files directly
-- Build custom components unnecessarily
 - Compromise on quality
 
 ## 📁 Repository Structure

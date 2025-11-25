@@ -188,7 +188,6 @@ Reference: api.md#auth-endpoints
 - Frontend: React + TypeScript + Redux + PWA
 - Database: PostgreSQL
 - Testing: Playwright (directly, no scripts)
-- Components: ReactBits → ChakraUI → Ant Design
 
 ## Critical Rules
 
