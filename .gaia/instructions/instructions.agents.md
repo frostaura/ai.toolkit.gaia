@@ -31,8 +31,8 @@ Spec-driven orchestration system with specialized agents enforcing 100% quality 
         - Agent-level instructions
         - Agent's own instructions from the agents file
 - Use your bash or terminal tool to invoke the agent using the appropriate model and the constructed system prompt. You should try the following terminal commands in order of priority. If the one fails, you should try the next one. If all of them fail, you should report an error. Make sure to replace <the agent's instructions from the agents file> with the actual instructions you constructed in the previous step, and replace <the input you want to provide to the agent> with the actual input you want to provide to the agent, serialized as a JSON string.
-    - `claude --dangerously-skip-permissions --model <sonnet | opus>` --system-prompt '<the agent's instructions from the agents file>' -p '<the input you want to provide to the agent, serialized as JSON>'
-    - copilot -p 'Fix the bug in main.js' --allow-all-tools --allow-all-paths
+    - `claude --dangerously-skip-permissions --model <sonnet | opus> --system-prompt '<the agent instructions from the agents file>' -p '<the input you want to provide to the agent>'`
+    - `copilot -p 'Fix the bug in main.js' --allow-all-tools --allow-all-paths`
         - In the case where you resort to Copilot, make sure to provide the agent's instructions and input in the prompt (-p) argument.
 - Capture the output from the agent invocation and use it as needed.
 

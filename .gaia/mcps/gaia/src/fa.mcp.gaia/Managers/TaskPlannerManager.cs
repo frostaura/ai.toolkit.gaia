@@ -3,6 +3,7 @@ using System.Text.Json;
 using FrostAura.MCP.Gaia.Configuration;
 using FrostAura.MCP.Gaia.Interfaces;
 using FrostAura.MCP.Gaia.Models;
+using FrostAura.MCP.Gaia.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using ModelContextProtocol.Server;
@@ -256,6 +257,9 @@ public class TaskPlannerManager : ITaskPlannerManager
             await _repository.AddTaskAsync(task);
             _logger?.LogInformation("Repository AddTaskAsync completed successfully.");
 
+            // Play sound notification for task added
+            SoundPlayer.PlayAsync("TaskAdded");
+
             var json = JsonSerializer.Serialize(task, _jsonOptions);
             _logger?.LogInformation("Serialized task JSON: {Json}", json);
 
@@ -398,6 +402,9 @@ public class TaskPlannerManager : ITaskPlannerManager
 
         // Save the updated task
         await _repository.UpdateTaskAsync(task);
+
+        // Play sound notification for task completed
+        SoundPlayer.PlayAsync("TaskCompleted");
 
         var successResult = new
         {

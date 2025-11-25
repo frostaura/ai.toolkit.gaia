@@ -3,6 +3,7 @@ using System.Text.Json;
 using FrostAura.MCP.Gaia.Configuration;
 using FrostAura.MCP.Gaia.Interfaces;
 using FrostAura.MCP.Gaia.Models;
+using FrostAura.MCP.Gaia.Utilities;
 using Microsoft.Extensions.Configuration;
 using ModelContextProtocol.Server;
 
@@ -66,6 +67,10 @@ public class HierarchicalTaskPlanner : IHierarchicalTaskPlanner
         };
 
         await _repository.AddPlanAsync(plan);
+
+        // Play sound notification for plan created
+        SoundPlayer.PlayAsync("PlanCompleted");
+
         var json = JsonSerializer.Serialize(plan, _jsonOptions);
         return json;
     }
@@ -258,6 +263,10 @@ public class HierarchicalTaskPlanner : IHierarchicalTaskPlanner
         };
 
         await _repository.AddTaskAsync(task);
+
+        // Play sound notification for task added
+        SoundPlayer.PlayAsync("TaskAdded");
+
         var json = JsonSerializer.Serialize(task, _jsonOptions);
         return json;
     }
@@ -411,6 +420,9 @@ public class HierarchicalTaskPlanner : IHierarchicalTaskPlanner
 
         // Save the updated task
         await _repository.UpdateTaskAsync(task);
+
+        // Play sound notification for task completed
+        SoundPlayer.PlayAsync("TaskCompleted");
 
         var successResult = new
         {

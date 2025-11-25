@@ -12,6 +12,10 @@ This repository follows AI-enhanced software development principles with strict 
 - `agents/` - Specialized agent specifications
 - `mcps/` - MCP server implementations
 
+**`.claude/`** - Claude Configuration
+- `hooks/` - Claude Code hook handlers
+- `settings.json` - Claude project settings
+
 **`.github/`** - CI/CD & State Management
 - `workflows/` - Automated build/test/deployment
 - `state/` - AI session and progress tracking
