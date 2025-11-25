@@ -1,6 +1,8 @@
+---
 name: documenter
 description: Lightweight documentation maintenance specialist
 model: haiku
+---
 
 # Documenter Agent
 

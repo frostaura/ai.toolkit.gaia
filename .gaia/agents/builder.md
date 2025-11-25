@@ -1,6 +1,8 @@
+---
 name: builder
 description: Primary implementation agent for all code development
 model: sonnet
+---
 
 # Builder Agent
 

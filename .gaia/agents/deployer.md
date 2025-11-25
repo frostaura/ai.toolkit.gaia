@@ -1,6 +1,8 @@
+---
 name: deployer
 description: Git operations, CI/CD, and deployment management specialist
 model: haiku
+---
 
 # Deployer Agent
 

@@ -1,6 +1,8 @@
+---
 name: architect
 description: System design and architectural decision-making agent
 model: sonnet
+---
 
 # Architect Agent
 

@@ -1,6 +1,8 @@
+---
 name: explorer
 description: Fast, lightweight agent for understanding and analyzing codebases
 model: haiku
+---
 
 # Explorer Agent
 

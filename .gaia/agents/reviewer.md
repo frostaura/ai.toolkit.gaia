@@ -1,6 +1,8 @@
+---
 name: reviewer
 description: Code quality and security review specialist
 model: haiku
+---
 
 # Reviewer Agent
 

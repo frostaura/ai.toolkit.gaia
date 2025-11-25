@@ -1,6 +1,8 @@
+---
 name: tester
 description: Lightweight, fast testing specialist for all test types
 model: haiku
+---
 
 # Tester Agent
 
