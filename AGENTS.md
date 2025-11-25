@@ -1,1 +1,0 @@
-.gaia/instructions/instructions.agents.md

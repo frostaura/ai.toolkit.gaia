@@ -86,10 +86,6 @@
     },
     "chat.mcp.autostart": "newAndOutdated",
     "chat.tools.terminal.enableAutoApprove": true,
-    "chat.promptFilesLocations": {
-        ".github/prompts": true,
-        ".gaia/prompts": true
-    },
     "chat.mcp.access": "all",
     "playwright.showTrace": false,
     "playwright.reuseBrowser": false,

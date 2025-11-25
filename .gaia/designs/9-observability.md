@@ -36,36 +36,42 @@ Comprehensive monitoring, logging, tracing, and alerting for production systems.
 
 ### Structured Logging
 
-**Log Format**: JSON structured logs for machine readability
+**Log Format**: JSON structured logs for machine readability (Winston)
 
 **Standard Log Structure**:
 ```json
 {
-  "timestamp": "2025-11-20T10:30:00.123Z",
-  "level": "INFO",
-  "service": "api-service",
-  "version": "2.1.0",
+  "timestamp": "2025-11-22T19:00:00.000Z",
+  "level": "info",
+  "message": "Tower placed successfully",
+  "service": "tower-defense-backend",
   "environment": "production",
-  "traceId": "550e8400-e29b-41d4-a716-446655440000",
-  "spanId": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
-  "userId": "user-123",
-  "message": "Order created successfully",
-  "metadata": {
-    "orderId": "order-456",
-    "amount": 99.99,
-    "duration_ms": 145
-  },
-  "error": null
+  "context": {
+    "userId": "user-123",
+    "gameSessionId": "session-456",
+    "towerId": "tower-789",
+    "towerType": "Arrow",
+    "position": {"x": 10, "y": 15},
+    "gold": 0,
+    "requestId": "req-abc123"
+  }
 }
 ```
 
 **Log Levels**:
-- **TRACE**: Very detailed debugging (disabled in production)
-- **DEBUG**: Detailed debugging information (minimal in production)
-- **INFO**: General informational messages (default production level)
-- **WARN**: Warning messages, potential issues (actionable)
-- **ERROR**: Error events that allow continued operation
-- **FATAL**: Critical errors causing application shutdown
+- **error**: Error events (pathfinding failures, WebSocket disconnections, database errors)
+- **warn**: Warning messages (rate limit approaching, slow pathfinding >80ms)
+- **info**: General informational messages (tower placed, wave started, player joined) **[Default Production]**
+- **debug**: Detailed debugging (enemy positions, state changes) **[Development Only]**
+
+**Game-Specific Log Events**:
+- `tower:placed` - Tower placement with position, type, owner
+- `pathfinding:recalculated` - Pathfinding duration, affected enemies
+- `wave:started` - Wave number, enemy count
+- `player:connected` - User ID, session ID, connection timestamp
+- `player:disconnected` - User ID, disconnect reason, reconnect timeout
+- `auth:login_success` - User ID, IP address (redacted email)
+- `auth:login_failed` - Email (redacted), IP address, reason
 
 ### Log Categories
 
@@ -155,46 +161,72 @@ graph LR
 
 ### Key Performance Indicators (KPIs)
 
+**Game Performance Metrics** (CRITICAL):
+```
+# Pathfinding performance (REQUIREMENT: <100ms)
+pathfinding_duration_ms{grid_size="50x50"} histogram
+  - P50, P95, P99 latencies
+  - Alert if P95 > 100ms
+
+# Game loop FPS (REQUIREMENT: 60fps)
+game_loop_fps{session_id} gauge
+  - Real-time frame rate per game session
+  - Alert if fps < 50 for 1 minute
+
+# WebSocket latency (REQUIREMENT: <100ms)
+websocket_latency_ms{event_type="tower:place|enemy:spawn|state:delta"} histogram
+  - Round-trip time by event type
+  - Alert if P95 > 100ms
+
+# Active game metrics
+active_players gauge - Current connected players across all sessions
+active_game_sessions gauge - Current running game sessions
+```
+
 **Application Metrics**:
 ```
-# HTTP request metrics
-http_requests_total{method="GET", endpoint="/api/users", status="200"}
-http_request_duration_seconds{method="GET", endpoint="/api/users"}
+# HTTP REST API metrics
+http_requests_total{method="POST", endpoint="/v1/auth/login", status="200"}
+http_request_duration_seconds{method="POST", endpoint="/v1/tribes"}
 
-# Database metrics
-db_query_duration_seconds{operation="SELECT", table="users"}
-db_connection_pool_size{state="active|idle|waiting"}
+# Tower placement metrics
+tower_placement_count{tower_type="Arrow|Cannon|Magic|Wall"} counter
+tower_placement_failed_count{reason="insufficient_gold|tile_occupied"} counter
 
-# Cache metrics
-cache_hits_total{cache="redis", key_prefix="user"}
-cache_misses_total{cache="redis", key_prefix="user"}
+# Enemy metrics
+enemy_spawn_count{enemy_type="Basic|Fast|Heavy"} counter
+enemy_killed_count{killed_by="tower|timeout"} counter
+enemy_goal_reached_count counter
 
-# External service metrics
-external_api_calls_total{service="payment-gateway", status="success|failure"}
-external_api_duration_seconds{service="payment-gateway"}
+# Pathfinding metrics
+pathfinding_recalculation_count counter
+pathfinding_failure_count counter - No valid path (boxed in)
 ```
 
-**Infrastructure Metrics**:
+**Database Metrics**:
 ```
-# CPU and Memory
-cpu_usage_percent{host="web-server-1"}
-memory_usage_bytes{host="web-server-1"}
-
-# Disk I/O
-disk_io_bytes_read{device="/dev/sda"}
-disk_io_bytes_written{device="/dev/sda"}
-
-# Network
-network_bytes_sent{interface="eth0"}
-network_bytes_received{interface="eth0"}
+db_query_duration_seconds{operation="SELECT|INSERT|UPDATE", table="maps|tribes|users"}
+db_connection_pool_size{state="active|idle"}
+db_slow_queries_count{threshold=">100ms"} counter
 ```
 
-**Custom Business Metrics**:
+**WebSocket Metrics**:
 ```
-# Business-specific metrics
-orders_created_total{product_category="electronics"}
-revenue_total_dollars{payment_method="credit_card"}
-user_registrations_total{source="organic|referral"}
+websocket_connections_total counter
+websocket_active_connections gauge
+websocket_messages_sent_total{event_type} counter
+websocket_messages_received_total{event_type} counter
+websocket_disconnections_total{reason="timeout|error|user_action"} counter
+```
+
+**Business Metrics**:
+```
+# User engagement
+user_registrations_total counter
+maps_created_total counter
+tribes_created_total counter
+games_played_total counter
+waves_completed_total counter
 ```
 
 ### Metric Collection
@@ -577,57 +609,60 @@ Alert: If failure rate > 10% over 15 minutes
 
 ## Validation Checklist
 
-**Logging**:
-- [ ] Structured JSON logging implemented
-- [ ] Log levels appropriate (INFO in production)
-- [ ] PII redaction and secret masking
-- [ ] Log aggregation and retention strategy
+**Logging** (Winston + JSON):
+- [x] Structured JSON logging (Winston library)
+- [x] Log levels: error, warn, info (production), debug (development)
+- [x] PII redaction (email masking: pla***@example.com)
+- [x] Secret masking (never log passwords, JWT tokens)
+- [x] Game-specific events: tower:placed, pathfinding:recalculated, player:connected
+- [x] Request ID propagation through WebSocket events
+- [x] Log rotation (daily, 7-day retention)
 
-**Metrics**:
-- [ ] RED/USE metrics instrumented
-- [ ] Business metrics tracked
-- [ ] Custom metrics for critical paths
-- [ ] Metric retention and aggregation rules
+**Metrics** (Custom Application Metrics):
+- [x] Pathfinding duration histogram (P50, P95, P99) - Alert if P95 > 100ms
+- [x] Game loop FPS gauge (target: 60fps) - Alert if <50fps for 1min
+- [x] WebSocket latency histogram (by event type) - Alert if P95 > 100ms
+- [x] Active players gauge
+- [x] Active game sessions gauge
+- [x] Tower placement counter (by type)
+- [x] Enemy spawn counter (by type)
+- [x] Pathfinding recalculation counter
 
-**Tracing**:
-- [ ] Distributed tracing implemented
-- [ ] Trace sampling strategy defined
-- [ ] Critical paths fully instrumented
-- [ ] Trace retention policy established
+**Tracing** (Request ID Propagation):
+- [x] Request ID generated on WebSocket connection
+- [x] Propagated through all events (tower:place → pathfinding:recalculate → pathfinding:complete)
+- [x] Logged in all structured logs for correlation
+- [x] Enables debugging multiplayer issues across backend instances
 
-**Alerting**:
-- [ ] Actionable alerts with runbooks
-- [ ] Alert severity and routing defined
-- [ ] On-call schedule established
-- [ ] Alert fatigue minimized (tuned thresholds)
+**Alerting Rules** (Grafana or equivalent):
+- [x] **CRITICAL**: Pathfinding duration P95 > 100ms for 5min → Page on-call
+- [x] **CRITICAL**: Game loop FPS < 50 for 1min → Page on-call
+- [x] **WARNING**: Error rate > 1% for 5min → Slack notification
+- [x] **WARNING**: WebSocket disconnection spike (>10% players in 1min) → Slack notification
+- [x] **INFO**: Backend instance restart → Slack notification
 
-**Dashboards**:
-- [ ] System health dashboard created
-- [ ] Application performance dashboard
-- [ ] Infrastructure monitoring dashboard
-- [ ] Business metrics dashboard
+**Dashboards** (Grafana/CloudWatch):
+- [x] **Real-time Performance**: Game loop FPS (line chart), WebSocket latency (histogram), active players (gauge)
+- [x] **Pathfinding Performance**: Duration histogram, P95 latency, recalculation rate
+- [x] **Multiplayer Health**: Connected players, active sessions, connection stability
+- [x] **Error Monitoring**: Error rate, failed pathfinding attempts, WebSocket disconnections
+- [x] **System Health**: CPU/memory usage, database connection pool, request rate
 
-**SLOs**:
-- [ ] Availability SLO defined and tracked
-- [ ] Latency SLO defined and tracked
-- [ ] Error budget calculated and monitored
-- [ ] Error budget policy established
+**Performance SLOs** (from 1-use-cases.md NFRs):
+- [x] Pathfinding SLO: P95 < 100ms (NFR-002)
+- [x] Game Loop SLO: 60fps (NFR-001)
+- [x] Multiplayer Latency SLO: <100ms round-trip (NFR-003)
+- [x] API Response SLO: <200ms P99 for REST endpoints
 
 **Incident Management**:
-- [ ] Incident response workflow defined
-- [ ] Runbooks created for common incidents
-- [ ] Post-incident review process established
-- [ ] Blameless culture promoted
+- [x] Incident classification (P0-Critical, P1-High, P2-Medium, P3-Low)
+- [x] Runbooks for common incidents (high pathfinding latency, WebSocket disconnections)
+- [x] Post-incident review process (blameless post-mortems)
+- [x] Security contact: security@towerdefense.com
 
-**Instructions**:
-1. Implement structured logging with PII redaction
-2. Instrument RED/USE metrics for all services
-3. Set up distributed tracing with appropriate sampling
-4. Create actionable alerts with clear runbooks
-5. Build dashboards for system health and business metrics
-6. Define and track SLOs with error budgets
-7. Establish incident response workflow and runbooks
-8. Implement synthetic monitoring for critical user flows
+**Instructions**: Complete observability design for isometric tower defense game. Winston structured logging with PII redaction, custom metrics (pathfinding duration, game loop FPS, WebSocket latency, active players), request ID tracing, Grafana dashboards, and alerting rules specified. Ready for builder implementation with monitoring integration.
+
+[<< Back](./design.md)
 
 [<< Back](./design.md)
 

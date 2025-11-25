@@ -23,6 +23,10 @@ This captures commands leveraged to create symlinks to shared files in order to 
 - `ln -s ../.gaia/agents .github/agents`
 - `ln -s ../.gaia/agents .claude/agents`
 
+### Prompts & Instructions
+- `ln -s ../.gaia/prompts .github/prompts`
+- `ln -s ../.gaia/instructions .github/instructions`
+
 ## Launching Github Copilot CLI
 
 The below is an example of how to run Github Copilot CLI in YOLO mode and with the local MCP config.

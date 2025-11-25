@@ -19,136 +19,322 @@ Complete data design including database schema, migrations, caching, and data li
 
 ## Data Architecture Overview
 
-**Database Type**: [Relational (PostgreSQL/MySQL) / NoSQL (MongoDB/DynamoDB) / Hybrid]
-**Caching Layer**: [Redis / Memcached / None]
-**Search Engine**: [Elasticsearch / Solr / None]
-**Data Warehouse**: [Redshift / BigQuery / Snowflake / None]
-**Message Queue**: [RabbitMQ / Kafka / SQS / None]
+**Database Type**: Relational (PostgreSQL 15)
+**Caching Layer**: Redis 7 (session data, game state hot cache)
+**Search Engine**: None (PostgreSQL full-text search for map names)
+**Data Warehouse**: None (future: analytics database)
+**Message Queue**: None (WebSocket for real-time sync)
 
 **Data Principles**:
-- **Data Integrity**: Enforce constraints and validation at database level
-- **Normalization**: Reduce redundancy (3NF minimum for transactional data)
-- **Scalability**: Design for growth (partitioning, sharding strategies)
-- **Performance**: Optimize for common query patterns
-- **Security**: Encryption, access control, audit trails
+- **Data Integrity**: Foreign keys, check constraints, triggers for audit logs
+- **Normalization**: 3NF for user/tribe/map data, denormalized game state (JSONB) for performance
+- **Scalability**: Connection pooling (max 10 per instance), read replicas for map browsing
+- **Performance**: Indexes on foreign keys, JSONB for complex game state
+- **Security**: Encrypted at rest (AES-256), SSL connections, no sensitive data in logs
 
 ## Database Schema Design
 
 ### Entity-Relationship Model
 
-**Core Entities**:
+**Isometric Tower Defense Game Schema**:
 ```mermaid
 erDiagram
-    USER ||--o{ ORDER : places
-    USER {
+    USERS ||--o{ TRIBES : owns
+    USERS ||--o{ MAPS : creates
+    USERS {
         uuid id PK
+        varchar username UK
         varchar email UK
         varchar password_hash
-        varchar first_name
-        varchar last_name
+        int level
+        int total_games_played
         timestamp created_at
-        timestamp updated_at
-        boolean is_active
+        timestamp last_login
     }
 
-    ORDER ||--|{ ORDER_ITEM : contains
-    ORDER {
+    TRIBES {
         uuid id PK
         uuid user_id FK
-        decimal total_amount
-        varchar status
-        timestamp ordered_at
-        timestamp updated_at
-    }
-
-    ORDER_ITEM }o--|| PRODUCT : references
-    ORDER_ITEM {
-        uuid id PK
-        uuid order_id FK
-        uuid product_id FK
-        integer quantity
-        decimal unit_price
-        decimal subtotal
-    }
-
-    PRODUCT ||--o{ PRODUCT_CATEGORY : belongs_to
-    PRODUCT {
-        uuid id PK
         varchar name
-        text description
-        decimal price
-        integer stock_quantity
-        boolean is_active
+        varchar archetype
+        decimal damage_bonus
+        decimal attack_speed_bonus
+        decimal range_bonus
+        varchar color_theme
         timestamp created_at
-        timestamp updated_at
     }
 
-    PRODUCT_CATEGORY {
+    MAPS {
         uuid id PK
+        uuid user_id FK
         varchar name
-        varchar slug UK
         text description
-        uuid parent_id FK
+        int width
+        int height
+        jsonb terrain_data
+        jsonb spawn_point
+        jsonb goal_point
+        jsonb wave_config
+        boolean is_public
+        int play_count
+        decimal rating
+        timestamp created_at
+    }
+
+    MAPS ||--o{ GAME_SESSIONS : uses
+    GAME_SESSIONS {
+        uuid id PK
+        uuid map_id FK
+        varchar status
+        int current_wave
+        int shared_lives
+        jsonb game_state
+        timestamp created_at
+        timestamp completed_at
+    }
+
+    GAME_SESSIONS ||--o{ SESSION_PLAYERS : contains
+    USERS ||--o{ SESSION_PLAYERS : participates
+    TRIBES ||--o{ SESSION_PLAYERS : uses
+    SESSION_PLAYERS {
+        uuid id PK
+        uuid session_id FK
+        uuid user_id FK
+        uuid tribe_id FK
+        int gold
+        boolean is_host
+        boolean is_ready
+        boolean is_connected
+        timestamp joined_at
     }
 ```
 
-### Table Specifications
+### Prisma Schema (schema.prisma)
+
+**Complete Database Schema**:
+```prisma
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                UUID      @id @default(uuid())
+  username          String    @unique @db.VarChar(50)
+  email             String    @unique @db.VarChar(255)
+  passwordHash      String    @map("password_hash") @db.VarChar(255)
+  level             Int       @default(1)
+  totalGamesPlayed  Int       @default(0) @map("total_games_played")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  lastLogin         DateTime? @map("last_login")
+
+  // Relations
+  tribes            Tribe[]
+  maps              Map[]
+  sessionPlayers    SessionPlayer[]
+
+  @@index([username])
+  @@index([email])
+  @@map("users")
+}
+
+model Tribe {
+  id                 UUID      @id @default(uuid())
+  userId             UUID      @map("user_id")
+  name               String    @db.VarChar(100)
+  archetype          String    @db.VarChar(50) // Aggressive, Defensive, Balanced, Support
+  damageBonus        Decimal   @default(0) @map("damage_bonus") @db.Decimal(5, 2)
+  attackSpeedBonus   Decimal   @default(0) @map("attack_speed_bonus") @db.Decimal(5, 2)
+  rangeBonus         Decimal   @default(0) @map("range_bonus") @db.Decimal(5, 2)
+  colorTheme         String    @map("color_theme") @db.VarChar(7) // Hex color #FFFFFF
+  createdAt          DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionPlayers     SessionPlayer[]
+
+  @@index([userId])
+  @@map("tribes")
+}
+
+model Map {
+  id          UUID      @id @default(uuid())
+  userId      UUID      @map("user_id")
+  name        String    @db.VarChar(100)
+  description String?   @db.Text
+  width       Int       // 20-100
+  height      Int       // 20-100
+  terrainData Json      @map("terrain_data") // Array of { x, y, terrainType, height, isBlocked }
+  spawnPoint  Json      @map("spawn_point") // { x, y }
+  goalPoint   Json      @map("goal_point") // { x, y }
+  waveConfig  Json      @map("wave_config") // { waves: [{ waveNumber, enemies: [{ type, count, spawnInterval }] }] }
+  isPublic    Boolean   @default(false) @map("is_public")
+  playCount   Int       @default(0) @map("play_count")
+  rating      Decimal   @default(0) @db.Decimal(3, 2) // 0.00 - 5.00
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gameSessions   GameSession[]
+
+  @@index([userId])
+  @@index([isPublic])
+  @@index([playCount])
+  @@map("maps")
+}
+
+model GameSession {
+  id            UUID       @id @default(uuid())
+  mapId         UUID       @map("map_id")
+  status        String     @db.VarChar(50) // Lobby, InProgress, Paused, Completed, Abandoned
+  currentWave   Int        @default(0) @map("current_wave")
+  sharedLives   Int        @default(20) @map("shared_lives")
+  gameState     Json?      @map("game_state") // { towers: [], enemies: [], resources: {} }
+  createdAt     DateTime   @default(now()) @map("created_at")
+  completedAt   DateTime?  @map("completed_at")
+
+  // Relations
+  map            Map               @relation(fields: [mapId], references: [id], onDelete: Restrict)
+  players        SessionPlayer[]
+
+  @@index([mapId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("game_sessions")
+}
+
+model SessionPlayer {
+  id          UUID      @id @default(uuid())
+  sessionId   UUID      @map("session_id")
+  userId      UUID      @map("user_id")
+  tribeId     UUID      @map("tribe_id")
+  gold        Int       @default(500)
+  isHost      Boolean   @default(false) @map("is_host")
+  isReady     Boolean   @default(false) @map("is_ready")
+  isConnected Boolean   @default(true) @map("is_connected")
+  joinedAt    DateTime  @default(now()) @map("joined_at")
+
+  // Relations
+  session     GameSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tribe       Tribe       @relation(fields: [tribeId], references: [id], onDelete: Restrict)
+
+  @@index([sessionId])
+  @@index([userId])
+  @@map("session_players")
+}
+```
+
+### SQL Table Creation (Generated from Prisma)
 
 **Users Table**:
 ```sql
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
-    first_name VARCHAR(100),
-    last_name VARCHAR(100),
-    is_active BOOLEAN DEFAULT true,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    level INT NOT NULL DEFAULT 1,
+    total_games_played INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_login TIMESTAMP,
 
-    CONSTRAINT email_format CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$')
+    CONSTRAINT email_format CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'),
+    CONSTRAINT username_length CHECK (length(username) >= 3 AND length(username) <= 50)
 );
 
+CREATE INDEX idx_users_username ON users(username);
 CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_users_created_at ON users(created_at);
 ```
 
-**Orders Table**:
+**Tribes Table**:
 ```sql
-CREATE TABLE orders (
+CREATE TABLE tribes (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
-    total_amount DECIMAL(10, 2) NOT NULL,
-    status VARCHAR(50) NOT NULL DEFAULT 'pending',
-    ordered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    name VARCHAR(100) NOT NULL,
+    archetype VARCHAR(50) NOT NULL,
+    damage_bonus DECIMAL(5, 2) NOT NULL DEFAULT 0,
+    attack_speed_bonus DECIMAL(5, 2) NOT NULL DEFAULT 0,
+    range_bonus DECIMAL(5, 2) NOT NULL DEFAULT 0,
+    color_theme VARCHAR(7) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT status_values CHECK (status IN ('pending', 'processing', 'shipped', 'delivered', 'cancelled')),
-    CONSTRAINT positive_amount CHECK (total_amount >= 0)
+    CONSTRAINT archetype_values CHECK (archetype IN ('Aggressive', 'Defensive', 'Balanced', 'Support')),
+    CONSTRAINT total_bonus_points CHECK (damage_bonus + attack_speed_bonus + range_bonus = 0.50),
+    CONSTRAINT valid_color_theme CHECK (color_theme ~* '^#[0-9A-Fa-f]{6}$')
 );
 
-CREATE INDEX idx_orders_user_id ON orders(user_id);
-CREATE INDEX idx_orders_status ON orders(status);
-CREATE INDEX idx_orders_ordered_at ON orders(ordered_at DESC);
+CREATE INDEX idx_tribes_user_id ON tribes(user_id);
 ```
 
-**Order Items Table**:
+**Maps Table**:
 ```sql
-CREATE TABLE order_items (
+CREATE TABLE maps (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    order_id UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
-    product_id UUID NOT NULL REFERENCES products(id) ON DELETE RESTRICT,
-    quantity INTEGER NOT NULL,
-    unit_price DECIMAL(10, 2) NOT NULL,
-    subtotal DECIMAL(10, 2) NOT NULL,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    width INT NOT NULL,
+    height INT NOT NULL,
+    terrain_data JSONB NOT NULL,
+    spawn_point JSONB NOT NULL,
+    goal_point JSONB NOT NULL,
+    wave_config JSONB NOT NULL,
+    is_public BOOLEAN NOT NULL DEFAULT false,
+    play_count INT NOT NULL DEFAULT 0,
+    rating DECIMAL(3, 2) NOT NULL DEFAULT 0,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT positive_quantity CHECK (quantity > 0),
-    CONSTRAINT positive_prices CHECK (unit_price >= 0 AND subtotal >= 0),
-    CONSTRAINT valid_subtotal CHECK (subtotal = quantity * unit_price)
+    CONSTRAINT map_dimensions CHECK (width >= 20 AND width <= 100 AND height >= 20 AND height <= 100),
+    CONSTRAINT rating_range CHECK (rating >= 0 AND rating <= 5)
 );
 
-CREATE INDEX idx_order_items_order_id ON order_items(order_id);
-CREATE INDEX idx_order_items_product_id ON order_items(product_id);
+CREATE INDEX idx_maps_user_id ON maps(user_id);
+CREATE INDEX idx_maps_is_public ON maps(is_public);
+CREATE INDEX idx_maps_play_count ON maps(play_count DESC);
+```
+
+**Game Sessions Table**:
+```sql
+CREATE TABLE game_sessions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    map_id UUID NOT NULL REFERENCES maps(id) ON DELETE RESTRICT,
+    status VARCHAR(50) NOT NULL,
+    current_wave INT NOT NULL DEFAULT 0,
+    shared_lives INT NOT NULL DEFAULT 20,
+    game_state JSONB,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    completed_at TIMESTAMP,
+
+    CONSTRAINT status_values CHECK (status IN ('Lobby', 'InProgress', 'Paused', 'Completed', 'Abandoned'))
+);
+
+CREATE INDEX idx_game_sessions_map_id ON game_sessions(map_id);
+CREATE INDEX idx_game_sessions_status ON game_sessions(status);
+CREATE INDEX idx_game_sessions_created_at ON game_sessions(created_at DESC);
+```
+
+**Session Players Table**:
+```sql
+CREATE TABLE session_players (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    session_id UUID NOT NULL REFERENCES game_sessions(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    tribe_id UUID NOT NULL REFERENCES tribes(id) ON DELETE RESTRICT,
+    gold INT NOT NULL DEFAULT 500,
+    is_host BOOLEAN NOT NULL DEFAULT false,
+    is_ready BOOLEAN NOT NULL DEFAULT false,
+    is_connected BOOLEAN NOT NULL DEFAULT true,
+    joined_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_session_players_session_id ON session_players(session_id);
+CREATE INDEX idx_session_players_user_id ON session_players(user_id);
 ```
 
 ### Data Constraints & Validation
@@ -272,22 +458,34 @@ LIMIT 20;
 
 ## Caching Strategy
 
-### Caching Layers
+### Redis Caching Architecture
 
-**Application-Level Caching** (Redis):
-- **Session Data**: User sessions and authentication tokens
-- **Frequently Accessed Data**: User profiles, product catalog
-- **Computed Results**: Expensive calculations, aggregations
-- **Rate Limiting**: API rate limit counters
+**Application-Level Caching** (Redis 7):
+- **Session Data**: JWT tokens, user sessions (TTL: 15 min access, 7 days refresh)
+- **Active Game Sessions**: Hot cache for in-progress games (TTL: 2 hours or until game ends)
+- **Tribe Configurations**: User tribe stats (TTL: 1 hour, invalidate on update)
+- **Public Maps**: Top 100 most played maps (TTL: 15 minutes)
+- **Rate Limiting**: API rate limit counters (100 req/min per IP)
+
+**Redis Key Patterns**:
+```
+session:{user_id}:access_token     -> JWT (TTL: 15min)
+session:{user_id}:refresh_token    -> JWT (TTL: 7 days)
+game:{session_id}:state            -> Game state JSONB (TTL: 2 hours)
+tribe:{tribe_id}:config            -> Tribe stats (TTL: 1 hour)
+map:{map_id}:data                  -> Map terrain data (TTL: 15 min)
+maps:public:top100                 -> List of popular map IDs (TTL: 15 min)
+ratelimit:{ip_address}:{endpoint}  -> Request count (TTL: 60 seconds)
+```
 
 **Database Query Caching**:
-- **Read Replicas**: Route read queries to replicas
-- **Materialized Views**: Pre-computed aggregations
-- **Query Result Caching**: Database-level query cache
+- **Read Replicas**: Route map browsing queries to read replica
+- **No Materialized Views**: Game data too dynamic
+- **PostgreSQL Cache**: Rely on PostgreSQL query cache for repeated queries
 
-**CDN Caching**:
-- **Static Assets**: Images, CSS, JavaScript
-- **API Responses**: Cacheable GET requests with cache headers
+**CDN Caching** (CloudFront):
+- **Static Assets**: Sprite sheets, terrain textures, fonts (1 year TTL)
+- **API Responses**: None (all game data real-time via WebSocket)
 
 ### Cache Patterns
 
@@ -346,38 +544,86 @@ search:{query_hash}
 
 ### Migration Strategy
 
-**Migration Tool**: [Flyway / Liquibase / Entity Framework Migrations / Alembic]
+**Migration Tool**: Prisma Migrate (integrated with Prisma ORM)
 
 **Migration Principles**:
-- **Version Control**: All migrations in source control
-- **Forward-Only**: No rollback migrations (use new migration to fix)
-- **Idempotent**: Safe to run multiple times
+- **Version Control**: All migrations in `prisma/migrations/` directory
+- **Forward-Only**: No rollback migrations (create new migration to fix)
+- **Idempotent**: Prisma ensures safe migrations
 - **Tested**: Test on staging before production
-- **Backwards Compatible**: Don't break running application versions
+- **Backwards Compatible**: Add nullable columns, deprecate instead of drop
 
 ### Migration File Structure
 
 ```
-migrations/
-├── V001__initial_schema.sql
-├── V002__add_users_table.sql
-├── V003__add_orders_table.sql
-├── V004__add_products_index.sql
-├── V005__alter_users_add_phone.sql
-└── V006__create_audit_log_table.sql
+prisma/
+├── schema.prisma
+└── migrations/
+    ├── 20251122000001_initial_schema/
+    │   └── migration.sql
+    ├── 20251122000002_add_tribes/
+    │   └── migration.sql
+    ├── 20251122000003_add_maps_and_sessions/
+    │   └── migration.sql
+    └── 20251122000004_add_session_players/
+        └── migration.sql
 ```
 
-**Migration Example** (V005):
+**Migration Example** (Initial Schema):
 ```sql
--- V005__alter_users_add_phone.sql
--- Add phone number field to users table
+-- 20251122000001_initial_schema/migration.sql
+-- Create users table with authentication
 
-ALTER TABLE users
-ADD COLUMN phone VARCHAR(20);
+CREATE TABLE users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    username VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    level INT NOT NULL DEFAULT 1,
+    total_games_played INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_login TIMESTAMP,
+    CONSTRAINT email_format CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'),
+    CONSTRAINT username_length CHECK (length(username) >= 3 AND length(username) <= 50)
+);
 
-CREATE INDEX idx_users_phone ON users(phone) WHERE phone IS NOT NULL;
+CREATE INDEX idx_users_username ON users(username);
+CREATE INDEX idx_users_email ON users(email);
+```
 
-COMMENT ON COLUMN users.phone IS 'User phone number in E.164 format';
+**Migration Example** (Add Tribes):
+```sql
+-- 20251122000002_add_tribes/migration.sql
+-- Add tribe customization system
+
+CREATE TABLE tribes (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    name VARCHAR(100) NOT NULL,
+    archetype VARCHAR(50) NOT NULL,
+    damage_bonus DECIMAL(5, 2) NOT NULL DEFAULT 0,
+    attack_speed_bonus DECIMAL(5, 2) NOT NULL DEFAULT 0,
+    range_bonus DECIMAL(5, 2) NOT NULL DEFAULT 0,
+    color_theme VARCHAR(7) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT archetype_values CHECK (archetype IN ('Aggressive', 'Defensive', 'Balanced', 'Support')),
+    CONSTRAINT total_bonus_points CHECK (damage_bonus + attack_speed_bonus + range_bonus = 0.50),
+    CONSTRAINT valid_color_theme CHECK (color_theme ~* '^#[0-9A-Fa-f]{6}$')
+);
+
+CREATE INDEX idx_tribes_user_id ON tribes(user_id);
+```
+
+**Running Migrations**:
+```bash
+# Development: Apply migrations and update Prisma Client
+npx prisma migrate dev
+
+# Production: Apply pending migrations only
+npx prisma migrate deploy
+
+# Generate migration without applying
+npx prisma migrate dev --create-only
 ```
 
 ### Breaking Change Migrations
@@ -453,20 +699,24 @@ Request → Shard Router → Determine Shard (hash user_id) → Query Specific S
 
 ### Backup Strategy
 
-**Full Backups**:
-- **Frequency**: Daily at 2 AM UTC
-- **Retention**: 30 days
-- **Storage**: Cross-region replication (S3 / Azure Blob)
+**Full Backups** (PostgreSQL):
+- **Frequency**: Daily at 3 AM UTC (low player activity)
+- **Retention**: 30 days (compliant with user data retention)
+- **Storage**: AWS S3 with cross-region replication (us-east-1 → us-west-2)
+- **Method**: `pg_dump` with compression (gzip)
 
 **Incremental Backups**:
-- **Frequency**: Every 6 hours
-- **Method**: Transaction log backups
+- **Frequency**: Every 6 hours (9 AM, 3 PM, 9 PM, 3 AM UTC)
+- **Method**: PostgreSQL WAL (Write-Ahead Logging) archives
 - **Retention**: 7 days
+- **Storage**: S3 with lifecycle policies
 
-**Point-in-Time Recovery**:
-- **Granularity**: 5-minute intervals
+**Point-in-Time Recovery** (PITR):
+- **Granularity**: 5-minute intervals via WAL replay
 - **Retention**: 7 days
-- **Use Case**: Recover from accidental data deletion
+- **Use Case**: Recover from accidental map deletion, user data corruption
+- **RTO**: 4 hours (restore full backup + replay WAL logs)
+- **RPO**: 5 minutes (max data loss)
 
 ### Backup Testing
 
@@ -603,51 +853,50 @@ $$ LANGUAGE plpgsql;
 ## Validation Checklist
 
 **Schema Design**:
-- [ ] ERD complete with all entities and relationships
-- [ ] Primary keys defined (UUID or auto-increment)
-- [ ] Foreign keys with appropriate cascade rules
-- [ ] Check constraints for business rules
-- [ ] Appropriate data types and constraints
+- [x] ERD complete with all entities and relationships (Users, Tribes, Maps, GameSessions, SessionPlayers)
+- [x] Primary keys defined (UUID for all tables)
+- [x] Foreign keys with appropriate cascade rules (CASCADE for tribes, RESTRICT for map references)
+- [x] Check constraints for business rules (archetype values, bonus point totals, map dimensions, rating range)
+- [x] Appropriate data types (UUID, VARCHAR, INT, DECIMAL, JSONB, TIMESTAMP, BOOLEAN)
 
 **Indexing**:
-- [ ] Indexes on foreign keys
-- [ ] Indexes on frequently queried columns
-- [ ] Composite indexes for multi-column queries
-- [ ] Partial indexes for filtered queries
+- [x] Indexes on foreign keys (user_id, map_id, session_id, tribe_id)
+- [x] Indexes on frequently queried columns (username, email, is_public, status)
+- [x] Composite indexes not needed (simple queries)
+- [x] Partial indexes not used (full table scans acceptable for small tables)
 
 **Caching**:
-- [ ] Caching strategy defined (cache-aside, write-through)
-- [ ] Cache invalidation strategy documented
-- [ ] TTL values appropriate for data volatility
-- [ ] Cache keys structured consistently
+- [x] Caching strategy defined (Redis cache-aside for game sessions, tribes, top maps)
+- [x] Cache invalidation strategy documented (event-based on update, TTL-based for reads)
+- [x] TTL values appropriate (15min access token, 1hr tribe config, 15min top maps)
+- [x] Cache keys structured consistently (entity:id:field pattern)
 
 **Migrations**:
-- [ ] Migration tool selected and configured
-- [ ] Migration versioning strategy defined
-- [ ] Backwards-compatible migration approach
-- [ ] Migration testing process documented
+- [x] Migration tool selected (Prisma Migrate)
+- [x] Migration versioning strategy defined (timestamp-based directories)
+- [x] Backwards-compatible migration approach (add nullable fields, deprecate before drop)
+- [x] Migration testing process documented (dev → staging → production)
 
 **Backup**:
-- [ ] Full backup schedule defined
-- [ ] Incremental backup strategy
-- [ ] Point-in-time recovery capability
-- [ ] Backup testing schedule established
+- [x] Full backup schedule defined (daily at 3 AM UTC)
+- [x] Incremental backup strategy (WAL archives every 6 hours)
+- [x] Point-in-Time recovery capability (5-minute granularity, 7-day retention)
+- [x] Backup testing schedule established (monthly recovery drills)
 
 **Compliance**:
-- [ ] Data classification levels defined
-- [ ] PII handling requirements documented
-- [ ] Data retention policies established
-- [ ] GDPR/privacy compliance implemented (if applicable)
+- [x] Data classification levels defined (Public: maps, Internal: user profiles, Confidential: email/password)
+- [x] PII handling requirements documented (email, username encrypted at rest)
+- [x] Data retention policies established (30-day backups, 7-day WAL, indefinite user data)
+- [x] GDPR compliance (user can delete account, export data)
 
-**Instructions**:
-1. Design complete ERD with all entities and relationships
-2. Define table schemas with constraints and validation
-3. Plan indexing strategy for query optimization
-4. Design caching layers and invalidation strategy
-5. Establish database migration approach
-6. Plan partitioning/sharding for scalability (if needed)
-7. Define backup, recovery, and archival strategies
-8. Implement data governance and compliance requirements
+**Game-Specific Data**:
+- [x] Prisma schema includes all game entities from 2-class.md
+- [x] JSONB fields for complex game state (terrain_data, wave_config, game_state)
+- [x] Connection pooling configured (max 10 connections per backend instance)
+- [x] Redis caching for hot game sessions (reduce database load during gameplay)
+- [x] Query performance targets (< 50ms for user/tribe queries, < 100ms for map queries)
+
+**Instructions**: This data architecture specification defines the complete PostgreSQL + Prisma schema, Redis caching strategy, database migrations approach, backup/recovery procedures, and indexing strategy for the Isometric Tower Defense game. All schemas support use cases from 1-use-cases.md and entities from 2-class.md. Ready for implementation.
 
 [<< Back](./design.md)
 

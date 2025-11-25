@@ -2,15 +2,24 @@
 
 ## Design
 
-System architecture following iDesign architectural principles.
+Isometric Tower Defense Game - Real-time multiplayer strategy game with dynamic pathfinding.
 
 ### Architecture Overview
 
-**3-Layer Hierarchical Structure**:
-- **Managers** (🟢): Orchestration, use case coordination
-- **Engines** (🟠): Business logic, domain algorithms
-- **Data Access** (⚫): I/O operations, persistence
-- **Models** (🟣): DTOs, entities, contracts
+**Game Architecture**: Real-time multiplayer tower defense with isometric rendering, dynamic A* pathfinding, and WebSocket synchronization.
+
+**Tech Stack**:
+- **Frontend**: React + TypeScript + PixiJS (WebGL rendering)
+- **Backend**: Node.js + Express + Socket.io (WebSocket)
+- **Database**: PostgreSQL + Prisma ORM
+- **State Management**: Zustand (client), Redis (server sessions)
+- **Rendering**: PixiJS (60fps game loop, sprite-based isometric graphics)
+
+**3-Layer Hierarchical Structure** (iDesign):
+- **Managers** (🟢): GameSessionManager, MultiplayerManager, MapManager
+- **Engines** (🟠): PathfindingEngine, TowerEngine, EnemyAIEngine, PhysicsEngine
+- **Data Access** (⚫): UserRepository, MapRepository, TribeRepository, GameSessionRepository
+- **Models** (🟣): User, Map, Tribe, Tower, Enemy, GameSession, Tile
 
 **Dependency Rules**:
 - Managers → Engines, Data Access, Models
@@ -36,9 +45,14 @@ System architecture following iDesign architectural principles.
 
 ### Quality Standards
 
-**Testing**: 100% unit test coverage, integration testing, E2E validation
-**Performance**: API < 200ms, Frontend LCP < 2.5s, zero build warnings
-**Security**: Automated vulnerability scanning, secure coding practices
+**Testing**: 100% unit test coverage, integration testing, E2E Playwright validation
+**Performance**:
+- Game Loop: 60fps sustained (16.67ms frame budget)
+- Pathfinding: < 100ms recalculation for 50x50 grid
+- Multiplayer Latency: < 100ms player action synchronization
+- API: < 200ms response time
+- Frontend LCP: < 2.5s initial load
+**Security**: JWT authentication, input validation, WebSocket security, rate limiting
 **Regression Prevention (NEW)**: Mandatory validation that all existing features continue working when new features are added
 
 ### Regression Testing Standards (NEW - MANDATORY)
