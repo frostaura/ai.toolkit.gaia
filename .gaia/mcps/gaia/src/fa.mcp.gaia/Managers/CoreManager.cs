@@ -4,15 +4,16 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using ModelContextProtocol.Abstractions;
-using ModelContextProtocol.Server.Attributes;
+using System.ComponentModel;
 using Microsoft.Extensions.Logging;
+using ModelContextProtocol.Server;
 
 namespace FrostAura.MCP.Gaia.Managers
 {
     /// <summary>
     /// Core MCP Manager - Essential tools for task and memory management using JSONL
     /// </summary>
+    [McpServerToolType]
     public class CoreManager
     {
         private readonly string _tasksPath = ".gaia/tasks.jsonl";
@@ -28,10 +29,12 @@ namespace FrostAura.MCP.Gaia.Managers
         }
 
         /// <summary>
-        /// Read current tasks from JSONL file
+        /// Get current tasks from JSONL file with optional filtering
         /// </summary>
-        [McpServerTool("read_tasks", "Get current tasks from JSONL file")]
-        public async Task<ToolResponse> ReadTasksAsync()
+        [McpServerTool]
+        [Description("Get current tasks from JSONL file with optional filtering")]
+        public async Task<string> read_tasks(
+            [Description("Hide completed tasks (default: false)")] bool hideCompleted = false)
         {
             try
             {
@@ -48,7 +51,16 @@ namespace FrostAura.MCP.Gaia.Managers
                     try
                     {
                         var task = JsonSerializer.Deserialize<Dictionary<string, object>>(line);
-                        if (task != null) tasks.Add(task);
+                        if (task != null)
+                        {
+                            // Filter out completed tasks if requested
+                            if (hideCompleted && task.ContainsKey("status"))
+                            {
+                                var status = task["status"]?.ToString()?.ToLower();
+                                if (status == "completed" || status == "done") continue;
+                            }
+                            tasks.Add(task);
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -56,31 +68,35 @@ namespace FrostAura.MCP.Gaia.Managers
                     }
                 }
 
-                return new ToolResponse
+                var summary = hideCompleted
+                    ? $"{tasks.Count} active/pending tasks"
+                    : $"{tasks.Count} total tasks";
+
+                return JsonSerializer.Serialize(new
                 {
-                    Content = JsonSerializer.Serialize(new
-                    {
-                        total = tasks.Count,
-                        tasks = tasks
-                    }, new JsonSerializerOptions { WriteIndented = true })
-                };
+                    summary = summary,
+                    filter = hideCompleted ? "active only" : "all tasks",
+                    count = tasks.Count,
+                    tasks = tasks
+                }, new JsonSerializerOptions { WriteIndented = true });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error reading tasks");
-                return new ToolResponse { IsError = true, Content = $"Error reading tasks: {ex.Message}" };
+                return $"Error reading tasks: {ex.Message}";
             }
         }
 
         /// <summary>
-        /// Update or add a task in JSONL file
+        /// Update or add a task
         /// </summary>
-        [McpServerTool("update_task", "Update or add a task")]
-        public async Task<ToolResponse> UpdateTaskAsync(
-            [McpServerToolParameter("Task ID (for updates) or title (for new tasks)")] string taskId,
-            [McpServerToolParameter("Task description")] string description,
-            [McpServerToolParameter("Status: pending, in_progress, completed, blocked")] string status,
-            [McpServerToolParameter("Assigned agent (optional)", Required = false)] string assignedTo = null)
+        [McpServerTool]
+        [Description("Update or add a task")]
+        public async Task<string> update_task(
+            [Description("ID of the task")] string taskId,
+            [Description("Description of the task")] string description,
+            [Description("Status of the task")] string status,
+            [Description("Who the task is assigned to")] string? assignedTo = null)
         {
             try
             {
@@ -123,32 +139,29 @@ namespace FrostAura.MCP.Gaia.Managers
 
                 if (!updated)
                 {
-                    // Add as new task
                     lines.Add(JsonSerializer.Serialize(task));
                 }
 
                 await File.WriteAllLinesAsync(_tasksPath, lines.Where(l => !string.IsNullOrWhiteSpace(l)));
 
-                return new ToolResponse
-                {
-                    Content = $"Task '{taskId}' {(updated ? "updated" : "added")} with status: {status}"
-                };
+                return $"Task '{taskId}' {(updated ? "updated" : "added")} with status: {status}";
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error updating task");
-                return new ToolResponse { IsError = true, Content = $"Error updating task: {ex.Message}" };
+                return $"Error updating task: {ex.Message}";
             }
         }
 
         /// <summary>
-        /// Store important decision or context for future reference
+        /// Store important decisions/context in JSONL
         /// </summary>
-        [McpServerTool("remember", "Store important decisions/context in JSONL")]
-        public async Task<ToolResponse> RememberAsync(
-            [McpServerToolParameter("Category: system, architecture, design, decision, learning")] string category,
-            [McpServerToolParameter("Key identifier for this memory")] string key,
-            [McpServerToolParameter("The content to remember")] string value)
+        [McpServerTool]
+        [Description("Store important decisions/context in JSONL")]
+        public async Task<string> remember(
+            [Description("Category of the memory")] string category,
+            [Description("Key identifier for the memory")] string key,
+            [Description("Value/content to remember")] string value)
         {
             try
             {
@@ -163,34 +176,36 @@ namespace FrostAura.MCP.Gaia.Managers
                 var json = JsonSerializer.Serialize(memory);
                 await File.AppendAllTextAsync(_memoryPath, json + Environment.NewLine);
 
-                return new ToolResponse
-                {
-                    Content = $"Memory stored: {category}/{key}"
-                };
+                return $"Memory stored: {category}/{key}";
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error storing memory");
-                return new ToolResponse { IsError = true, Content = $"Error storing memory: {ex.Message}" };
+                return $"Error storing memory: {ex.Message}";
             }
         }
 
         /// <summary>
-        /// Search and recall previous decisions/context
+        /// Search previous decisions/context from JSONL with fuzzy matching
         /// </summary>
-        [McpServerTool("recall", "Search previous decisions/context from JSONL")]
-        public async Task<ToolResponse> RecallAsync(
-            [McpServerToolParameter("Search query to find relevant memories")] string query)
+        [McpServerTool]
+        [Description("Search previous decisions/context from JSONL with fuzzy matching")]
+        public async Task<string> recall(
+            [Description("Query to search for in memories (supports fuzzy search)")] string query,
+            [Description("Maximum number of results to return (default: 20)")] int maxResults = 20)
         {
             try
             {
                 if (!File.Exists(_memoryPath))
                 {
-                    return new ToolResponse { Content = "No memories found. Memory file doesn't exist yet." };
+                    return "No memories found. Memory file doesn't exist yet.";
                 }
 
                 var lines = await File.ReadAllLinesAsync(_memoryPath);
-                var results = new List<Dictionary<string, object>>();
+                var scoredResults = new List<(Dictionary<string, object> memory, double score)>();
+
+                // Split query into words for fuzzy matching
+                var queryWords = query.ToLower().Split(new[] { ' ', '-', '_', '.' }, StringSplitOptions.RemoveEmptyEntries);
 
                 foreach (var line in lines.Where(l => !string.IsNullOrWhiteSpace(l)))
                 {
@@ -199,10 +214,47 @@ namespace FrostAura.MCP.Gaia.Managers
                         var memory = JsonSerializer.Deserialize<Dictionary<string, object>>(line);
                         if (memory != null)
                         {
-                            var content = JsonSerializer.Serialize(memory);
-                            if (content.ToLower().Contains(query.ToLower()))
+                            var content = JsonSerializer.Serialize(memory).ToLower();
+                            double score = 0;
+
+                            // Exact match (highest score)
+                            if (content.Contains(query.ToLower()))
                             {
-                                results.Add(memory);
+                                score = 100;
+                            }
+                            else
+                            {
+                                // Fuzzy matching - check how many query words are found
+                                int wordsFound = 0;
+                                int totalPositionScore = 0;
+
+                                foreach (var word in queryWords)
+                                {
+                                    var index = content.IndexOf(word);
+                                    if (index >= 0)
+                                    {
+                                        wordsFound++;
+                                        // Earlier matches get higher scores
+                                        totalPositionScore += Math.Max(0, 100 - (index / 10));
+                                    }
+                                }
+
+                                if (wordsFound > 0)
+                                {
+                                    // Score based on percentage of words found and their positions
+                                    score = (wordsFound * 60.0 / queryWords.Length) + (totalPositionScore / queryWords.Length * 0.4);
+
+                                    // Bonus for category/key matches
+                                    if (memory.ContainsKey("category") && memory["category"]?.ToString()?.ToLower().Contains(query.ToLower()) == true)
+                                        score += 20;
+                                    if (memory.ContainsKey("key") && memory["key"]?.ToString()?.ToLower().Contains(query.ToLower()) == true)
+                                        score += 15;
+                                }
+                            }
+
+                            if (score > 0)
+                            {
+                                scoredResults.Add((memory, score));
                             }
                         }
                     }
@@ -212,25 +264,41 @@ namespace FrostAura.MCP.Gaia.Managers
                     }
                 }
 
-                if (results.Count == 0)
+                if (scoredResults.Count == 0)
                 {
-                    return new ToolResponse { Content = $"No memories found matching '{query}'" };
+                    return JsonSerializer.Serialize(new
+                    {
+                        count = 0,
+                        query = query,
+                        message = $"No memories found matching '{query}'",
+                        memories = new List<object>()
+                    }, new JsonSerializerOptions { WriteIndented = true });
                 }
 
-                return new ToolResponse
-                {
-                    Content = JsonSerializer.Serialize(new
+                // Sort by score descending and take top N results
+                var topResults = scoredResults
+                    .OrderByDescending(r => r.score)
+                    .Take(maxResults)
+                    .Select(r => new
                     {
-                        count = results.Count,
-                        query = query,
-                        memories = results
-                    }, new JsonSerializerOptions { WriteIndented = true })
-                };
+                        memory = r.memory,
+                        relevance = Math.Round(r.score, 1)
+                    })
+                    .ToList();
+
+                return JsonSerializer.Serialize(new
+                {
+                    count = topResults.Count,
+                    totalMatches = scoredResults.Count,
+                    query = query,
+                    searchMode = "fuzzy",
+                    results = topResults
+                }, new JsonSerializerOptions { WriteIndented = true });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error recalling memories");
-                return new ToolResponse { IsError = true, Content = $"Error recalling memories: {ex.Message}" };
+                return $"Error recalling memories: {ex.Message}";
             }
         }
 
@@ -241,7 +309,7 @@ namespace FrostAura.MCP.Gaia.Managers
                 new Dictionary<string, object>
                 {
                     ["id"] = "init",
-                    ["description"] = "System initialized with simplified MCP tools",
+                    ["description"] = "System initialized with core MCP tools",
                     ["status"] = "completed",
                     ["updated"] = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss")
                 }

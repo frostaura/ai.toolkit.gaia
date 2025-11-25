@@ -5,7 +5,7 @@ This captures commands leveraged to create symlinks to shared files in order to 
 ### Share Instructions
 - `ln -s .gaia/instructions/instructions.agents.md AGENTS.md`
 - `git add AGENTS.md`
-- `ln -s ../.gaia/instructions/instructions.project.md .github/copilot-instructions.md`
+- `ln -s ../.gaia/instructions/instructions.common.commands.md .github/copilot-instructions.md`
 - `git add .github/copilot-instructions.md`
 - `ln -s .gaia/instructions/instructions.project.md CLAUDE.md`
 - `git add CLAUDE.md`
