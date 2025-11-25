@@ -3,12 +3,10 @@
 This captures commands leveraged to create symlinks to shared files in order to reuse agent and instructions definitions.
 
 ### Share Instructions
-- `ln -s .gaia/instructions/instructions.agents.md AGENTS.md`
-- `git add AGENTS.md`
-- `ln -s ../.gaia/instructions/instructions.common.commands.md .github/copilot-instructions.md`
-- `git add .github/copilot-instructions.md`
-- `ln -s .gaia/instructions/instructions.project.md CLAUDE.md`
+- `ln -s .gaia/instructions/gaia.instructions.md CLAUDE.md`
 - `git add CLAUDE.md`
+- `ln -s ../.gaia/instructions/gaia.instructions.md .github/copilot-instructions.md`
+- `git add .github/copilot-instructions.md`
 
 ### MCP Configuration
 - `ln -s ../.gaia/mcp-config.json .github/mcp-config.json`

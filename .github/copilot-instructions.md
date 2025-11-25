@@ -1,1 +1,1 @@
-../.gaia/instructions/instructions.common.commands.md
+../.gaia/instructions/gaia.instructions.md

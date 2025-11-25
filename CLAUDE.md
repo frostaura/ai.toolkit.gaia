@@ -1,1 +1,1 @@
-.gaia/instructions/instructions.project.md
+.gaia/instructions/gaia.instructions.md
