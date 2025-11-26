@@ -347,7 +347,7 @@ mcp__gaia__remember("reflection", "phase_X_attempts", "2")
 - ❌ Create tasks before design completion
 - ❌ Skip regression testing
 - ❌ Create TODO.md or any markdown task files
-- ❌ Modify .gaia/tasks.jsonl or memory.jsonl directly
+- ❌ Attempt to directly read, write, or edit system state files (use MCP tools only)
 - ❌ Create separate test scripts
 - ❌ Proceed with <100% on critical metrics
 

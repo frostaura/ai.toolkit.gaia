@@ -27,23 +27,21 @@ This captures commands leveraged to create symlinks to shared files in order to 
 
 ## Task & Memory Management - USE MCP TOOLS ONLY
 
-**CRITICAL**: All task and memory management MUST use GAIA MCP tools exclusively:
+**CRITICAL**: All task and memory management MUST use GAIA MCP tools exclusively.
+State is managed internally by the MCP server - direct file access is not possible.
 
 ### Task Management
 - `mcp__gaia__update_task` - Add or update tasks (DO NOT create TODO.md)
 - `mcp__gaia__read_tasks` - View tasks with optional hideCompleted filter
-- Tasks are stored in `.gaia/tasks.jsonl` (managed by MCP only)
 
 ### Memory Management
 - `mcp__gaia__remember` - Store decisions and context (DO NOT create decision files)
 - `mcp__gaia__recall` - Search memories with fuzzy matching
-- Memories are stored in `.gaia/memory.jsonl` (managed by MCP only)
 
 **FORBIDDEN**:
 - Creating TODO.md, TASKS.md, or any task tracking markdown files
 - Using Write/Edit tools to manage tasks in files
 - Creating decision/memory markdown files
-- Manually editing .jsonl files
 
 ## Launching Github Copilot CLI
 

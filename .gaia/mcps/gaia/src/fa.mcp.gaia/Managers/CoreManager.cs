@@ -1,10 +1,10 @@
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.ComponentModel;
 using Microsoft.Extensions.Logging;
 using ModelContextProtocol.Server;
 
@@ -16,16 +16,19 @@ namespace FrostAura.MCP.Gaia.Managers
     [McpServerToolType]
     public class CoreManager
     {
-        private readonly string _tasksPath = ".gaia/tasks.jsonl";
-        private readonly string _memoryPath = ".gaia/memory.jsonl";
+        // Obfuscated state files in hidden directory to prevent direct AI agent access
+        // These files should ONLY be accessed via MCP tools, never directly edited
+        private readonly string _stateDir = ".gaia/.sys";
+        private readonly string _tasksPath = ".gaia/.sys/.s1.dat";
+        private readonly string _memoryPath = ".gaia/.sys/.s2.dat";
         private readonly ILogger<CoreManager> _logger;
 
         public CoreManager(ILogger<CoreManager> logger)
         {
             _logger = logger;
 
-            // Ensure .gaia directory exists
-            Directory.CreateDirectory(".gaia");
+            // Ensure hidden state directory exists
+            Directory.CreateDirectory(_stateDir);
 
             // Initialize files if they don't exist or are corrupt
             InitializeFilesIfNeeded();
@@ -36,14 +39,14 @@ namespace FrostAura.MCP.Gaia.Managers
             // Check and initialize tasks file
             if (!IsFileValid(_tasksPath))
             {
-                _logger.LogWarning($"Tasks file missing or corrupt, creating new file: {_tasksPath}");
+                _logger.LogWarning("Task state missing or corrupt, initializing fresh state");
                 File.WriteAllText(_tasksPath, string.Empty);
             }
 
             // Check and initialize memory file
             if (!IsFileValid(_memoryPath))
             {
-                _logger.LogWarning($"Memory file missing or corrupt, creating new file: {_memoryPath}");
+                _logger.LogWarning("Memory state missing or corrupt, initializing fresh state");
                 File.WriteAllText(_memoryPath, string.Empty);
             }
         }
@@ -65,13 +68,12 @@ namespace FrostAura.MCP.Gaia.Managers
             }
             catch
             {
-                // File exists but is corrupt
-                // Back it up before recreating
+                // File exists but is corrupt - back it up before recreating
                 var backupPath = $"{path}.corrupt.{DateTime.UtcNow:yyyyMMddHHmmss}";
                 try
                 {
                     File.Move(path, backupPath);
-                    _logger.LogWarning($"Corrupt file backed up to: {backupPath}");
+                    _logger.LogWarning("Corrupt state file backed up");
                 }
                 catch { }
                 return false;
@@ -244,7 +246,7 @@ namespace FrostAura.MCP.Gaia.Managers
             {
                 if (!File.Exists(_memoryPath))
                 {
-                    return "No memories found. Memory file doesn't exist yet.";
+                    return "No memories found. Use mcp__gaia__remember to store memories first.";
                 }
 
                 var lines = await File.ReadAllLinesAsync(_memoryPath);
