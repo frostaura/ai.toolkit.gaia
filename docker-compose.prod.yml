@@ -1,0 +1,259 @@
+services:
+  backend:
+    image: ${BACKEND_IMAGE:-ghcr.io/yourusername/taleweaver-backend:latest}
+    container_name: taleweaver-backend-prod
+    ports:
+      - "${BACKEND_PORT:-5000}:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:5000
+      - DATABASE_CONNECTION_STRING=${DATABASE_CONNECTION_STRING}
+      - REDIS_CONNECTION_STRING=${REDIS_CONNECTION_STRING}
+      - OLLAMA_ENDPOINT=http://ollama:11434
+      - TTS_ENDPOINT=http://tts-engine:5002
+      - IMAGE_ENGINE_ENDPOINT=http://image-engine:5003
+      - OLLAMA_STORY_MODEL=${OLLAMA_STORY_MODEL:-llama3:8b-instruct}
+      - OLLAMA_OUTLINE_MODEL=${OLLAMA_OUTLINE_MODEL:-phi3:mini-instruct}
+      - OLLAMA_METADATA_MODEL=${OLLAMA_METADATA_MODEL:-phi3:mini-instruct}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_ISSUER=${JWT_ISSUER:-taleweaver}
+      - JWT_AUDIENCE=${JWT_AUDIENCE:-taleweaver-api}
+      - JWT_ACCESS_TOKEN_EXPIRY_MINUTES=${JWT_ACCESS_TOKEN_EXPIRY_MINUTES:-15}
+      - JWT_REFRESH_TOKEN_EXPIRY_DAYS=${JWT_REFRESH_TOKEN_EXPIRY_DAYS:-7}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_PUBLISHABLE_KEY=${STRIPE_PUBLISHABLE_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - VAPID_PUBLIC_KEY=${VAPID_PUBLIC_KEY}
+      - VAPID_PRIVATE_KEY=${VAPID_PRIVATE_KEY}
+      - VAPID_SUBJECT=${VAPID_SUBJECT}
+      - LOG_LEVEL=${LOG_LEVEL:-Warning}
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+    networks:
+      - taleweaver-internal
+      - taleweaver-public
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    volumes:
+      - backend_logs:/app/logs
+
+  frontend:
+    image: ${FRONTEND_IMAGE:-ghcr.io/yourusername/taleweaver-frontend:latest}
+    container_name: taleweaver-frontend-prod
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:5000}
+      - NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${STRIPE_PUBLISHABLE_KEY}
+      - NEXT_PUBLIC_VAPID_PUBLIC_KEY=${VAPID_PUBLIC_KEY}
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - taleweaver-public
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: taleweaver-ollama-prod
+    expose:
+      - "11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+      - OLLAMA_NUM_PARALLEL=4
+      - OLLAMA_MAX_LOADED_MODELS=2
+    networks:
+      - taleweaver-internal
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        ollama serve &
+        sleep 10
+        ollama pull ${OLLAMA_STORY_MODEL:-llama3:8b-instruct}
+        ollama pull ${OLLAMA_OUTLINE_MODEL:-phi3:mini-instruct}
+        wait
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  tts-engine:
+    image: rhasspy/piper:latest
+    container_name: taleweaver-tts-prod
+    expose:
+      - "5002"
+    volumes:
+      - tts_models:/data/models
+    networks:
+      - taleweaver-internal
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    command: ["--port", "5002"]
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+
+  image-engine:
+    image: automaticai/sdxl-turbo:latest
+    container_name: taleweaver-image-prod
+    expose:
+      - "5003"
+    volumes:
+      - sd_models:/models
+      - sd_outputs:/outputs
+    environment:
+      - MODEL_PATH=/models
+      - OUTPUT_PATH=/outputs
+      - WEBUI_PORT=5003
+    networks:
+      - taleweaver-internal
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5003/health"]
+      interval: 60s
+      timeout: 15s
+      retries: 3
+      start_period: 120s
+    deploy:
+      resources:
+        limits:
+          memory: 12G
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: taleweaver-db-prod
+    expose:
+      - "5432"
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=en_US.UTF-8 --lc-ctype=en_US.UTF-8
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - postgres_backups:/backups
+    networks:
+      - taleweaver-internal
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+    command: >
+      postgres
+      -c shared_buffers=256MB
+      -c max_connections=200
+      -c effective_cache_size=1GB
+      -c maintenance_work_mem=64MB
+      -c checkpoint_completion_target=0.9
+      -c wal_buffers=16MB
+      -c default_statistics_target=100
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+      -c work_mem=1MB
+      -c min_wal_size=1GB
+      -c max_wal_size=4GB
+
+  redis:
+    image: redis:7-alpine
+    container_name: taleweaver-redis-prod
+    expose:
+      - "6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - taleweaver-internal
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    command: >
+      redis-server
+      --appendonly yes
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+networks:
+  taleweaver-internal:
+    driver: bridge
+    internal: true
+  taleweaver-public:
+    driver: bridge
+    internal: false
+
+volumes:
+  ollama_data:
+    driver: local
+  tts_models:
+    driver: local
+  sd_models:
+    driver: local
+  sd_outputs:
+    driver: local
+  postgres_data:
+    driver: local
+  postgres_backups:
+    driver: local
+  redis_data:
+    driver: local
+  backend_logs:
+    driver: local
