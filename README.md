@@ -10,7 +10,7 @@
 **A spec-driven AI framework that combines 7 specialized agents with objective quality gates to build production-ready applications through mandatory design-first development.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/Version-5.0.0-blue.svg)]()
+[![Version](https://img.shields.io/badge/Version-5.1.0-blue.svg)]()
 [![Status](https://img.shields.io/badge/Status-Production%20Ready-green.svg)]()
 [![AI Enhanced](https://img.shields.io/badge/AI-Enhanced%20Intelligence-purple.svg)]()
 [![.NET 9](https://img.shields.io/badge/.NET-9.0-512BD4.svg)]()
