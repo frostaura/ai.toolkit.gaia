@@ -1,0 +1,11 @@
+﻿{"timestamp":"2025-11-26 09:31:25","category":"stress_test","key":"test_1","value":"UPDATED: First test now modified - upsert working correctly"}
+{"timestamp":"2025-11-26 09:31:06","category":"stress_test","key":"test_4","value":"Fourth concurrent write test - longer content with multiple sentences. This tests the file write buffer. Making sure content doesn\u0027t get truncated or corrupted during concurrent access."}
+{"timestamp":"2025-11-26 09:31:06","category":"stress_test","key":"test_5","value":"Fifth concurrent write test - quotes and escapes: \u0022hello\u0022 \u0027world\u0027 \\n \\t backslash\\\\ end"}
+{"timestamp":"2025-11-26 09:31:25","category":"stress_test","key":"test_2","value":"UPDATED: Second test modified concurrently with test_1 upsert"}
+{"timestamp":"2025-11-26 09:31:06","category":"stress_test","key":"test_3","value":"Third concurrent write test - UTF-8 encoding with special chars: \u2192 \u2713 \u2717 \u26A0\uFE0F \uD83D\uDE80"}
+{"timestamp":"2025-11-26 09:31:13","category":"stress_test","key":"test_6","value":"Sixth test - concurrent with recalls happening"}
+{"timestamp":"2025-11-26 09:31:13","category":"stress_test","key":"test_7","value":"Seventh test - more concurrent pressure"}
+{"timestamp":"2025-11-26 09:31:13","category":"stress_test","key":"test_8","value":"Eighth test - keep pushing the locks"}
+{"timestamp":"2025-11-26 09:31:25","category":"stress_test","key":"test_9","value":"Ninth test - new entry while upserts happen"}
+{"timestamp":"2025-11-26 09:31:25","category":"stress_test","key":"test_10","value":"Tenth test - final batch entry"}
+{"timestamp":"2025-11-26 09:31:25","category":"different_category","key":"cross_category","value":"Testing different category during stress test"}

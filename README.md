@@ -18,7 +18,7 @@
 ## 🎯 What is GAIA 5?
 
 GAIA 5 is an advanced AI-driven development system that enforces quality through:
-- **7 Specialized Agents** for different development tasks
+- **8 Specialized Agents** for different development tasks
 - **Objective Quality Gates** (binary pass/fail validation)
 - **Spec-Driven Development** (design before code)
 - **MCP Tools** for task/memory management
@@ -47,15 +47,16 @@ Each phase requires **quality gates to pass** before proceeding:
 - **Test Gate**: All tests pass (exit code 0)
 - **Regression Gate**: No broken existing functionality
 
-## 🤖 The 7 Agents
+## 🤖 The 8 Agents
 
 | Agent | Model | Purpose |
-|-------|-------|---------|
+|-------|-------|---------|----------|
 | **@Explorer** | haiku | Analyze code & repository structure |
 | **@Architect** | sonnet | Design decisions and system architecture |
 | **@Builder** | sonnet | Implementation and feature development |
 | **@Tester** | haiku | Playwright testing (direct use only) |
 | **@Reviewer** | haiku | Code quality and security review |
+| **@Researcher** | opus | Web research, product analysis, documentation discovery |
 | **@Deployer** | haiku | Git operations and deployments |
 | **@Documenter** | haiku | Documentation maintenance |
 

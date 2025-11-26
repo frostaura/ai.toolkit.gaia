@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using ModelContextProtocol.Server;
@@ -18,20 +20,47 @@ namespace FrostAura.MCP.Gaia.Managers
     {
         // Obfuscated state files in hidden directory to prevent direct AI agent access
         // These files should ONLY be accessed via MCP tools, never directly edited
-        private readonly string _stateDir = ".gaia/.sys";
-        private readonly string _tasksPath = ".gaia/.sys/.s.t.1.dat";
-        private readonly string _memoryPath = ".gaia/.sys/.s.m.1.dat";
+        private readonly string _tasksPath = ".gaia/tasks.jsonl";
+        private readonly string _memoryPath = ".gaia/memory.jsonl";
         private readonly ILogger<CoreManager> _logger;
+
+        // Semaphores for thread-safe file access (prevents concurrent write corruption)
+        private static readonly SemaphoreSlim _tasksLock = new SemaphoreSlim(1, 1);
+        private static readonly SemaphoreSlim _memoryLock = new SemaphoreSlim(1, 1);
 
         public CoreManager(ILogger<CoreManager> logger)
         {
             _logger = logger;
 
-            // Ensure hidden state directory exists
-            Directory.CreateDirectory(_stateDir);
-
             // Initialize files if they don't exist or are corrupt
             InitializeFilesIfNeeded();
+        }
+
+        /// <summary>
+        /// Safely write lines to a file with atomic write pattern to prevent corruption
+        /// </summary>
+        private async Task SafeWriteAllLinesAsync(string path, IEnumerable<string> lines)
+        {
+            var tempPath = path + ".tmp";
+            var content = string.Join(Environment.NewLine, lines);
+
+            // Write to temp file first
+            await File.WriteAllTextAsync(tempPath, content, Encoding.UTF8);
+
+            // Atomic rename (replace) - this is atomic on most file systems
+            File.Move(tempPath, path, overwrite: true);
+        }
+
+        /// <summary>
+        /// Safely read all lines from a file
+        /// </summary>
+        private async Task<List<string>> SafeReadAllLinesAsync(string path)
+        {
+            if (!File.Exists(path))
+                return new List<string>();
+
+            var content = await File.ReadAllTextAsync(path, Encoding.UTF8);
+            return content.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).ToList();
         }
 
         private void InitializeFilesIfNeeded()
@@ -88,10 +117,10 @@ namespace FrostAura.MCP.Gaia.Managers
         public async Task<string> read_tasks(
             [Description("Hide completed tasks (default: false)")] bool hideCompleted = false)
         {
+            await _tasksLock.WaitAsync();
             try
             {
-
-                var lines = await File.ReadAllLinesAsync(_tasksPath);
+                var lines = await SafeReadAllLinesAsync(_tasksPath);
                 var tasks = new List<object>();
 
                 foreach (var line in lines.Where(l => !string.IsNullOrWhiteSpace(l)))
@@ -133,6 +162,10 @@ namespace FrostAura.MCP.Gaia.Managers
                 _logger.LogError(ex, "Error reading tasks");
                 return $"Error reading tasks: {ex.Message}";
             }
+            finally
+            {
+                _tasksLock.Release();
+            }
         }
 
         /// <summary>
@@ -146,6 +179,7 @@ namespace FrostAura.MCP.Gaia.Managers
             [Description("Status of the task")] string status,
             [Description("Who the task is assigned to")] string? assignedTo = null)
         {
+            await _tasksLock.WaitAsync();
             try
             {
                 var task = new Dictionary<string, object>
@@ -162,9 +196,7 @@ namespace FrostAura.MCP.Gaia.Managers
                 }
 
                 // Check if task exists and update, or append new
-                var lines = File.Exists(_tasksPath)
-                    ? (await File.ReadAllLinesAsync(_tasksPath)).ToList()
-                    : new List<string>();
+                var lines = await SafeReadAllLinesAsync(_tasksPath);
 
                 var updated = false;
                 for (int i = 0; i < lines.Count; i++)
@@ -190,7 +222,7 @@ namespace FrostAura.MCP.Gaia.Managers
                     lines.Add(JsonSerializer.Serialize(task));
                 }
 
-                await File.WriteAllLinesAsync(_tasksPath, lines.Where(l => !string.IsNullOrWhiteSpace(l)));
+                await SafeWriteAllLinesAsync(_tasksPath, lines.Where(l => !string.IsNullOrWhiteSpace(l)));
 
                 return $"Task '{taskId}' {(updated ? "updated" : "added")} with status: {status}";
             }
@@ -198,6 +230,10 @@ namespace FrostAura.MCP.Gaia.Managers
             {
                 _logger.LogError(ex, "Error updating task");
                 return $"Error updating task: {ex.Message}";
+            }
+            finally
+            {
+                _tasksLock.Release();
             }
         }
 
@@ -211,6 +247,7 @@ namespace FrostAura.MCP.Gaia.Managers
             [Description("Key identifier for the memory")] string key,
             [Description("Value/content to remember")] string value)
         {
+            await _memoryLock.WaitAsync();
             try
             {
                 var memory = new Dictionary<string, object>
@@ -222,9 +259,7 @@ namespace FrostAura.MCP.Gaia.Managers
                 };
 
                 // Read existing memories and upsert by category+key
-                var lines = File.Exists(_memoryPath)
-                    ? (await File.ReadAllLinesAsync(_memoryPath)).ToList()
-                    : new List<string>();
+                var lines = await SafeReadAllLinesAsync(_memoryPath);
 
                 var updated = false;
                 var compositeKey = $"{category}/{key}".ToLower();
@@ -257,7 +292,7 @@ namespace FrostAura.MCP.Gaia.Managers
                     lines.Add(JsonSerializer.Serialize(memory));
                 }
 
-                await File.WriteAllLinesAsync(_memoryPath, lines.Where(l => !string.IsNullOrWhiteSpace(l)));
+                await SafeWriteAllLinesAsync(_memoryPath, lines.Where(l => !string.IsNullOrWhiteSpace(l)));
 
                 return $"Memory {(updated ? "updated" : "stored")}: {category}/{key}";
             }
@@ -265,6 +300,10 @@ namespace FrostAura.MCP.Gaia.Managers
             {
                 _logger.LogError(ex, "Error storing memory");
                 return $"Error storing memory: {ex.Message}";
+            }
+            finally
+            {
+                _memoryLock.Release();
             }
         }
 
@@ -277,14 +316,22 @@ namespace FrostAura.MCP.Gaia.Managers
             [Description("Query to search for in memories (supports fuzzy search)")] string query,
             [Description("Maximum number of results to return (default: 20)")] int maxResults = 20)
         {
+            await _memoryLock.WaitAsync();
             try
             {
-                if (!File.Exists(_memoryPath))
+                var lines = await SafeReadAllLinesAsync(_memoryPath);
+
+                if (lines.Count == 0)
                 {
-                    return "No memories found. Use mcp__gaia__remember to store memories first.";
+                    return JsonSerializer.Serialize(new
+                    {
+                        count = 0,
+                        query = query,
+                        message = "No memories found. Use mcp__gaia__remember to store memories first.",
+                        memories = new List<object>()
+                    }, new JsonSerializerOptions { WriteIndented = true });
                 }
 
-                var lines = await File.ReadAllLinesAsync(_memoryPath);
                 var scoredResults = new List<(Dictionary<string, object> memory, double score)>();
 
                 // Split query into words for fuzzy matching
@@ -382,6 +429,10 @@ namespace FrostAura.MCP.Gaia.Managers
             {
                 _logger.LogError(ex, "Error recalling memories");
                 return $"Error recalling memories: {ex.Message}";
+            }
+            finally
+            {
+                _memoryLock.Release();
             }
         }
     }

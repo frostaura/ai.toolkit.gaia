@@ -147,6 +147,3 @@ nunit-*.xml
 /playwright/.cache/
 
 **/*.db*
-
-# Gaia system state (managed by MCP server only)
-.gaia/.sys/

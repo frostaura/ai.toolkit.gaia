@@ -21,14 +21,15 @@ Gaia 5 is a comprehensive AI-driven development system that enforces quality thr
 
 ## Core Architecture
 
-### 7 Specialized Agents
+### 8 Specialized Agents
 1. **@Explorer** (haiku) - Repository analysis and code discovery
 2. **@Architect** (sonnet) - Design decisions and system architecture
 3. **@Builder** (sonnet) - Implementation and development
 4. **@Tester** (haiku) - Testing with Playwright directly (no custom scripts)
 5. **@Reviewer** (haiku) - Code quality and security review
-6. **@Deployer** (haiku) - Git operations and deployments
-7. **@Documenter** (haiku) - Documentation maintenance
+6. **@Researcher** (opus) - Web research, product analysis, documentation discovery
+7. **@Deployer** (haiku) - Git operations and deployments
+8. **@Documenter** (haiku) - Documentation maintenance
 
 ### MCP Tools (MANDATORY - Never Create Markdown Files)
 - `mcp__gaia__read_tasks(hideCompleted?)` - View tasks

@@ -8,6 +8,7 @@ You are orchestrating the GAIA framework with 7 specialized agents. Since agents
 - **@Builder** (sonnet): Implement features and fixes
 - **@Tester** (haiku): Write and run tests
 - **@Reviewer** (haiku): Review code quality and security
+- **@Researcher** (opus): Web research, product analysis, documentation discovery
 - **@Deployer** (haiku): Handle git operations and deployments
 - **@Documenter** (haiku): Update documentation
 
@@ -26,6 +27,26 @@ You are orchestrating the GAIA framework with 7 specialized agents. Since agents
 **Bug Fix**: Explorer → **UPDATE SPECS** (if design flaw) → Builder → Tester → Deployer
 **Code Review**: Reviewer → Builder (if issues) → Tester (if fixed)
 **Deployment**: Tester → Reviewer → Deployer → Documenter
+**Research**: Researcher → Architect (design decisions) | Researcher → Builder (implementation choices)
+**Technology Selection**: Researcher → Architect → Builder (research informs design and implementation)
+
+### Research Agent Usage Examples
+```markdown
+@Researcher: Find the best state management library for React in 2025
+Context: E-commerce platform, need TypeScript support, team of 5 developers
+
+@Researcher: Compare Stripe vs PayPal for payment integration
+Context: International sales, subscription billing required
+
+@Researcher: What's the latest version of Next.js and key new features?
+Context: Planning upgrade from v13, need migration considerations
+
+@Researcher: Research serverless hosting options for .NET Core APIs
+Context: Cost-effective, auto-scaling, minimal DevOps overhead
+
+@Researcher: Find best practices for JWT token refresh in React apps
+Context: Need secure implementation, good UX during token refresh
+```
 
 ## Context Passing
 
@@ -85,6 +106,7 @@ Key reminders from the Gaia 5 system:
 - **@Builder** (sonnet): Implementation
 - **@Tester** (haiku): Testing with Playwright
 - **@Reviewer** (haiku): Code quality review
+- **@Researcher** (opus): Web research and product analysis
 - **@Deployer** (haiku): Git and deployment
 - **@Documenter** (haiku): Documentation updates
 
