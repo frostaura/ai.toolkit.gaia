@@ -66,16 +66,18 @@ Decision: REST vs GraphQL for API
 
 ## Document Management
 ```markdown
-# Instead of 11 templates, use adaptive design:
-.gaia/DESIGN.md - Main design document that grows with project
+# Tiered design documents in .gaia/designs/
+Required docs scale with SDLC tier:
 
-Sections added only when relevant:
-- Overview (always)
-- Architecture (when >3 components)
-- API Design (when building APIs)
-- Data Model (when using databases)
-- Security (for user-facing features)
-- Performance (when scale matters)
+Micro SDLC: architecture.md only (if needed)
+Small SDLC: architecture.md + api.md
+Medium SDLC: + database.md
+Large/Enterprise: All 5 docs (architecture, api, database, security, frontend)
+
+Each doc should have:
+- No [TODO] or [TBD] placeholders
+- Consistent terminology across docs
+- Traceable to requirements
 ```
 
 ## Example Tasks

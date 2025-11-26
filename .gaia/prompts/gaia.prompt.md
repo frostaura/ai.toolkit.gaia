@@ -94,11 +94,10 @@ Key reminders from the Gaia 5 system:
 1. Analyze the user request thoroughly
 2. Use @Explorer to examine existing code
 3. Store requirements: `mcp__gaia__remember("requirements", "user_request", "...")`
-4. **Reflect** until these metrics = 100%:
-   - Clarity
-   - Efficiency
-   - Comprehensiveness
-   - Visual Requirements Quality
+4. **Validate Quality Gates**:
+   - Clarity Gate: Request parsed into discrete items with success criteria
+   - Scope Gate: In/out-of-scope boundaries defined
+   - Acceptance Gate: Each feature has testable acceptance criteria
 
 ### Step 2: Repository Assessment & SDLC Selection
 1. Determine repository state:
@@ -106,31 +105,34 @@ Key reminders from the Gaia 5 system:
    - Has code + designs: Update designs first
    - Has code, no designs: Generate designs first
 
-2. Select minimal SDLC for the task
+2. Select minimal SDLC for the task (determines required design docs):
+   - **Micro**: architecture.md only (if needed)
+   - **Small**: architecture.md + api.md
+   - **Medium**: + database.md
+   - **Large/Enterprise**: All 5 design docs
 3. Store: `mcp__gaia__remember("sdlc", "selected", "[steps]")`
-4. **Reflect** until Pipeline Quality = 100%
+4. **Validate**: SDLC Selection Gate passed
 
 ### Step 3: Execute Design Steps (MANDATORY BEFORE TASKS!)
 **CRITICAL**: Complete ALL design work before creating ANY tasks!
 
-1. Use @Architect to update each design document
+1. Use @Architect to update each required design document (per SDLC tier)
 2. Use @Documenter to write the updates
-3. Ensure all designs in `.gaia/designs/` are complete
+3. Ensure all required designs in `.gaia/designs/` are complete
 4. Store decisions: `mcp__gaia__remember("design", "[area]", "[decisions]")`
-5. **Reflect** until ALL = 100%:
-   - Design Completeness
-   - Template Adherence
-   - Document Alignment
-   - Requirements Coverage
+5. **Validate Quality Gates**:
+   - Completeness Gate: All required docs exist, no `[TODO]` placeholders
+   - Consistency Gate: Entity names match across docs
+   - Traceability Gate: Every requirement maps to a design section
 
 ### Step 4: Planning (From Completed Designs)
 1. Create comprehensive implementation plan
-2. Each task MUST reference design docs
-3. Include acceptance criteria
-4. **Reflect** until ALL = 100%:
-   - Comprehensiveness
-   - Design Alignment
-   - Plan Quality
+2. Each task MUST reference design docs (e.g., `api.md#users-endpoint`)
+3. Include acceptance criteria that can be validated programmatically
+4. **Validate Quality Gates**:
+   - Coverage Gate: Every design section has at least one task
+   - Reference Gate: Every task includes design doc reference
+   - Testability Gate: Every task has testable acceptance criteria
 
 ### Step 5: Capture Plan in MCP Tools
 Use ONLY MCP tools for tasks:
@@ -155,16 +157,18 @@ After EACH feature:
 
 If ANY test fails: STOP, fix, then continue
 
-## Reflection Process (MANDATORY)
+## Quality Gate Validation (MANDATORY)
 
 For EACH step:
-1. Score against metrics
-2. WHILE any metric <100%:
-   - Improve output
-   - Re-score
-3. Only proceed at 100%
+1. Run objective validation checks
+2. Gates are binary: PASS or FAIL
+3. If gate fails:
+   - Attempt 1: Fix identified issue, re-run
+   - Attempt 2: Simplify approach, re-run
+   - Attempt 3: Reduce scope, re-run
+   - If still failing: Mark task as `blocked`, continue with others
 
-Max 3 attempts. If still <100%, flag for review.
+No subjective scoring - validate with builds, lints, tests.
 
 ## Context Passing Between Agents
 
@@ -185,34 +189,34 @@ Reference: api.md#auth-endpoints
 ## Default Stack
 
 - Backend: .NET Core + EF Core
-- Frontend: React + TypeScript + Redux + PWA
+- Frontend: React + TypeScript + Redux (PWA optional)
 - Database: PostgreSQL
 - Testing: Playwright (directly, no scripts)
 
 ## Critical Rules
 
 ✅ MUST:
-- Complete designs before tasks
+- Complete designs before tasks (tiered by SDLC)
 - Reference designs in every task
 - Use MCP tools only (no markdown tasks)
 - Run regression tests after each feature
-- Achieve 100% on reflection metrics
+- Pass all quality gates before proceeding
 
 ❌ NEVER:
 - Skip design phase
 - Create TODO.md files
 - Build without testing
 - Ignore regression failures
-- Compromise quality
+- Proceed when gates fail (mark blocked after 3 retries)
 
 ## Success Criteria
 
 You succeed when:
-- All designs complete before implementation
+- All required designs complete before implementation
 - Every task aligns with designs
-- All tests pass 100%
+- All quality gates pass (build, lint, test)
 - No regressions introduced
-- All reflection metrics at 100%
+- Blocked tasks documented with reason
 
 ---
 

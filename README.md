@@ -5,9 +5,9 @@
 <h1 align="center">
   <b>GAIA 5</b>
 </h1>
-<h3 align="center">🌍 AI-Driven Development with Reflection-Based Quality Assurance</h3>
+<h3 align="center">🌍 AI-Driven Development with Objective Quality Gates</h3>
 
-**A spec-driven AI framework that combines 7 specialized agents with reflection metrics to build production-ready applications through mandatory design-first development.**
+**A spec-driven AI framework that combines 7 specialized agents with objective quality gates to build production-ready applications through mandatory design-first development.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Version](https://img.shields.io/badge/Version-5.0.0-blue.svg)]()
@@ -19,7 +19,7 @@
 
 GAIA 5 is an advanced AI-driven development system that enforces quality through:
 - **7 Specialized Agents** for different development tasks
-- **Reflection-based Quality Assurance** (100% metrics required)
+- **Objective Quality Gates** (binary pass/fail validation)
 - **Spec-Driven Development** (design before code)
 - **MCP Tools** for task/memory management
 - **Regression Prevention** with mandatory validation
@@ -41,11 +41,11 @@ graph LR
     style G fill:#DC143C
 ```
 
-Each phase requires **100% reflection metrics** before proceeding:
-- **Clarity, Efficiency, Comprehensiveness**
-- **Design Completeness, Template Adherence**
-- **Test Coverage, Regression Prevention**
-- **Visual Quality, Performance Metrics**
+Each phase requires **quality gates to pass** before proceeding:
+- **Build Gate**: Project compiles without errors
+- **Lint Gate**: Code passes static analysis
+- **Test Gate**: All tests pass (exit code 0)
+- **Regression Gate**: No broken existing functionality
 
 ## 🤖 The 7 Agents
 
@@ -125,7 +125,7 @@ gh copilot
 ## 🏗️ Default Technology Stack
 
 - **Backend**: .NET Core + Entity Framework
-- **Frontend**: React + TypeScript + Redux (PWA mandatory)
+- **Frontend**: React + TypeScript + Redux (PWA optional)
 - **Database**: PostgreSQL
 - **Testing**: Playwright (direct use only)
 
@@ -134,21 +134,21 @@ gh copilot
 GAIA 5 succeeds when:
 - ✅ All designs complete before coding
 - ✅ Every task references designs
-- ✅ All tests pass at 100%
+- ✅ All quality gates pass
 - ✅ No regressions introduced
-- ✅ All reflection metrics achieve 100%
+- ✅ Build, lint, and test gates green
 
 ## 🛡️ Quality Gates
 
-Every phase requires **100% on ALL metrics**:
-- Max 3 improvement attempts
+Every phase requires **all gates to pass**:
+- Max 3 retry attempts per gate
+- On failure: fix issue → simplify → reduce scope
 - Store results in MCP
-- Flag if can't achieve 100%
 
-### Reflection Process
-1. Score each metric (0-100%)
-2. WHILE any metric <100%: Improve → Re-score
-3. Only proceed at 100%
+### Gate Validation
+1. Run objective checks (build, lint, test)
+2. Binary pass/fail - no subjective scoring
+3. If blocked after 3 attempts, mark task blocked and continue
 
 ## 💡 Critical Rules
 
@@ -157,7 +157,7 @@ Every phase requires **100% on ALL metrics**:
 - Use MCP tools for tasks/memories
 - Test after EVERY feature
 - Maintain backward compatibility
-- Achieve 100% reflection metrics
+- Pass all quality gates before proceeding
 
 ### ❌ NEVER:
 - Skip design phase
@@ -171,7 +171,7 @@ Every phase requires **100% on ALL metrics**:
 .gaia/
 ├── instructions/
 │   └── gaia.instructions.md  # Complete Gaia 5 system
-├── designs/               # 5 mandatory design documents
+├── designs/               # Design documents (tiered by SDLC)
 ├── agents/                # 7 agent specifications
 └── mcps/                  # MCP server (JSONL-based)
 
@@ -181,14 +181,12 @@ src/                       # Your application code
 ## 🔧 MCP Tools
 
 **Task Management** (Use ONLY these):
-- `mcp__gaia__create_new_plan` - Create project plan
-- `mcp__gaia__add_task_to_plan` - Add tasks
-- `mcp__gaia__get_tasks_from_plan` - View tasks
-- `mcp__gaia__mark_task_as_completed` - Complete tasks
+- `mcp__gaia__read_tasks(hideCompleted?)` - View tasks
+- `mcp__gaia__update_task(taskId, description, status, assignedTo?)` - Add/update tasks
 
 **Memory Management**:
-- `mcp__gaia__remember` - Store decisions
-- `mcp__gaia__recall` - Search memories
+- `mcp__gaia__remember(category, key, value)` - Store decisions (upserts by key)
+- `mcp__gaia__recall(query, maxResults?)` - Search memories
 
 **FORBIDDEN**: Creating TODO.md or any markdown task files!
 
@@ -204,11 +202,11 @@ src/                       # Your application code
 ```
 
 GAIA 5 will:
-1. Analyze requirements (100% clarity required)
-2. Create 5 design documents
+1. Analyze requirements (clarity gate required)
+2. Create design documents (scaled to SDLC tier)
 3. Generate implementation tasks
 4. Build with continuous testing
-5. Validate with zero regressions
+5. Validate with quality gates
 
 ## 📊 SDLC Selection
 
@@ -220,7 +218,7 @@ GAIA automatically selects the minimal viable process:
 - **Large** (Major changes, 1-2 weeks)
 - **Enterprise** (Full system, 2+ weeks)
 
-Each level enforces 100% reflection metrics per phase.
+Each level enforces quality gates per phase.
 
 ## 🔍 Troubleshooting
 
@@ -251,12 +249,12 @@ dotnet restore && dotnet build
 
 ## 🌟 The GAIA 5 Promise
 
-> **"Quality through reflection, success through design, excellence through validation"**
+> **"Quality through validation, success through design, excellence through gates"**
 
 GAIA 5 ensures every project meets production standards through:
 - Mandatory design-first development
-- Continuous reflection and improvement
-- 100% test coverage and regression prevention
+- Objective quality gate validation
+- Autonomous retry and scope reduction
 - Professional visual quality at all viewports
 
 ## 📄 License

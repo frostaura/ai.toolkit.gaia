@@ -19,8 +19,8 @@ namespace FrostAura.MCP.Gaia.Managers
         // Obfuscated state files in hidden directory to prevent direct AI agent access
         // These files should ONLY be accessed via MCP tools, never directly edited
         private readonly string _stateDir = ".gaia/.sys";
-        private readonly string _tasksPath = ".gaia/.sys/.s1.dat";
-        private readonly string _memoryPath = ".gaia/.sys/.s2.dat";
+        private readonly string _tasksPath = ".gaia/.sys/.s.t.1.dat";
+        private readonly string _memoryPath = ".gaia/.sys/.s.m.1.dat";
         private readonly ILogger<CoreManager> _logger;
 
         public CoreManager(ILogger<CoreManager> logger)
@@ -202,10 +202,10 @@ namespace FrostAura.MCP.Gaia.Managers
         }
 
         /// <summary>
-        /// Store important decisions/context in JSONL
+        /// Store important decisions/context for later recalling (upserts by category+key)
         /// </summary>
         [McpServerTool]
-        [Description("Store important decisions/context in JSONL")]
+        [Description("Store important decisions/context for later recalling. Upserts by category+key to prevent duplicates.")]
         public async Task<string> remember(
             [Description("Category of the memory")] string category,
             [Description("Key identifier for the memory")] string key,
@@ -221,10 +221,45 @@ namespace FrostAura.MCP.Gaia.Managers
                     ["value"] = value
                 };
 
-                var json = JsonSerializer.Serialize(memory);
-                await File.AppendAllTextAsync(_memoryPath, json + Environment.NewLine);
+                // Read existing memories and upsert by category+key
+                var lines = File.Exists(_memoryPath)
+                    ? (await File.ReadAllLinesAsync(_memoryPath)).ToList()
+                    : new List<string>();
 
-                return $"Memory stored: {category}/{key}";
+                var updated = false;
+                var compositeKey = $"{category}/{key}".ToLower();
+
+                for (int i = 0; i < lines.Count; i++)
+                {
+                    if (string.IsNullOrWhiteSpace(lines[i])) continue;
+
+                    try
+                    {
+                        var existingMemory = JsonSerializer.Deserialize<Dictionary<string, object>>(lines[i]);
+                        if (existingMemory != null &&
+                            existingMemory.ContainsKey("category") &&
+                            existingMemory.ContainsKey("key"))
+                        {
+                            var existingKey = $"{existingMemory["category"]}/{existingMemory["key"]}".ToLower();
+                            if (existingKey == compositeKey)
+                            {
+                                lines[i] = JsonSerializer.Serialize(memory);
+                                updated = true;
+                                break;
+                            }
+                        }
+                    }
+                    catch { }
+                }
+
+                if (!updated)
+                {
+                    lines.Add(JsonSerializer.Serialize(memory));
+                }
+
+                await File.WriteAllLinesAsync(_memoryPath, lines.Where(l => !string.IsNullOrWhiteSpace(l)));
+
+                return $"Memory {(updated ? "updated" : "stored")}: {category}/{key}";
             }
             catch (Exception ex)
             {
@@ -234,10 +269,10 @@ namespace FrostAura.MCP.Gaia.Managers
         }
 
         /// <summary>
-        /// Search previous decisions/context from JSONL with fuzzy matching
+        /// Search previous decisions/context with fuzzy matching
         /// </summary>
         [McpServerTool]
-        [Description("Search previous decisions/context from JSONL with fuzzy matching")]
+        [Description("Search previous decisions/context with fuzzy matching")]
         public async Task<string> recall(
             [Description("Query to search for in memories (supports fuzzy search)")] string query,
             [Description("Maximum number of results to return (default: 20)")] int maxResults = 20)

@@ -95,18 +95,19 @@ Production:
 
 ## CI/CD Pipeline Management
 ```yaml
-Pre-deployment Checks:
-- Tests passing
-- Build successful
+Pre-deployment Quality Gates (ALL must pass):
+- Build Gate: `dotnet build` / `npm run build` exits 0
+- Lint Gate: `dotnet format --verify-no-changes` / `npm run lint` exits 0
+- Test Gate: `dotnet test` / `npm test` exits 0
 - Security scan clean
-- Performance benchmarks met
 
 Deployment Steps:
-1. Build artifacts
-2. Run smoke tests
-3. Deploy to target environment
-4. Verify health checks
-5. Run post-deployment tests
+1. Verify all quality gates passed
+2. Build artifacts
+3. Run smoke tests
+4. Deploy to target environment
+5. Verify health checks
+6. Run post-deployment tests
 ```
 
 ## Example Tasks

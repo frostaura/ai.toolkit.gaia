@@ -2,7 +2,22 @@
 
 ## System Overview
 
-Gaia 5 is a comprehensive AI-driven development system that enforces quality through reflection metrics, spec-driven development, and regression prevention.
+Gaia 5 is a comprehensive AI-driven development system that enforces quality through objective quality gates, spec-driven development, and regression prevention.
+
+> 🤖 **AUTONOMOUS EXECUTION MANDATE**
+>
+> Gaia 5 agents operate **autonomously without user intervention**. Agents MUST:
+> - **ACT, don't ask** - Execute tasks directly instead of asking for permission
+> - **DECIDE, don't suggest** - Make decisions and implement them immediately
+> - **PROCEED, don't pause** - Continue through all phases without waiting for approval
+> - **FIX, don't report** - When issues arise, fix them autonomously; only report blockers after 3 failed attempts
+>
+> The only acceptable reasons to pause and ask the user:
+> 1. Genuine ambiguity in requirements that cannot be reasonably inferred
+> 2. A task is BLOCKED after 3 fix attempts (report what was tried)
+> 3. User explicitly requested a review checkpoint
+>
+> **Default behavior**: Full autonomous execution from request to completion.
 
 ## Core Architecture
 
@@ -39,14 +54,12 @@ Gaia 5 is a comprehensive AI-driven development system that enforces quality thr
 3. Identify gaps and enhancement areas
 4. Store: `mcp__gaia__remember("requirements", "user_request", "[details]")`
 
-**Reflection Metrics** (ALL must reach 100%):
-- **Clarity**: User intent unambiguous, success criteria defined, constraints identified
-- **Efficiency**: Minimal viable scope identified, quick wins prioritized, resources realistic
-- **Quality**: Functional/non-functional requirements complete, acceptance criteria measurable
-- **Frontend Visual Requirements**: Layout captured, breakpoints defined, interactions specified
-- **Comprehensiveness**: All stories covered, edge cases considered, integration mapped
+**Quality Gates** (ALL must pass):
+- **Clarity Gate**: User request parsed into discrete, actionable items with explicit success criteria
+- **Scope Gate**: Features listed with explicit in/out-of-scope boundaries
+- **Acceptance Gate**: Each feature has testable acceptance criteria (can be validated by Playwright or unit test)
 
-**Reflection Process**: Score each metric 0-100%, improve until all reach 100% (max 3 attempts)
+**Validation**: Gates pass/fail binary. If requirements are unclear, make reasonable assumptions based on context and industry best practices, document assumptions via `mcp__gaia__remember`, and proceed. Only ask user for clarification if requirements are genuinely ambiguous with no reasonable default.
 
 ### Phase 2: Repository Assessment & SDLC Selection
 **Agent**: @Explorer + Main AI
@@ -63,34 +76,46 @@ Gaia 5 is a comprehensive AI-driven development system that enforces quality thr
 
 **SDLC Selection** (Choose minimal viable):
 
-**Micro SDLC** (Bug fixes, <1 day):
+> ⚠️ **CRITICAL: Time Estimates Are HUMAN HOURS, Not Agent Execution Time**
+>
+> The time estimates below (e.g., "<1 day", "1-3 days") represent how long a **human developer** would take to complete the work manually. These estimates are used ONLY for selecting the appropriate SDLC tier based on project complexity.
+>
+> **Agents MUST**:
+> - Select SDLC tier based on feature complexity, NOT execution time concerns
+> - NEVER refuse or reduce scope because a task "would take too long"
+> - NEVER suggest breaking work into smaller requests due to time estimates
+> - Execute the full scope regardless of the human-equivalent time estimate
+>
+> AI agents can complete work much faster than these human estimates suggest. A "2-week" enterprise project for a human may take an agent minutes to hours.
+
+**Micro SDLC** (Bug fixes, <1 human-day equivalent):
 ```yaml
 Requirements → Design Update (if needed) → Implementation → Testing
-Reflection Metrics per phase: 100% required
+Design Docs Required: architecture.md only (if changes affect architecture)
 ```
 
-**Small SDLC** (Single feature, 1-3 days):
+**Small SDLC** (Single feature, 1-3 human-days equivalent):
 ```yaml
 Requirements → Design → Implementation → Testing → Deployment
-Reflection Metrics per phase: 100% required
+Design Docs Required: architecture.md + api.md (if API changes)
 ```
 
-**Medium SDLC** (Multiple features, 3-7 days):
+**Medium SDLC** (Multiple features, 3-7 human-days equivalent):
 ```yaml
 Requirements → System Design → Documentation → Implementation → QA → Deployment
-Reflection Metrics per phase: 100% required
+Design Docs Required: architecture.md + api.md + database.md
 ```
 
-**Large SDLC** (Major changes, 1-2 weeks):
+**Large SDLC** (Major changes, 1-2 human-weeks equivalent):
 ```yaml
 Requirements → Architecture → Detailed Design → Documentation → Development → Testing → Quality Gates → Deployment
-Reflection Metrics per phase: 100% required
+Design Docs Required: All 5 (architecture, api, database, security, frontend)
 ```
 
-**Enterprise SDLC** (Full system, 2+ weeks):
+**Enterprise SDLC** (Full system, 2+ human-weeks equivalent):
 ```yaml
 Discovery → System Architecture → Detailed Design → Compliance → Phased Development → Comprehensive Testing → Quality Gates → Infrastructure → Deployment → Post-Release
-Reflection Metrics per phase: 100% required
+Design Docs Required: All 5 (architecture, api, database, security, frontend)
 ```
 
 **Store Selection**:
@@ -99,9 +124,9 @@ mcp__gaia__remember("sdlc", "type", "[micro/small/medium/large/enterprise]")
 mcp__gaia__remember("sdlc", "phases", "[phase list]")
 ```
 
-**Reflection Metrics**:
-- **Pipeline Quality**: Appropriate for project size, phases ordered correctly
-- **Design Principles Adherence**: Follows Gaia framework, spec-driven approach
+**Quality Gates**:
+- **SDLC Selection Gate**: Selected SDLC matches project complexity (stored in MCP)
+- **Repository State Gate**: Existing code/designs inventoried and compatibility requirements identified
 
 ### Phase 3: Execute Design Steps (MANDATORY BEFORE ANY TASKS!)
 **Agent**: @Architect + @Documenter
@@ -109,13 +134,13 @@ mcp__gaia__remember("sdlc", "phases", "[phase list]")
 **CRITICAL RULE**: Complete ALL design work BEFORE creating implementation tasks!
 
 **Actions**:
-1. For each design document in `.gaia/designs/`:
+1. For each design document required by selected SDLC tier:
    - Update with new requirements
    - Ensure consistency across all docs
    - Validate completeness
 
 2. Design Completion Checkpoint:
-   - ✅ All 5 design docs complete
+   - ✅ All required design docs for SDLC tier complete
    - ✅ No template placeholders remain
    - ✅ Designs capture 100% requirements
    - ✅ Inter-document consistency verified
@@ -127,11 +152,10 @@ mcp__gaia__remember("design", "api", "[endpoint designs]")
 mcp__gaia__remember("design", "database", "[schema decisions]")
 ```
 
-**Reflection Metrics** (100% Required):
-- **Design Completeness**: All docs updated, specs detailed enough to code from
-- **Template Adherence**: Follows formats, sections filled, consistent terminology
-- **Document Alignment**: No contradictions, shared concepts consistent
-- **Requirements Coverage**: Every requirement mapped, no missing features
+**Quality Gates**:
+- **Completeness Gate**: All required design docs for SDLC tier exist and have no `[TODO]` or `[TBD]` placeholders
+- **Consistency Gate**: Entity names, API paths, and terminology match across all design docs
+- **Traceability Gate**: Every requirement from Phase 1 maps to at least one design section
 
 ### Phase 4: Planning (Based on COMPLETED Design)
 **Agent**: Main AI
@@ -153,12 +177,10 @@ Acceptance Criteria:
 Assignee: @Builder
 ```
 
-**Reflection Metrics**:
-- **Comprehensiveness**: All design elements have tasks, no gaps
-- **Design Alignment**: Each task references designs, follows architecture
-- **Frontend Plan Quality**: Components, state, routing, PWA requirements
-- **Backend Plan Quality**: APIs, business logic, database operations
-- **Test Coverage Plan**: Unit, integration, E2E, visual regression
+**Quality Gates**:
+- **Coverage Gate**: Every design section has at least one implementation task
+- **Reference Gate**: Every task includes explicit design doc reference (e.g., `api.md#users-endpoint`)
+- **Testability Gate**: Every task has acceptance criteria that can be validated programmatically
 
 ### Phase 5: Capture Plan in MCP Tools
 **Agent**: Main AI
@@ -172,9 +194,9 @@ mcp__gaia__update_task("auth-test", "Test auth with Playwright", "pending", "Tes
 
 **NEVER**: Create TODO.md, TASKS.md, or any markdown task files!
 
-**Reflection Metrics**:
-- **Task Capture Completeness**: All planned tasks in MCP
-- **Design-Task Alignment**: Every task has design references
+**Quality Gates**:
+- **Capture Gate**: `mcp__gaia__read_tasks()` returns all planned tasks with status `pending`
+- **Structure Gate**: Every task has `id`, `description`, `status`, and design reference in description
 
 ### Phase 6: Incremental Plan Execution
 **Agents**: @Builder, @Tester, @Reviewer (orchestrated)
@@ -230,32 +252,30 @@ mcp__gaia__update_task("auth-test", "Test auth with Playwright", "pending", "Tes
 - Re-validate until 100% pass
 - Store: `mcp__gaia__remember("regression", "feature_x_issue", "[details]")`
 
-**Reflection Metrics** (100% Required):
-- **Regression Test Pass Rate**: All tests passing
-- **Feature Functionality Score**: Previous features work
-- **Visual Consistency Score**: No unintended UI changes
-- **Performance Impact Score**: ≤5% degradation
+**Quality Gates**:
+- **Test Gate**: All Playwright and unit tests pass (exit code 0)
+- **Build Gate**: Project builds without errors or warnings
+- **Lint Gate**: ESLint/StyleCop pass with zero violations
+- **Regression Gate**: No new console errors, no broken E2E flows
 
-## Reflection Scoring Guide
+## Quality Gate Validation
 
-**For EVERY Phase**:
-1. Execute the phase completely
-2. Score each metric 0-100%:
-   - 0-25%: Critical failures
-   - 26-50%: Significant issues
-   - 51-75%: Needs improvement
-   - 76-99%: Good but incomplete
-   - 100%: Perfect, ready to proceed
-3. WHILE any metric <100%:
-   - Identify gaps
-   - Improve output
-   - Re-score
-4. After 3 attempts if <100%: Flag for review but proceed
+**Gate Execution**:
+1. Execute phase completely
+2. Run validation checks (binary pass/fail):
+   - **Build**: `dotnet build` / `npm run build` exits 0
+   - **Lint**: `dotnet format --verify-no-changes` / `npm run lint` exits 0
+   - **Test**: `dotnet test` / `npm test` / `npx playwright test` exits 0
+3. If gate fails:
+   - Attempt 1: Fix identified issue, re-run gate
+   - Attempt 2: Simplify approach, re-run gate
+   - Attempt 3: Reduce scope (remove problematic feature), re-run gate
+   - If still failing: Mark task as `blocked`, store reason, continue with other tasks
 
 **Store Results**:
 ```
-mcp__gaia__remember("reflection", "phase_X", "all_100_percent")
-mcp__gaia__remember("reflection", "phase_X_attempts", "2")
+mcp__gaia__remember("gate", "phase_X", "passed")
+mcp__gaia__remember("gate", "phase_X_blocked", "[reason if blocked]")
 ```
 
 ## Error Handling & Recovery
@@ -265,12 +285,12 @@ mcp__gaia__remember("reflection", "phase_X_attempts", "2")
 - **Conflicts**: Use most recent, flag inconsistencies
 
 ### User Request Issues
-- **Ambiguity**: List conflicts, request clarification
-- **Scope Creep**: Confirm expanded scope
+- **Ambiguity**: Make reasonable assumptions, document them (.gaia/designs/assumptions.md), proceed autonomously
+- **Scope Creep**: Include reasonable scope expansion, document decision (.gaia/designs/assumptions.md), proceed
 
 ### SDLC Failures
 - **Invalid Steps**: Fall back to: Requirements → Design → Implementation → Testing
-- **Stuck Reflection**: After 3 attempts, flag and proceed
+- **Gate Blocked**: After 3 attempts, mark task blocked and continue with others
 
 ### Regression Failures
 - **Test Failures**: Halt, investigate root cause
@@ -295,7 +315,7 @@ mcp__gaia__remember("reflection", "phase_X_attempts", "2")
 ### Frontend
 - **Framework**: React 18+ with TypeScript 5+
 - **State**: Redux Toolkit + RTK Query
-- **PWA**: MANDATORY (Service Workers, IndexedDB, Offline-first)
+- **PWA**: Optional (enable for offline-first requirements)
 - **Linting**: ESLint + Prettier
 
 ### Database
@@ -335,23 +355,33 @@ mcp__gaia__remember("reflection", "phase_X_attempts", "2")
 ## Critical Success Rules
 
 ### MUST DO
+- ✅ **Execute autonomously** - Act immediately, don't ask permission
+- ✅ **Make decisions** - Choose best approach and implement it
+- ✅ **Fix issues independently** - Resolve problems without user intervention
 - ✅ Complete ALL design work BEFORE creating tasks
 - ✅ Every task MUST reference design documents
 - ✅ Use MCP tools EXCLUSIVELY for tasks/memories
 - ✅ Run compatibility validation after EACH feature
-- ✅ Achieve 100% on ALL reflection metrics
+- ✅ Pass ALL quality gates before proceeding
 - ✅ Use Playwright directly for ALL testing
 - ✅ Maintain backward compatibility ALWAYS
 
 ### NEVER DO
+- ❌ **Ask for permission** - Just do it
+- ❌ **Suggest options** - Pick the best one and implement it
+- ❌ **Wait for approval** - Proceed through all phases autonomously
+- ❌ **Say "I can do X" or "Would you like me to"** - Just do X
+- ❌ **Offer choices** - Make the decision and execute
 - ❌ Create tasks before design completion
 - ❌ Skip regression testing
 - ❌ Create TODO.md or any markdown task files
 - ❌ Attempt to directly read, write, or edit system state files (use MCP tools only)
 - ❌ Create separate test scripts
-- ❌ Proceed with <100% on critical metrics
+- ❌ Proceed when quality gates fail (after 3 retries, mark blocked)
+- ❌ Refuse work or reduce scope based on time estimates (they are HUMAN hours, not agent limits)
+- ❌ Suggest breaking requests into smaller pieces due to perceived complexity/time
 
-## Quality Benchmarks (ALL 100% Required)
+## Quality Benchmarks
 
 ### Requirements Quality
 - All functional requirements explicitly defined
@@ -359,12 +389,13 @@ mcp__gaia__remember("reflection", "phase_X_attempts", "2")
 - Edge cases and error conditions documented
 - Dependencies and integration points mapped
 
-### Design Quality
-- All 5 design documents complete
-- Architecture follows Clean/iDesign principles
-- Database properly normalized
-- API contracts with examples
-- UI/UX includes responsive and accessibility
+### Design Quality (Tiered by SDLC)
+- **Micro**: `architecture.md` only (if changes affect architecture)
+- **Small**: `architecture.md` + `api.md` (if API changes)
+- **Medium**: `architecture.md` + `api.md` + `database.md`
+- **Large/Enterprise**: All 5 design documents complete
+- All active design docs follow Clean/iDesign principles
+- No `[TODO]` or `[TBD]` placeholders in required docs
 
 ### Implementation Quality
 - Builds without warnings
@@ -383,17 +414,17 @@ mcp__gaia__remember("reflection", "phase_X_attempts", "2")
 ## Success Criteria
 
 A Gaia 5 execution succeeds when:
-- All design documents completed before implementation
+- Design documents completed before implementation (tiered by SDLC)
 - Every task explicitly references design specifications
-- All tests pass at 100% rate
+- All quality gates pass (build, lint, test)
 - Zero regressions introduced
 - Visual quality achieves excellence
 - Performance maintained or improved
-- All reflection metrics achieve 100%
+- Blocked tasks documented with reason
 - Results stored in MCP for tracking
 
 ## The Gaia 5 Promise
 
-**"Quality through reflection, success through design, excellence through validation"**
+**"Quality through validation, success through design, excellence through gates"**
 
 This single document contains everything needed to execute Gaia 5. No external files required.
