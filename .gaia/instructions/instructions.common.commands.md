@@ -7,6 +7,8 @@ This captures commands leveraged to create symlinks to shared files in order to 
 - `git add CLAUDE.md`
 - `ln -s ../.gaia/instructions/gaia.instructions.md .github/copilot-instructions.md`
 - `git add .github/copilot-instructions.md`
+- `ln -s .gaia/instructions/gaia.instructions.md AGENTS.md`
+- `git add AGENTS.md`
 
 ### MCP Configuration
 - `ln -s ../.gaia/mcp-config.json .github/mcp-config.json`
