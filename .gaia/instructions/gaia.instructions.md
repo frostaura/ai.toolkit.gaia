@@ -171,7 +171,7 @@ mcp__gaia__remember("design", "database", "[schema decisions]")
 1. Decompose project into Epics based on major objectives from design docs
 2. Break each Epic into Stories representing user-facing capabilities
 3. Decompose Stories into Features representing technical components
-4. Break Features into atomic Tasks that can be completed in 1-4 hours
+4. Break Features into atomic Tasks (typically 1-4 hours; exceptions for research/debugging)
 5. Each item MUST reference specific design sections
 6. Include measurable acceptance criteria at each level
 7. Ensure proper sequencing and dependencies
@@ -189,7 +189,7 @@ Epic: E-1 - User Authentication System
   Acceptance: All auth flows functional, security audit passed
   
   Story: E-1/S-1 - Users can register and login securely
-    References: security.md#auth-flows, frontend.md#auth-pages
+    References: security.md#auth-flows, api.md#auth-endpoints
     Acceptance: Registration, login, logout flows working E2E
     
     Feature: E-1/S-1/F-1 - JWT Token Management
@@ -216,7 +216,8 @@ Epic: E-1 - User Authentication System
       ...
 ```
 
-**Minimum Decomposition Requirements**:
+**Minimum Decomposition Guidelines**:
+These are recommended minimums - adjust based on natural project structure:
 - Small SDLC: At least 1 Epic, 2+ Stories, 3+ Features, 5+ Tasks
 - Medium SDLC: At least 2 Epics, 4+ Stories, 8+ Features, 15+ Tasks
 - Large SDLC: At least 3 Epics, 8+ Stories, 15+ Features, 30+ Tasks
@@ -227,7 +228,7 @@ Epic: E-1 - User Authentication System
 - **Coverage Gate**: Every design section maps to at least one Feature
 - **Reference Gate**: Every item includes explicit design doc reference
 - **Testability Gate**: Every Task has acceptance criteria that can be validated programmatically
-- **Atomicity Gate**: Tasks are small enough to complete in 1-4 hours
+- **Atomicity Gate**: Most tasks should be completable in 1-4 hours; exceptions allowed for research, complex debugging, or integration testing with documented justification
 
 ### Phase 5: Capture Plan in MCP Tools
 **Agent**: Main AI

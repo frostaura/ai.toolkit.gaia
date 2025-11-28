@@ -152,7 +152,7 @@ Key reminders from the Gaia 5 system:
 - **Epics**: Major project objectives (e.g., "E-1 User Authentication")
 - **Stories**: User-facing capabilities (e.g., "E-1/S-1 Users can login")
 - **Features**: Technical components (e.g., "E-1/S-1/F-1 JWT Management")
-- **Tasks**: Atomic units, 1-4 hours (e.g., "E-1/S-1/F-1/T-1 Create JWT service")
+- **Tasks**: Atomic units, typically 1-4 hours (e.g., "E-1/S-1/F-1/T-1 Create JWT service")
 
 **Minimum Decomposition**:
 - Small SDLC: 1 Epic, 2+ Stories, 3+ Features, 5+ Tasks
@@ -164,14 +164,14 @@ Key reminders from the Gaia 5 system:
 - Coverage Gate: Every design section maps to at least one Feature
 - Reference Gate: Every item includes design doc reference
 - Testability Gate: Every Task has testable acceptance criteria
-- Atomicity Gate: Tasks completable in 1-4 hours
+- Atomicity Gate: Most tasks completable in 1-4 hours
 
 ### Step 5: Capture Plan in MCP Tools
 Use ONLY MCP tools - capture ENTIRE hierarchy:
 ```
 mcp__gaia__update_task("E-1", "[EPIC] Auth System | Refs: security.md | AC: All auth functional", "pending", "Architect")
 mcp__gaia__update_task("E-1/S-1", "[STORY] Users can login | Refs: security.md#flows | AC: Login E2E", "pending", "Builder")
-mcp__gaia__update_task("E-1/S-1/F-1", "[FEATURE] JWT Management | Refs: security.md#jwt | AC: Tokens work", "pending", "Builder")
+mcp__gaia__update_task("E-1/S-1/F-1", "[FEATURE] JWT Management | Refs: security.md#jwt | AC: Tokens generated, validated, refreshed", "pending", "Builder")
 mcp__gaia__update_task("E-1/S-1/F-1/T-1", "[TASK] Create JWT service | Refs: security.md#jwt-signing | AC: Valid JWTs", "pending", "Builder")
 ```
 Format: `[TYPE] Title | Refs: doc#section | AC: Acceptance criteria`
