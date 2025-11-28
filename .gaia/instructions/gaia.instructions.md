@@ -87,11 +87,11 @@ Gaia 5 is a comprehensive AI-driven development system that enforces quality thr
 | `decision` | Architectural decisions | `"rest_vs_graphql"` |
 | `research` | Research findings | `"best_orm_2024"` |
 
-**Minimum Memory Operations Per Task**:
-- **Every task**: At least 1 `recall()` before starting (check for relevant past knowledge)
-- **Every issue resolved**: At least 1 `remember()` documenting the fix
-- **Every configuration change**: At least 1 `remember()` documenting what worked
-- **Every failed attempt**: 1 `remember()` documenting what didn't work and why
+**Memory Operations Guidelines**:
+- **Every task**: Use `recall()` before starting to check for relevant past knowledge
+- **Every issue resolved**: Use `remember()` to document the fix for future reference
+- **Every configuration change**: Use `remember()` to document working configurations
+- **Every failed attempt**: Use `remember()` to document what didn't work and why (prevents repeating mistakes)
 
 ### Design Documents (Always in `.gaia/designs/`)
 - `architecture.md` - System design and components
@@ -495,6 +495,6 @@ A Gaia 5 execution succeeds when:
 
 ## The Gaia 5 Promise
 
-**"Quality through validation, success through design, excellence through gates, wisdom through memory"**
+**"Quality through validation, success through design, excellence through gates and memory"**
 
 This single document contains everything needed to execute Gaia 5. No external files required.

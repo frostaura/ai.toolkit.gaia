@@ -196,7 +196,7 @@ src/                       # Your application code
 
 ### 🧠 Continuous Memory Usage
 
-Memory tools are NOT just for the beginning! Use throughout:
+Memory tools should be used continuously throughout development, not only at initialization:
 
 | When | Action | Example |
 |------|--------|---------|
