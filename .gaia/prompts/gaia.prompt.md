@@ -148,19 +148,33 @@ Key reminders from the Gaia 5 system:
    - Traceability Gate: Every requirement maps to a design section
 
 ### Step 4: Planning (From Completed Designs)
-1. Create comprehensive implementation plan
-2. Each task MUST reference design docs (e.g., `api.md#users-endpoint`)
-3. Include acceptance criteria that can be validated programmatically
-4. **Validate Quality Gates**:
-   - Coverage Gate: Every design section has at least one task
-   - Reference Gate: Every task includes design doc reference
-   - Testability Gate: Every task has testable acceptance criteria
+**CRITICAL**: Use hierarchical Work Breakdown Structure (WBS):
+- **Epics**: Major project objectives (e.g., "E-1 User Authentication")
+- **Stories**: User-facing capabilities (e.g., "E-1/S-1 Users can login")
+- **Features**: Technical components (e.g., "E-1/S-1/F-1 JWT Management")
+- **Tasks**: Atomic units, 1-4 hours (e.g., "E-1/S-1/F-1/T-1 Create JWT service")
+
+**Minimum Decomposition**:
+- Small SDLC: 1 Epic, 2+ Stories, 3+ Features, 5+ Tasks
+- Medium SDLC: 2 Epics, 4+ Stories, 8+ Features, 15+ Tasks
+- Large SDLC: 3 Epics, 8+ Stories, 15+ Features, 30+ Tasks
+
+**Validate Quality Gates**:
+- Decomposition Gate: WBS reaches Task level for all work
+- Coverage Gate: Every design section maps to at least one Feature
+- Reference Gate: Every item includes design doc reference
+- Testability Gate: Every Task has testable acceptance criteria
+- Atomicity Gate: Tasks completable in 1-4 hours
 
 ### Step 5: Capture Plan in MCP Tools
-Use ONLY MCP tools for tasks:
+Use ONLY MCP tools - capture ENTIRE hierarchy:
 ```
-mcp__gaia__update_task("id", "description per design", "status", "agent")
+mcp__gaia__update_task("E-1", "[EPIC] Auth System | Refs: security.md | AC: All auth functional", "pending", "Architect")
+mcp__gaia__update_task("E-1/S-1", "[STORY] Users can login | Refs: security.md#flows | AC: Login E2E", "pending", "Builder")
+mcp__gaia__update_task("E-1/S-1/F-1", "[FEATURE] JWT Management | Refs: security.md#jwt | AC: Tokens work", "pending", "Builder")
+mcp__gaia__update_task("E-1/S-1/F-1/T-1", "[TASK] Create JWT service | Refs: security.md#jwt-signing | AC: Valid JWTs", "pending", "Builder")
 ```
+Format: `[TYPE] Title | Refs: doc#section | AC: Acceptance criteria`
 Never create TODO.md files!
 
 ### Step 6: Execute Plan Incrementally

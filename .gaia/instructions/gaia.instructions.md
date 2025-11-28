@@ -161,43 +161,109 @@ mcp__gaia__remember("design", "database", "[schema decisions]")
 ### Phase 4: Planning (Based on COMPLETED Design)
 **Agent**: Main AI
 
-**Generate Comprehensive Plan**:
-1. Create tasks FROM completed design docs
-2. Each task MUST reference specific design sections
-3. Include measurable acceptance criteria
-4. Ensure proper sequencing
+**CRITICAL**: Planning MUST use hierarchical Work Breakdown Structure (WBS):
+- **Epics**: Major project objectives/themes (e.g., "User Authentication System")
+- **Stories**: User-facing capabilities within epics (e.g., "Users can register and login")
+- **Features**: Technical implementations within stories (e.g., "JWT token management")
+- **Tasks**: Atomic, implementable units within features (e.g., "Create JWT signing middleware")
 
-**Task Structure Example**:
+**Generate Comprehensive Plan**:
+1. Decompose project into Epics based on major objectives from design docs
+2. Break each Epic into Stories representing user-facing capabilities
+3. Decompose Stories into Features representing technical components
+4. Break Features into atomic Tasks that can be completed in 1-4 hours
+5. Each item MUST reference specific design sections
+6. Include measurable acceptance criteria at each level
+7. Ensure proper sequencing and dependencies
+
+**Hierarchical ID Convention**:
+- Epic: `E-[number]` (e.g., `E-1`, `E-2`)
+- Story: `E-[epic]/S-[number]` (e.g., `E-1/S-1`, `E-1/S-2`)
+- Feature: `E-[epic]/S-[story]/F-[number]` (e.g., `E-1/S-1/F-1`)
+- Task: `E-[epic]/S-[story]/F-[feature]/T-[number]` (e.g., `E-1/S-1/F-1/T-1`)
+
+**Work Breakdown Structure Example**:
 ```
-Task: Implement JWT authentication
-References: security.md#jwt-tokens, api.md#auth-endpoints
-Acceptance Criteria:
-- JWT with 15min access, 7day refresh per security.md
-- All endpoints from api.md functional
-- Tests achieve 100% coverage
-Assignee: @Builder
+Epic: E-1 - User Authentication System
+  References: security.md, api.md#auth-section
+  Acceptance: All auth flows functional, security audit passed
+  
+  Story: E-1/S-1 - Users can register and login securely
+    References: security.md#auth-flows, frontend.md#auth-pages
+    Acceptance: Registration, login, logout flows working E2E
+    
+    Feature: E-1/S-1/F-1 - JWT Token Management
+      References: security.md#jwt-tokens
+      Acceptance: Tokens generated, validated, refreshed correctly
+      
+      Task: E-1/S-1/F-1/T-1 - Create JWT signing service
+        References: security.md#jwt-signing
+        Acceptance: Service generates valid JWTs with correct claims
+        Assignee: @Builder
+        
+      Task: E-1/S-1/F-1/T-2 - Implement token validation middleware
+        References: security.md#jwt-validation
+        Acceptance: Middleware rejects invalid/expired tokens
+        Assignee: @Builder
+        
+      Task: E-1/S-1/F-1/T-3 - Add refresh token endpoint
+        References: api.md#token-refresh
+        Acceptance: Endpoint issues new access token with valid refresh
+        Assignee: @Builder
+    
+    Feature: E-1/S-1/F-2 - Login API Endpoints
+      References: api.md#login-endpoints
+      ...
 ```
+
+**Minimum Decomposition Requirements**:
+- Small SDLC: At least 1 Epic, 2+ Stories, 3+ Features, 5+ Tasks
+- Medium SDLC: At least 2 Epics, 4+ Stories, 8+ Features, 15+ Tasks
+- Large SDLC: At least 3 Epics, 8+ Stories, 15+ Features, 30+ Tasks
+- Enterprise SDLC: At least 5 Epics, 15+ Stories, 30+ Features, 60+ Tasks
 
 **Quality Gates**:
-- **Coverage Gate**: Every design section has at least one implementation task
-- **Reference Gate**: Every task includes explicit design doc reference (e.g., `api.md#users-endpoint`)
-- **Testability Gate**: Every task has acceptance criteria that can be validated programmatically
+- **Decomposition Gate**: WBS depth reaches Task level for all implementation work
+- **Coverage Gate**: Every design section maps to at least one Feature
+- **Reference Gate**: Every item includes explicit design doc reference
+- **Testability Gate**: Every Task has acceptance criteria that can be validated programmatically
+- **Atomicity Gate**: Tasks are small enough to complete in 1-4 hours
 
 ### Phase 5: Capture Plan in MCP Tools
 **Agent**: Main AI
 
-**Actions** (Use MCP exclusively):
+**Actions** (Use MCP exclusively - capture ENTIRE hierarchy):
+
+First, capture Epics:
 ```
-mcp__gaia__update_task("auth-1", "Implement JWT per security.md#jwt", "pending", "Builder")
-mcp__gaia__update_task("auth-2", "Create login endpoints per api.md#login", "pending", "Builder")
-mcp__gaia__update_task("auth-test", "Test auth with Playwright", "pending", "Tester")
+mcp__gaia__update_task("E-1", "[EPIC] User Authentication System | Refs: security.md, api.md#auth | AC: All auth flows functional", "pending", "Architect")
 ```
+
+Then, capture Stories within Epics:
+```
+mcp__gaia__update_task("E-1/S-1", "[STORY] Users can register and login securely | Refs: security.md#auth-flows | AC: Registration, login, logout E2E", "pending", "Builder")
+```
+
+Then, capture Features within Stories:
+```
+mcp__gaia__update_task("E-1/S-1/F-1", "[FEATURE] JWT Token Management | Refs: security.md#jwt | AC: Token generation, validation, refresh working", "pending", "Builder")
+```
+
+Finally, capture Tasks within Features:
+```
+mcp__gaia__update_task("E-1/S-1/F-1/T-1", "[TASK] Create JWT signing service | Refs: security.md#jwt-signing | AC: Valid JWTs with correct claims", "pending", "Builder")
+mcp__gaia__update_task("E-1/S-1/F-1/T-2", "[TASK] Implement token validation middleware | Refs: security.md#jwt-validation | AC: Rejects invalid tokens", "pending", "Builder")
+mcp__gaia__update_task("E-1/S-1/F-1/T-3", "[TASK] Add refresh token endpoint | Refs: api.md#token-refresh | AC: Issues new tokens correctly", "pending", "Builder")
+```
+
+**Description Format**: `[TYPE] Title | Refs: design-doc#section | AC: Acceptance criteria`
 
 **NEVER**: Create TODO.md, TASKS.md, or any markdown task files!
 
 **Quality Gates**:
-- **Capture Gate**: `mcp__gaia__read_tasks()` returns all planned tasks with status `pending`
-- **Structure Gate**: Every task has `id`, `description`, `status`, and design reference in description
+- **Capture Gate**: `mcp__gaia__read_tasks()` returns ALL hierarchy levels (Epics, Stories, Features, Tasks)
+- **Structure Gate**: Every item has hierarchical ID, type tag, description, refs, and acceptance criteria
+- **Completeness Gate**: Task count meets minimum requirements for selected SDLC tier
 
 ### Phase 6: Incremental Plan Execution
 **Agents**: @Builder, @Tester, @Reviewer (orchestrated)
