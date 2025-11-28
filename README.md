@@ -156,6 +156,9 @@ Every phase requires **all gates to pass**:
 ### ✅ ALWAYS:
 - Complete designs BEFORE tasks
 - Use MCP tools for tasks/memories
+- **Use `recall()` BEFORE every task** - Check past knowledge first
+- **Use `remember()` AFTER every fix** - Document solutions for future
+- **Build institutional memory** - Capture patterns, workarounds, learnings
 - Test after EVERY feature
 - Maintain backward compatibility
 - Pass all quality gates before proceeding
@@ -164,6 +167,8 @@ Every phase requires **all gates to pass**:
 - Skip design phase
 - Create TODO.md files
 - Modify .jsonl files directly
+- **Skip memory recall before work**
+- **Skip memory storage after fixes**
 - Compromise on quality
 
 ## 📁 Repository Structure
@@ -185,9 +190,22 @@ src/                       # Your application code
 - `mcp__gaia__read_tasks(hideCompleted?)` - View tasks
 - `mcp__gaia__update_task(taskId, description, status, assignedTo?)` - Add/update tasks
 
-**Memory Management**:
-- `mcp__gaia__remember(category, key, value)` - Store decisions (upserts by key)
-- `mcp__gaia__recall(query, maxResults?)` - Search memories
+**Memory Management** (Use CONTINUOUSLY):
+- `mcp__gaia__remember(category, key, value)` - Store decisions, fixes, patterns (upserts by key)
+- `mcp__gaia__recall(query, maxResults?)` - Search memories with fuzzy matching
+
+### 🧠 Continuous Memory Usage
+
+Memory tools are NOT just for the beginning! Use throughout:
+
+| When | Action | Example |
+|------|--------|---------|
+| Before any task | `recall()` | `recall("authentication")` |
+| After fixing issue | `remember()` | `remember("issue", "cors_error", "Added proxy config")` |
+| After discovering pattern | `remember()` | `remember("pattern", "retry_logic", "Use exponential backoff")` |
+| When encountering error | `recall()` | `recall("timeout")` |
+
+**Categories**: `issue`, `workaround`, `config`, `pattern`, `performance`, `test_fix`, `dependency`, `environment`, `decision`, `research`
 
 **FORBIDDEN**: Creating TODO.md or any markdown task files!
 

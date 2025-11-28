@@ -34,8 +34,64 @@ Gaia 5 is a comprehensive AI-driven development system that enforces quality thr
 ### MCP Tools (MANDATORY - Never Create Markdown Files)
 - `mcp__gaia__read_tasks(hideCompleted?)` - View tasks
 - `mcp__gaia__update_task(taskId, description, status, assignedTo?)` - Manage tasks
-- `mcp__gaia__remember(category, key, value)` - Store decisions
+- `mcp__gaia__remember(category, key, value)` - Store decisions, learnings, and resolutions
 - `mcp__gaia__recall(query, maxResults?)` - Search memories with fuzzy matching
+
+### 🧠 Continuous Memory Usage (MANDATORY)
+
+> **THE MEMORY MANDATE**: Agents MUST actively use `remember()` and `recall()` throughout execution, not just at the beginning!
+
+**When to REMEMBER** (store knowledge for future use):
+1. **Issue Resolutions**: Every time you fix a bug or resolve an issue
+   - `remember("issue", "typescript_path_error", "Fixed by updating tsconfig paths to include src/")`
+2. **Workarounds Discovered**: When you find a workaround for a limitation
+   - `remember("workaround", "docker_memory", "Use --memory=4g flag to prevent OOM")`
+3. **Configuration Patterns**: When you discover working configurations
+   - `remember("config", "eslint_react", "Must add plugin:react/recommended for JSX")`
+4. **Code Patterns**: Useful patterns you implement or discover
+   - `remember("pattern", "auth_middleware", "JWT validation uses req.headers.authorization")`
+5. **Performance Fixes**: Any optimization that improved performance
+   - `remember("performance", "db_index", "Added index on user_id reduced query from 2s to 50ms")`
+6. **Test Fixes**: How you fixed failing tests
+   - `remember("test_fix", "async_timeout", "Increased Jest timeout to 30s for integration tests")`
+7. **Dependency Insights**: Version requirements, compatibility notes
+   - `remember("dependency", "react_18", "React 18 requires @types/react@18 for TS compatibility")`
+8. **Environment Quirks**: Platform-specific discoveries
+   - `remember("environment", "github_actions", "Node 20 requires explicit npm cache config")`
+
+**When to RECALL** (retrieve past knowledge):
+1. **Before Starting Any Task**: Check if you've solved similar problems before
+   - `recall("authentication")` before implementing auth
+   - `recall("error")` before debugging a new error
+2. **When Encountering Errors**: Search for previous resolutions
+   - `recall("ENOENT")` when you see file not found errors
+   - `recall("timeout")` when tests timeout
+3. **Before Making Configuration Changes**: Check what worked before
+   - `recall("webpack")` before changing build config
+4. **Before Choosing Libraries**: Check previous research/decisions
+   - `recall("state management")` before picking a state library
+5. **During Code Review**: Check for known issues
+   - `recall("security")` to remember past security fixes
+
+**Memory Categories** (use consistently):
+| Category | Purpose | Example Key |
+|----------|---------|-------------|
+| `issue` | Bugs and their fixes | `"null_pointer_user"` |
+| `workaround` | Temporary solutions | `"docker_arm_compat"` |
+| `config` | Configuration learnings | `"vite_proxy_setup"` |
+| `pattern` | Useful code patterns | `"retry_logic"` |
+| `performance` | Optimization learnings | `"lazy_loading"` |
+| `test_fix` | Test-related solutions | `"mock_database"` |
+| `dependency` | Library/version notes | `"axios_v1_migration"` |
+| `environment` | Platform-specific notes | `"m1_mac_docker"` |
+| `decision` | Architectural decisions | `"rest_vs_graphql"` |
+| `research` | Research findings | `"best_orm_2024"` |
+
+**Minimum Memory Operations Per Task**:
+- **Every task**: At least 1 `recall()` before starting (check for relevant past knowledge)
+- **Every issue resolved**: At least 1 `remember()` documenting the fix
+- **Every configuration change**: At least 1 `remember()` documenting what worked
+- **Every failed attempt**: 1 `remember()` documenting what didn't work and why
 
 ### Design Documents (Always in `.gaia/designs/`)
 - `architecture.md` - System design and components
@@ -50,10 +106,12 @@ Gaia 5 is a comprehensive AI-driven development system that enforces quality thr
 **Agent**: @Explorer + Main AI
 
 **Actions**:
-1. Comprehensively analyze user request
-2. Examine existing system with @Explorer
-3. Identify gaps and enhancement areas
-4. Store: `mcp__gaia__remember("requirements", "user_request", "[details]")`
+1. **FIRST**: `recall("requirements")` + `recall("[project_name]")` to check for past context
+2. Comprehensively analyze user request
+3. Examine existing system with @Explorer
+4. Identify gaps and enhancement areas
+5. Store: `mcp__gaia__remember("requirements", "user_request", "[details]")`
+6. Store: `mcp__gaia__remember("requirements", "scope", "[in/out of scope items]")`
 
 **Quality Gates** (ALL must pass):
 - **Clarity Gate**: User request parsed into discrete, actionable items with explicit success criteria
@@ -205,6 +263,7 @@ mcp__gaia__update_task("auth-test", "Test auth with Playwright", "pending", "Tes
 **For Each Task**:
 
 **Before Starting**:
+- **MANDATORY**: `recall("[task_keywords]")` to check for related past knowledge
 - Identify potentially impacted features
 - Review relevant design sections
 - Set up for regression testing
@@ -214,11 +273,14 @@ mcp__gaia__update_task("auth-test", "Test auth with Playwright", "pending", "Tes
 - Frequent testing with Playwright
 - Incremental commits
 - Update task status: `mcp__gaia__update_task("[id]", "...", "in_progress", "Builder")`
+- **On any issue encountered**: `recall("[error_type]")` to check for past solutions
+- **On any issue resolved**: `remember("issue", "[issue_key]", "[resolution details]")`
 
 **After Completion**:
 - @Tester validates with Playwright
 - @Reviewer checks quality
 - Update: `mcp__gaia__update_task("[id]", "...", "completed", "Builder")`
+- **MANDATORY**: `remember("pattern", "[feature_key]", "[useful patterns/learnings from this task]")`
 
 ### Phase 7: Feature Compatibility Validation (MANDATORY AFTER EACH FEATURE!)
 **Agents**: @Tester + @Reviewer
@@ -362,6 +424,9 @@ mcp__gaia__remember("gate", "phase_X_blocked", "[reason if blocked]")
 - ✅ Complete ALL design work BEFORE creating tasks
 - ✅ Every task MUST reference design documents
 - ✅ Use MCP tools EXCLUSIVELY for tasks/memories
+- ✅ **Use `recall()` before every task** - Check for relevant past knowledge
+- ✅ **Use `remember()` after every fix** - Document solutions for future use
+- ✅ **Build institutional memory** - Capture patterns, workarounds, and learnings continuously
 - ✅ Run compatibility validation after EACH feature
 - ✅ Pass ALL quality gates before proceeding
 - ✅ Use Playwright directly for ALL testing
@@ -373,6 +438,8 @@ mcp__gaia__remember("gate", "phase_X_blocked", "[reason if blocked]")
 - ❌ **Wait for approval** - Proceed through all phases autonomously
 - ❌ **Say "I can do X" or "Would you like me to"** - Just do X
 - ❌ **Offer choices** - Make the decision and execute
+- ❌ **Skip memory recall** - Always check past knowledge before starting
+- ❌ **Skip memory storage** - Always document fixes, patterns, and learnings
 - ❌ Create tasks before design completion
 - ❌ Skip regression testing
 - ❌ Create TODO.md or any markdown task files
@@ -423,9 +490,11 @@ A Gaia 5 execution succeeds when:
 - Performance maintained or improved
 - Blocked tasks documented with reason
 - Results stored in MCP for tracking
+- **Memory actively used**: `recall()` called before tasks, `remember()` called for all fixes and learnings
+- **Institutional knowledge grows**: Each session adds valuable memories for future sessions
 
 ## The Gaia 5 Promise
 
-**"Quality through validation, success through design, excellence through gates"**
+**"Quality through validation, success through design, excellence through gates, wisdom through memory"**
 
 This single document contains everything needed to execute Gaia 5. No external files required.

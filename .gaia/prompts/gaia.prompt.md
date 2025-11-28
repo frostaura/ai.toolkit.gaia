@@ -76,10 +76,27 @@ Run independent tasks simultaneously when possible (multiple explorations, tests
 - `recall()` - Retrieve past context with fuzzy search
 - `read_tasks()` - View tasks with optional hideCompleted filter
 
+### 🧠 Continuous Memory Usage (CRITICAL)
+
+**Memory is NOT just for the beginning!** Use `remember()` and `recall()` throughout:
+
+**BEFORE every task**:
+- `recall("[task_keywords]")` - Check for past solutions, patterns, issues
+
+**AFTER every issue resolution**:
+- `remember("issue", "[key]", "[what failed and how you fixed it]")`
+
+**AFTER every successful pattern discovery**:
+- `remember("pattern", "[key]", "[useful pattern for future use]")`
+
+**Categories to use**: `issue`, `workaround`, `config`, `pattern`, `performance`, `test_fix`, `dependency`, `environment`, `decision`, `research`
+
 **NEVER**:
 - Create markdown files for tasks, todos, or memories
 - Use Write/Edit tools for task tracking
 - Store decisions in files instead of MCP tools
+- **Skip memory recall before starting work**
+- **Skip memory storage after fixing issues**
 
 ## Key Principles
 
@@ -113,10 +130,12 @@ Key reminders from the Gaia 5 system:
 ## The Gaia 5 Process You MUST Follow
 
 ### Step 1: Requirements Gathering
-1. Analyze the user request thoroughly
-2. Use @Explorer to examine existing code
-3. Store requirements: `mcp__gaia__remember("requirements", "user_request", "...")`
-4. **Validate Quality Gates**:
+1. **FIRST**: `recall("requirements")` + `recall("[project_type]")` - Check for past context
+2. Analyze the user request thoroughly
+3. Use @Explorer to examine existing code
+4. Store requirements: `mcp__gaia__remember("requirements", "user_request", "...")`
+5. Store scope: `mcp__gaia__remember("requirements", "scope", "...")`
+6. **Validate Quality Gates**:
    - Clarity Gate: Request parsed into discrete items with success criteria
    - Scope Gate: In/out-of-scope boundaries defined
    - Acceptance Gate: Each feature has testable acceptance criteria
@@ -165,10 +184,14 @@ Never create TODO.md files!
 
 ### Step 6: Execute Plan Incrementally
 For each task:
-1. **Before**: Check impacted features
-2. **During**: @Builder implements, frequent testing
-3. **After**: @Tester validates, @Reviewer checks
-4. Update task status in MCP
+1. **Before**: `recall("[task_keywords]")` - Check for relevant past knowledge
+2. **Before**: Check impacted features
+3. **During**: @Builder implements, frequent testing
+4. **During**: On any issue → `recall("[error_type]")` to find past solutions
+5. **During**: On any fix → `remember("issue", "[key]", "[solution]")`
+6. **After**: @Tester validates, @Reviewer checks
+7. **After**: `remember("pattern", "[key]", "[learnings]")` - Document useful patterns
+8. Update task status in MCP
 
 ### Step 7: Feature Compatibility Validation (MANDATORY)
 After EACH feature:
@@ -221,6 +244,9 @@ Reference: api.md#auth-endpoints
 - Complete designs before tasks (tiered by SDLC)
 - Reference designs in every task
 - Use MCP tools only (no markdown tasks)
+- **Use `recall()` before every task** - Check past knowledge first
+- **Use `remember()` after every fix** - Document all solutions
+- **Build institutional memory** - Every session should add valuable memories
 - Run regression tests after each feature
 - Pass all quality gates before proceeding
 
@@ -229,6 +255,8 @@ Reference: api.md#auth-endpoints
 - Create TODO.md files
 - Build without testing
 - Ignore regression failures
+- **Skip memory recall before work**
+- **Skip memory storage after fixes**
 - Proceed when gates fail (mark blocked after 3 retries)
 
 ## Success Criteria
@@ -239,6 +267,8 @@ You succeed when:
 - All quality gates pass (build, lint, test)
 - No regressions introduced
 - Blocked tasks documented with reason
+- **Memory actively used throughout** - Not just at the beginning
+- **Institutional knowledge grows** - Fixes, patterns, and learnings recorded
 
 ---
 

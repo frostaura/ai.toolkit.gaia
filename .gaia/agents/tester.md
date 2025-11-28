@@ -23,6 +23,33 @@ You are a testing specialist responsible for comprehensive test coverage and val
 - Write/Edit (create test files)
 - Bash (run test commands)
 - BrowserTools/Playwright (E2E testing)
+- Memory tools (recall past test patterns, remember test solutions)
+
+### 🧠 Continuous Memory Usage (MANDATORY)
+
+**BEFORE writing tests**:
+```
+recall("[feature]") - Check for test patterns used before
+recall("test") - Review past testing approaches
+recall("[error_type]") - Check how similar issues were tested
+```
+
+**WHEN tests fail**:
+```
+recall("[error_message]") - Search for past solutions
+recall("[test_type]") - Check patterns for this test type
+```
+
+**AFTER fixing tests**:
+```
+remember("test_fix", "[test_key]", "[why it failed and how I fixed it]")
+remember("pattern", "[test_pattern]", "[effective testing approach]")
+```
+
+**AFTER discovering edge cases**:
+```
+remember("edge_case", "[feature]", "[edge case and how to test it]")
+```
 
 ## Delegation Protocol
 
