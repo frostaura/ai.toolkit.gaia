@@ -1,0 +1,108 @@
+{
+    "enableAllProjectMcpServers": true,
+    "hooks": {
+        "PreToolUse": [
+            {
+                "matcher": "*",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python3 ${CLAUDE_PROJECT_DIR}/.claude/hooks/handler.py PreToolUse"
+                    }
+                ]
+            }
+        ],
+        "PostToolUse": [
+            {
+                "matcher": "*",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python3 ${CLAUDE_PROJECT_DIR}/.claude/hooks/handler.py PostToolUse"
+                    }
+                ]
+            }
+        ],
+        "PermissionRequest": [
+            {
+                "matcher": "*",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python3 ${CLAUDE_PROJECT_DIR}/.claude/hooks/handler.py PermissionRequest"
+                    }
+                ]
+            }
+        ],
+        "UserPromptSubmit": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python3 ${CLAUDE_PROJECT_DIR}/.claude/hooks/handler.py UserPromptSubmit"
+                    }
+                ]
+            }
+        ],
+        "Stop": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python3 ${CLAUDE_PROJECT_DIR}/.claude/hooks/handler.py Stop"
+                    }
+                ]
+            }
+        ],
+        "SubagentStop": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python3 ${CLAUDE_PROJECT_DIR}/.claude/hooks/handler.py SubagentStop"
+                    }
+                ]
+            }
+        ],
+        "SessionStart": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python3 ${CLAUDE_PROJECT_DIR}/.claude/hooks/handler.py SessionStart"
+                    }
+                ]
+            }
+        ],
+        "SessionEnd": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python3 ${CLAUDE_PROJECT_DIR}/.claude/hooks/handler.py SessionEnd"
+                    }
+                ]
+            }
+        ],
+        "Notification": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python3 ${CLAUDE_PROJECT_DIR}/.claude/hooks/handler.py Notification"
+                    }
+                ]
+            }
+        ],
+        "PreCompact": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python3 ${CLAUDE_PROJECT_DIR}/.claude/hooks/handler.py PreCompact"
+                    }
+                ]
+            }
+        ]
+    }
+}

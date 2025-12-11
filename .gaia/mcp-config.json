@@ -1,0 +1,45 @@
+{
+    "mcpServers": {
+        "github": {
+            "transport": "http",
+            "type": "http",
+            "url": "https://api.githubcopilot.com/mcp/"
+        },
+        "playwright": {
+            "transport": "stdio",
+            "type": "stdio",
+            "command": "npx",
+            "args": [
+                "@playwright/mcp@latest"
+            ]
+        },
+        "gaia": {
+            "transport": "stdio",
+            "type": "stdio",
+            "command": "dotnet",
+            "args": [
+                "run",
+                "--project",
+                ".gaia/mcps/gaia/src/fa.mcp.gaia/fa.mcp.gaia.csproj"
+            ]
+        }
+    },
+    "servers": {
+        "playwright-mcp": {
+            "type": "stdio",
+            "command": "npx",
+            "args": [
+                "@playwright/mcp@latest"
+            ]
+        },
+        "gaia": {
+            "type": "stdio",
+            "command": "dotnet",
+            "args": [
+                "run",
+                "--project",
+                ".gaia/mcps/gaia/src/fa.mcp.gaia/fa.mcp.gaia.csproj"
+            ]
+        }
+    }
+}

@@ -1,0 +1,59 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: lifeos-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: lifeos
+      POSTGRES_PASSWORD: lifeos_dev_password
+      POSTGRES_DB: lifeos
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lifeos"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./src/backend
+      dockerfile: Dockerfile
+    container_name: lifeos-backend
+    ports:
+      - "5001:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=lifeos;Username=lifeos;Password=lifeos_dev_password
+      - Jwt__SecretKey=LifeOS-Development-Secret-Key-Must-Be-At-Least-32-Characters-Long!
+      - Jwt__Issuer=lifeos-api
+      - Jwt__Audience=lifeos-client
+      - Cors__AllowedOrigins__0=http://localhost:5173
+      - Cors__AllowedOrigins__1=http://localhost:3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  frontend:
+    build:
+      context: ./src/frontend
+      dockerfile: Dockerfile
+    container_name: lifeos-frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./src/frontend/src:/app/src
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

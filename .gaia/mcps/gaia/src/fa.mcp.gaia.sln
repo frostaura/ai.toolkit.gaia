@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fa.mcp.gaia", "fa.mcp.gaia\fa.mcp.gaia.csproj", "{A76E386D-BFAF-FE95-96FB-A17D60ED8C0F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A76E386D-BFAF-FE95-96FB-A17D60ED8C0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A76E386D-BFAF-FE95-96FB-A17D60ED8C0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A76E386D-BFAF-FE95-96FB-A17D60ED8C0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A76E386D-BFAF-FE95-96FB-A17D60ED8C0F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6B6D8D7A-AD71-497B-B07A-5150DFA2A390}
+	EndGlobalSection
+EndGlobal
