@@ -7,7 +7,7 @@
 </h1>
 <h3 align="center">🌍 AI-Driven Development with Objective Quality Gates</h3>
 
-**A spec-driven AI framework that combines 7 specialized agents with objective quality gates to build production-ready applications through mandatory design-first development.**
+**A spec-driven AI framework that combines specialized agents with objective quality gates to build production-ready applications through mandatory design-first development.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Version](https://img.shields.io/badge/Version-5.2.0-blue.svg)]()
