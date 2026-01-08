@@ -195,5 +195,7 @@
     "coverage-gutters.showLineCoverage": true,
     "coverage-gutters.showRulerCoverage": true,
     "dotnet.formatting.organizeImportsOnFormat": true,
-    "git.ignoreLimitWarning": true
+    "git.ignoreLimitWarning": true,
+    "chat.useAgentSkills": true,
+    "chat.useNestedAgentsMdFiles": true
 }
