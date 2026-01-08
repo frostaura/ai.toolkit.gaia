@@ -28,8 +28,9 @@ builder.Configuration
         ["Logging:LogLevel:ModelContextProtocol"] = "Warning"
     });
 
-// Register core manager
-builder.Services.AddScoped<CoreManager>();
+// Register specialized managers
+builder.Services.AddScoped<TaskManager>();
+builder.Services.AddScoped<MemoryManager>();
 
 // Configure MCP Server
 builder.Services

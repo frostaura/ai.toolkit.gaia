@@ -19,6 +19,9 @@ namespace FrostAura.MCP.Gaia.Models
         [Description("The actual content/value being remembered")]
         public string Value { get; set; } = string.Empty;
 
+        [Description("Duration of memory persistence")]
+        public MemoryDuration Duration { get; set; } = MemoryDuration.SessionLength;
+
         [Description("UTC timestamp when the memory was first created")]
         public DateTime Created { get; set; } = DateTime.UtcNow;
 

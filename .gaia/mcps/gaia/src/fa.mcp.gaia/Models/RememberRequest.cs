@@ -16,5 +16,8 @@ namespace FrostAura.MCP.Gaia.Models
 
         [Description("The actual content/value to remember")]
         public string Value { get; set; } = string.Empty;
+
+        [Description("Duration of memory persistence: SessionLength (lost on restart) or ProjectWide (permanently stored)")]
+        public MemoryDuration Duration { get; set; } = MemoryDuration.SessionLength;
     }
 }

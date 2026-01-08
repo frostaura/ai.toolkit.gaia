@@ -18,6 +18,7 @@
 ## 🎯 What is GAIA 5?
 
 GAIA 5 is an advanced AI-driven development system that enforces quality through:
+
 - **8 Specialized Agents** for different development tasks
 - **Objective Quality Gates** (binary pass/fail validation)
 - **Spec-Driven Development** (design before code)
@@ -42,27 +43,31 @@ graph LR
 ```
 
 Each phase requires **quality gates to pass** before proceeding:
+
 - **Build Gate**: Project compiles without errors
 - **Lint Gate**: Code passes static analysis
 - **Test Gate**: All tests pass (exit code 0)
+- **Coverage Gate**: 100% code coverage (frontend + backend)
+- **Functional Gate**: Features verified via Playwright MCP
 - **Regression Gate**: No broken existing functionality
 
 ## 🤖 The 8 Agents
 
-| Agent | Model | Purpose |
-|-------|-------|---------|----------|
-| **@Explorer** | haiku | Analyze code & repository structure |
-| **@Architect** | sonnet | Design decisions and system architecture |
-| **@Builder** | sonnet | Implementation and feature development |
-| **@Tester** | haiku | Playwright testing (direct use only) |
-| **@Reviewer** | haiku | Code quality and security review |
-| **@Researcher** | opus | Web research, product analysis, documentation discovery |
-| **@Deployer** | haiku | Git operations and deployments |
-| **@Documenter** | haiku | Documentation maintenance |
+| Agent           | Model  | Purpose                                                 |
+| --------------- | ------ | ------------------------------------------------------- |
+| **@Explorer**   | haiku  | Analyze code & repository structure                     |
+| **@Architect**  | sonnet | Design decisions and system architecture                |
+| **@Builder**    | sonnet | Implementation and feature development                  |
+| **@Tester**     | haiku  | Playwright testing (direct use only)                    |
+| **@Reviewer**   | haiku  | Code quality and security review                        |
+| **@Researcher** | opus   | Web research, product analysis, documentation discovery |
+| **@Deployer**   | haiku  | Git operations and deployments                          |
+| **@Documenter** | haiku  | Documentation maintenance                               |
 
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - **AI Assistant**: GitHub Copilot or Claude (with MCP support)
 - **.NET SDK**: 9.0+ (for MCP server)
 - **Node.js**: 20+ LTS
@@ -91,12 +96,14 @@ Create `~/.config/copilot/mcp-config.json`:
 ### 2. Launch GAIA
 
 **GitHub Copilot CLI**:
+
 ```bash
 gh copilot
 # Type: Build me a [your app description]
 ```
 
 **Claude Desktop**:
+
 ```
 @Gaia Build me a [your app description]
 ```
@@ -115,38 +122,43 @@ gh copilot
 
 **CRITICAL**: All design documents in `.gaia/designs/` must be complete BEFORE creating implementation tasks!
 
-| Document | Purpose |
-|----------|---------|
-| `architecture.md` | System design and components |
-| `api.md` | API endpoints and contracts |
-| `database.md` | Schema and data models |
-| `security.md` | Authentication and authorization |
-| `frontend.md` | UI/UX patterns and components |
+| Document          | Purpose                                |
+| ----------------- | -------------------------------------- |
+| `use-cases.md`    | Use cases, user flows, API/UI journeys |
+| `architecture.md` | System design and components           |
+| `api.md`          | API endpoints and contracts            |
+| `database.md`     | Schema and data models                 |
+| `security.md`     | Authentication and authorization       |
+| `frontend.md`     | UI/UX patterns and components          |
 
 ## 🏗️ Default Technology Stack
 
 - **Backend**: .NET Core + Entity Framework
 - **Frontend**: React + TypeScript + Redux (PWA optional)
 - **Database**: PostgreSQL
-- **Testing**: Playwright (direct use only)
+- **Testing**: Playwright MCP tools (100% coverage required)
 
 ## ✅ Success Criteria
 
 GAIA 5 succeeds when:
+
 - ✅ All designs complete before coding
 - ✅ Every task references designs
-- ✅ All quality gates pass
+- ✅ All quality gates pass (build, lint, test, coverage)
+- ✅ 100% code coverage achieved
 - ✅ No regressions introduced
-- ✅ Build, lint, and test gates green
+- ✅ Functional regression verified via Playwright MCP
 
 ## 🛡️ Quality Gates
 
 Every phase requires **all gates to pass**:
+
 - Max 3 retry attempts per gate
 - On failure: fix issue → simplify → reduce scope
 - Store results in MCP
 
 ### Gate Validation
+
 1. Run objective checks (build, lint, test)
 2. Binary pass/fail - no subjective scoring
 3. If blocked after 3 attempts, mark task blocked and continue
@@ -154,6 +166,7 @@ Every phase requires **all gates to pass**:
 ## 💡 Critical Rules
 
 ### ✅ ALWAYS:
+
 - Complete designs BEFORE tasks
 - Use MCP tools for tasks/memories
 - **Use `recall()` BEFORE every task** - Check past knowledge first
@@ -164,6 +177,7 @@ Every phase requires **all gates to pass**:
 - Pass all quality gates before proceeding
 
 ### ❌ NEVER:
+
 - Skip design phase
 - Create TODO.md files
 - Modify .jsonl files directly
@@ -178,7 +192,8 @@ Every phase requires **all gates to pass**:
 ├── instructions/
 │   └── gaia.instructions.md  # Complete Gaia 5 system
 ├── designs/               # Design documents (tiered by SDLC)
-├── agents/                # 7 agent specifications
+├── agents/                # 8 agent specifications
+├── skills/                # Contextual instruction modules
 └── mcps/                  # MCP server (JSONL-based)
 
 src/                       # Your application code
@@ -187,10 +202,12 @@ src/                       # Your application code
 ## 🔧 MCP Tools
 
 **Task Management** (Use ONLY these):
+
 - `mcp__gaia__read_tasks(hideCompleted?)` - View tasks
 - `mcp__gaia__update_task(taskId, description, status, assignedTo?)` - Add/update tasks
 
 **Memory Management** (Use CONTINUOUSLY):
+
 - `mcp__gaia__remember(category, key, value)` - Store decisions, fixes, patterns (upserts by key)
 - `mcp__gaia__recall(query, maxResults?)` - Search memories with fuzzy matching
 
@@ -198,12 +215,12 @@ src/                       # Your application code
 
 Memory tools should be used continuously throughout development, not only at initialization:
 
-| When | Action | Example |
-|------|--------|---------|
-| Before any task | `recall()` | `recall("authentication")` |
-| After fixing issue | `remember()` | `remember("issue", "cors_error", "Added proxy config")` |
+| When                      | Action       | Example                                                         |
+| ------------------------- | ------------ | --------------------------------------------------------------- |
+| Before any task           | `recall()`   | `recall("authentication")`                                      |
+| After fixing issue        | `remember()` | `remember("issue", "cors_error", "Added proxy config")`         |
 | After discovering pattern | `remember()` | `remember("pattern", "retry_logic", "Use exponential backoff")` |
-| When encountering error | `recall()` | `recall("timeout")` |
+| When encountering error   | `recall()`   | `recall("timeout")`                                             |
 
 **Categories**: `issue`, `workaround`, `config`, `pattern`, `performance`, `test_fix`, `dependency`, `environment`, `decision`, `research`
 
@@ -221,6 +238,7 @@ Memory tools should be used continuously throughout development, not only at ini
 ```
 
 GAIA 5 will:
+
 1. Analyze requirements (clarity gate required)
 2. Create design documents (scaled to SDLC tier)
 3. Generate implementation tasks
@@ -242,6 +260,7 @@ Each level enforces quality gates per phase.
 ## 🔍 Troubleshooting
 
 **MCP Server Issues**:
+
 ```bash
 # Verify .NET
 dotnet --version  # Should be 9.0+
@@ -252,6 +271,7 @@ dotnet run
 ```
 
 **Build Failures**:
+
 ```bash
 # Frontend
 npm install && npm run build
@@ -266,14 +286,33 @@ dotnet restore && dotnet build
 - **Design Templates**: `.gaia/designs/`
 - **Agent Specs**: `.gaia/agents/`
 
-## 🌟 The GAIA 5 Promise
+## � Skills (Contextual Instructions)
 
-> **"Quality through validation, success through design, excellence through gates"**
+Skills are modular instruction sets that Copilot injects when relevant to the task at hand:
+
+| Skill                  | File                            | Triggered When                                     |
+| ---------------------- | ------------------------------- | -------------------------------------------------- |
+| **MCP Memory**         | `mcp-memory-management.md`      | Debugging, implementing features, making decisions |
+| **SDLC Selection**     | `sdlc-tier-selection.md`        | Planning features, assessing project scope         |
+| **Work Breakdown**     | `work-breakdown-structure.md`   | Creating plans, breaking down features into tasks  |
+| **Quality Gates**      | `quality-gate-validation.md`    | Running tests, validating builds, checking quality |
+| **Playwright Testing** | `playwright-testing.md`         | E2E testing, visual/functional regression          |
+| **Tech Stack**         | `default-tech-stack.md`         | Starting projects, making technology decisions     |
+| **Visual Excellence**  | `visual-excellence.md`          | Building UI, reviewing frontend, validating UX     |
+| **Design Docs**        | `design-document-management.md` | Creating/updating design documentation             |
+
+All skills are located in `.gaia/skills/` and follow the ~50 line limit for focused, contextual guidance.
+
+## �🌟 The GAIA 5 Promise
+
+> **"Quality through validation, success through design, excellence through gates and memory"**
 
 GAIA 5 ensures every project meets production standards through:
+
 - Mandatory design-first development
-- Objective quality gate validation
+- Objective quality gate validation (100% coverage)
 - Autonomous retry and scope reduction
+- Continuous memory for institutional knowledge
 - Professional visual quality at all viewports
 
 ## 📄 License
@@ -285,6 +324,7 @@ MIT License - see [LICENSE](./LICENSE) for details
 **Inspiration**: [Conway Osler](https://www.linkedin.com/in/conway-osler)
 
 **Architectural Principles**:
+
 - **iDesign** by Juval Löwy
 - **Clean Architecture** by Robert C. Martin
 - **Domain-Driven Design** by Eric Evans
