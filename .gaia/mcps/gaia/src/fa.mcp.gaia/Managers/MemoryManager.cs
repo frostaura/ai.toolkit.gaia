@@ -16,9 +16,10 @@ namespace FrostAura.MCP.Gaia.Managers
     /// <summary>
     /// Memory Manager - Essential tools for session-level and persistent memory management
     /// Supports both ephemeral (SessionLength) and permanent (ProjectWide) storage
+    /// Uses a write queue to ensure no memories are lost when file is locked
     /// </summary>
     [McpServerToolType]
-    public class MemoryManager
+    public class MemoryManager : IDisposable
     {
         private readonly ILogger<MemoryManager> _logger;
         private const string PersistentMemoryPath = ".gaia/memory.json";
@@ -30,6 +31,24 @@ namespace FrostAura.MCP.Gaia.Managers
         // Thread-safe in-memory storage - project-wide memories (persisted to disk)
         private static readonly ConcurrentDictionary<string, GaiaMemory> _persistentMemories = new();
 
+        // Write queue for batching persistence operations
+        private static BlockingCollection<WriteRequest>? _writeQueue = new(new ConcurrentQueue<WriteRequest>());
+        private static Task? _writeProcessorTask;
+        private static CancellationTokenSource? _cancellationTokenSource = new();
+        private static readonly object _processorLock = new();
+        private static bool _processorStarted = false;
+        private static bool _disposed = false;
+
+        // Track pending writes for acknowledgment
+        private static readonly ConcurrentDictionary<string, TaskCompletionSource<bool>> _pendingWrites = new();
+
+        private sealed class WriteRequest
+        {
+            public required string RequestId { get; init; }
+            public required GaiaMemory Memory { get; init; }
+            public required bool IsDelete { get; init; }
+        }
+
         public MemoryManager(ILogger<MemoryManager> logger)
         {
             _logger = logger;
@@ -37,10 +56,226 @@ namespace FrostAura.MCP.Gaia.Managers
             // Load persistent memories from disk
             LoadPersistentMemoriesAsync().Wait();
 
+            // Start the background write processor (only once across all instances)
+            StartWriteProcessor();
+
             _logger.LogInformation(
-                "[STARTUP] MemoryManager initialized | SessionMemories={SessionCount} | PersistentMemories={PersistentCount}",
+                "[STARTUP] MemoryManager initialized | SessionMemories={SessionCount} | PersistentMemories={PersistentCount} | WriteQueueEnabled=true",
                 _sessionMemories.Count,
                 _persistentMemories.Count);
+        }
+
+        /// <summary>
+        /// Start the background write processor task
+        /// </summary>
+        private void StartWriteProcessor()
+        {
+            lock (_processorLock)
+            {
+                if (_processorStarted || _disposed) return;
+
+                // Reinitialize if previously disposed
+                if (_writeQueue == null || _writeQueue.IsAddingCompleted)
+                {
+                    _writeQueue = new BlockingCollection<WriteRequest>(new ConcurrentQueue<WriteRequest>());
+                }
+                if (_cancellationTokenSource == null || _cancellationTokenSource.IsCancellationRequested)
+                {
+                    _cancellationTokenSource = new CancellationTokenSource();
+                }
+
+                _disposed = false;
+                _processorStarted = true;
+
+                _writeProcessorTask = Task.Run(async () =>
+                {
+                    _logger.LogInformation("[WRITE_QUEUE] Background write processor started");
+
+                    try
+                    {
+                        await ProcessWriteQueueAsync(_cancellationTokenSource.Token);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        _logger.LogInformation("[WRITE_QUEUE] Background write processor stopped (cancelled)");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "[WRITE_QUEUE] Background write processor failed | Error={ErrorMessage}", ex.Message);
+                    }
+                });
+            }
+        }
+
+        /// <summary>
+        /// Process the write queue - batches writes for efficiency
+        /// </summary>
+        private async Task ProcessWriteQueueAsync(CancellationToken cancellationToken)
+        {
+            var batchDelay = TimeSpan.FromMilliseconds(100); // Batch writes within 100ms window
+            var completedRequestIds = new List<string>();
+
+            while (!cancellationToken.IsCancellationRequested && _writeQueue != null)
+            {
+                try
+                {
+                    // Wait for at least one item
+                    if (_writeQueue == null || !_writeQueue.TryTake(out var firstRequest, Timeout.Infinite, cancellationToken))
+                        continue;
+
+                    completedRequestIds.Clear();
+                    completedRequestIds.Add(firstRequest.RequestId);
+
+                    // Apply the first request to in-memory storage
+                    if (firstRequest.IsDelete)
+                    {
+                        _persistentMemories.TryRemove(firstRequest.Memory.CompositeKey, out _);
+                    }
+                    else
+                    {
+                        _persistentMemories[firstRequest.Memory.CompositeKey] = firstRequest.Memory;
+                    }
+
+                    // Wait briefly to batch more writes
+                    await Task.Delay(batchDelay, cancellationToken);
+
+                    // Drain any additional pending writes
+                    while (_writeQueue != null && _writeQueue.TryTake(out var additionalRequest))
+                    {
+                        completedRequestIds.Add(additionalRequest.RequestId);
+
+                        if (additionalRequest.IsDelete)
+                        {
+                            _persistentMemories.TryRemove(additionalRequest.Memory.CompositeKey, out _);
+                        }
+                        else
+                        {
+                            _persistentMemories[additionalRequest.Memory.CompositeKey] = additionalRequest.Memory;
+                        }
+                    }
+
+                    // Perform single batched write to disk
+                    await SavePersistentMemoriesToDiskAsync();
+
+                    _logger.LogDebug(
+                        "[WRITE_QUEUE] Batch completed | BatchSize={BatchSize} | TotalMemories={TotalMemories}",
+                        completedRequestIds.Count,
+                        _persistentMemories.Count);
+
+                    // Signal completion to all waiting callers
+                    foreach (var requestId in completedRequestIds)
+                    {
+                        if (_pendingWrites.TryRemove(requestId, out var tcs))
+                        {
+                            tcs.TrySetResult(true);
+                        }
+                    }
+                }
+                catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+                {
+                    // Flush remaining items before exit
+                    await FlushRemainingWritesAsync();
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "[WRITE_QUEUE] Error processing batch | Error={ErrorMessage}", ex.Message);
+
+                    // Signal failure to waiting callers
+                    foreach (var requestId in completedRequestIds)
+                    {
+                        if (_pendingWrites.TryRemove(requestId, out var tcs))
+                        {
+                            tcs.TrySetException(ex);
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Flush any remaining writes in the queue before shutdown
+        /// </summary>
+        private async Task FlushRemainingWritesAsync()
+        {
+            var remaining = new List<WriteRequest>();
+
+            while (_writeQueue != null && _writeQueue.TryTake(out var request))
+            {
+                remaining.Add(request);
+
+                if (request.IsDelete)
+                {
+                    _persistentMemories.TryRemove(request.Memory.CompositeKey, out _);
+                }
+                else
+                {
+                    _persistentMemories[request.Memory.CompositeKey] = request.Memory;
+                }
+            }
+
+            if (remaining.Count > 0)
+            {
+                _logger.LogInformation("[WRITE_QUEUE] Flushing {Count} remaining writes before shutdown", remaining.Count);
+                await SavePersistentMemoriesToDiskAsync();
+
+                foreach (var request in remaining)
+                {
+                    if (_pendingWrites.TryRemove(request.RequestId, out var tcs))
+                    {
+                        tcs.TrySetResult(true);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Queue a memory write operation
+        /// </summary>
+        private Task QueueWriteAsync(GaiaMemory memory, bool isDelete = false)
+        {
+            // Check if disposed or queue unavailable - save synchronously as fallback
+            if (_disposed || _writeQueue == null || _writeQueue.IsAddingCompleted)
+            {
+                _logger.LogWarning("[WRITE_QUEUE] Queue unavailable, saving synchronously | Key={Key}", memory.CompositeKey);
+                return SavePersistentMemoriesToDiskAsync();
+            }
+
+            var requestId = Guid.NewGuid().ToString();
+            var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+            _pendingWrites[requestId] = tcs;
+
+            var request = new WriteRequest
+            {
+                RequestId = requestId,
+                Memory = memory,
+                IsDelete = isDelete
+            };
+
+            try
+            {
+                if (!_writeQueue.TryAdd(request))
+                {
+                    _pendingWrites.TryRemove(requestId, out _);
+                    _logger.LogWarning("[WRITE_QUEUE] Failed to queue, saving synchronously | Key={Key}", memory.CompositeKey);
+                    return SavePersistentMemoriesToDiskAsync();
+                }
+            }
+            catch (ObjectDisposedException)
+            {
+                _pendingWrites.TryRemove(requestId, out _);
+                _logger.LogWarning("[WRITE_QUEUE] Queue disposed, saving synchronously | Key={Key}", memory.CompositeKey);
+                return SavePersistentMemoriesToDiskAsync();
+            }
+
+            _logger.LogDebug(
+                "[WRITE_QUEUE] Queued | RequestId={RequestId} | Key={Key} | QueueSize={QueueSize}",
+                requestId,
+                memory.CompositeKey,
+                _writeQueue.Count);
+
+            return tcs.Task;
         }
 
         /// <summary>
@@ -99,9 +334,9 @@ namespace FrostAura.MCP.Gaia.Managers
         }
 
         /// <summary>
-        /// Save persistent memories to disk
+        /// Save persistent memories to disk (called only by write processor)
         /// </summary>
-        private async Task SavePersistentMemoriesAsync()
+        private async Task SavePersistentMemoriesToDiskAsync()
         {
             try
             {
@@ -144,7 +379,7 @@ namespace FrostAura.MCP.Gaia.Managers
         /// </summary>
         [McpServerTool]
         [Description("Store important decisions/context for later recalling. Upserts by category+key to prevent duplicates.")]
-        public async Task<RememberResponse> remember(
+        public Task<RememberResponse> remember(
             [Description("The memory to store")] RememberRequest request)
         {
             _logger.LogDebug(
@@ -182,12 +417,19 @@ namespace FrostAura.MCP.Gaia.Managers
                     memory.Created = DateTime.UtcNow;
                 }
 
-                targetStorage[compositeKey] = memory;
-
-                // Save to disk if persistent
-                if (request.Duration == MemoryDuration.ProjectWide)
+                // For session memories, update immediately
+                if (request.Duration == MemoryDuration.SessionLength)
                 {
-                    await SavePersistentMemoriesAsync();
+                    targetStorage[compositeKey] = memory;
+                }
+                else
+                {
+                    // For persistent memories, queue the write (memory is applied in the queue processor)
+                    // Immediately update in-memory for read consistency
+                    _persistentMemories[compositeKey] = memory;
+
+                    // Queue for disk persistence (fire-and-forget with guaranteed delivery)
+                    _ = QueueWriteAsync(memory, isDelete: false);
                 }
 
                 if (isUpdate)
@@ -213,13 +455,13 @@ namespace FrostAura.MCP.Gaia.Managers
                         _persistentMemories.Count);
                 }
 
-                return new RememberResponse
+                return Task.FromResult(new RememberResponse
                 {
                     Success = true,
                     Message = $"Memory {(isUpdate ? "updated" : "stored")} ({request.Duration}): {request.Category}/{request.Key}",
                     WasUpdate = isUpdate,
                     Memory = memory
-                };
+                });
             }
             catch (Exception ex)
             {
@@ -229,13 +471,13 @@ namespace FrostAura.MCP.Gaia.Managers
                     request.Key,
                     ex.Message);
 
-                return new RememberResponse
+                return Task.FromResult(new RememberResponse
                 {
                     Success = false,
                     Message = $"Error storing memory: {ex.Message}",
                     WasUpdate = false,
                     Memory = null
-                };
+                });
             }
         }
 
@@ -398,8 +640,8 @@ namespace FrostAura.MCP.Gaia.Managers
             _sessionMemories.Clear();
             _persistentMemories.Clear();
 
-            // Clear the persistent file
-            await SavePersistentMemoriesAsync();
+            // Clear the persistent file directly (bypass queue for immediate effect)
+            await SavePersistentMemoriesToDiskAsync();
 
             _logger.LogWarning(
                 "[MEMORY:CLEAR] All memories cleared | SessionCleared={SessionCount} | PersistentCleared={PersistentCount} | TotalCleared={TotalCount}",
@@ -413,6 +655,44 @@ namespace FrostAura.MCP.Gaia.Managers
                 Message = $"Cleared {totalCount} memories (Session: {sessionCount}, Persistent: {persistentCount})",
                 ClearedCount = totalCount
             };
+        }
+
+        /// <summary>
+        /// Dispose and flush any pending writes
+        /// </summary>
+        public void Dispose()
+        {
+            lock (_processorLock)
+            {
+                if (_disposed) return;
+                _disposed = true;
+                _processorStarted = false;
+            }
+
+            _logger.LogInformation("[MEMORY:DISPOSE] Disposing MemoryManager, flushing pending writes");
+
+            try
+            {
+                _cancellationTokenSource?.Cancel();
+
+                // Wait for write processor to complete (with timeout)
+                if (_writeProcessorTask != null)
+                {
+                    _writeProcessorTask.Wait(TimeSpan.FromSeconds(5));
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "[MEMORY:DISPOSE] Error during disposal | Error={ErrorMessage}", ex.Message);
+            }
+            finally
+            {
+                try
+                {
+                    _writeQueue?.CompleteAdding();
+                }
+                catch { /* Ignore if already completed */ }
+            }
         }
     }
 }
