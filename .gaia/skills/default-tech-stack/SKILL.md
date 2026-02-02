@@ -7,21 +7,27 @@ description: Default technology stack for Gaia projects. Use when starting new p
 
 ## Backend
 
-| Component    | Technology                |
-| ------------ | ------------------------- |
-| Framework    | ASP.NET Core (.NET 8+)    |
-| ORM          | Entity Framework Core     |
-| Architecture | Clean Architecture        |
-| Linting      | StyleCop + .NET Analyzers |
+| Component    | Technology                                                     |
+| ------------ | -------------------------------------------------------------- |
+| Framework    | ASP.NET Core (.NET 8+)                                         |
+| ORM          | Entity Framework Core                                          |
+| Architecture | Clean Architecture                                             |
+| Linting      | StyleCop + Roslynator + SonarAnalyzer + .NET Analyzers (STRICT) |
+
+> **STRICT MODE**: `TreatWarningsAsErrors=true`, zero warnings allowed. Build fails on any lint violation.
+> See **`.gaia/skills/strict-linting/SKILL.md`** for configuration.
 
 ## Frontend
 
-| Component | Technology                   |
-| --------- | ---------------------------- |
-| Framework | React 18+ with TypeScript 5+ |
-| State     | Redux Toolkit + RTK Query    |
-| PWA       | Optional (for offline-first) |
-| Linting   | ESLint + Prettier            |
+| Component | Technology                        |
+| --------- | --------------------------------- |
+| Framework | React 18+ with TypeScript 5+      |
+| State     | Redux Toolkit + RTK Query         |
+| PWA       | Optional (for offline-first)      |
+| Linting   | ESLint (strict) + Prettier (STRICT) |
+
+> **STRICT MODE**: `--max-warnings 0`, all warnings are errors. Build fails on any lint violation.
+> See **`.gaia/skills/strict-linting/SKILL.md`** for configuration.
 
 ## Database
 

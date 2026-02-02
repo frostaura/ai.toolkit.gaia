@@ -33,9 +33,8 @@ This captures commands leveraged to create symlinks to shared files in order to 
 - `ln -s ../.gaia/skills .github/skills`
 - `ln -s ../.gaia/skills .claude/skills`
 
-### Prompts & Instructions
+### Instructions
 
-- `ln -s ../.gaia/prompts .github/prompts`
 - `ln -s ../.gaia/instructions .github/instructions`
 
 ## Task & Memory Management - USE MCP TOOLS ONLY

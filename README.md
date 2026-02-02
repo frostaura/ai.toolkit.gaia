@@ -190,9 +190,9 @@ Every phase requires **all gates to pass**:
 ```
 .gaia/
 ├── instructions/
-│   └── gaia.instructions.md  # Complete Gaia 5 system
+│   └── gaia.instructions.md  # Common Gaia 5 system standards
 ├── designs/               # Design documents (tiered by SDLC)
-├── agents/                # 8 agent specifications
+├── agents/                # Agent specifications (including gaia orchestrator)
 ├── skills/                # Contextual instruction modules
 └── mcps/                  # MCP server (JSONL-based)
 
@@ -282,7 +282,8 @@ dotnet restore && dotnet build
 
 ## 📚 Documentation
 
-- **Complete System**: `.gaia/instructions/gaia.instructions.md`
+- **Common Standards**: `.gaia/instructions/gaia.instructions.md`
+- **Orchestrator Agent**: `.gaia/agents/gaia.md`
 - **Design Templates**: `.gaia/designs/`
 - **Agent Specs**: `.gaia/agents/`
 

@@ -7,12 +7,17 @@ description: Guide for running and validating quality gates (build, lint, test, 
 
 ## Gate Commands
 
-| Gate         | .NET                                          | Node.js                            |
-| ------------ | --------------------------------------------- | ---------------------------------- |
-| **Build**    | `dotnet build`                                | `npm run build`                    |
-| **Lint**     | `dotnet format --verify-no-changes`           | `npm run lint`                     |
-| **Test**     | `dotnet test`                                 | `npm test` / `npx playwright test` |
-| **Coverage** | `dotnet test --collect:"XPlat Code Coverage"` | `npm test -- --coverage`           |
+| Gate         | .NET                                          | Node.js                                     |
+| ------------ | --------------------------------------------- | ------------------------------------------- |
+| **Build**    | `dotnet build --no-incremental`               | `npm run build`                             |
+| **Lint**     | `dotnet format --verify-no-changes --severity error` | `npm run lint` (must use `--max-warnings 0`) |
+| **Test**     | `dotnet test`                                 | `npm test` / `npx playwright test`          |
+| **Coverage** | `dotnet test --collect:"XPlat Code Coverage"` | `npm test -- --coverage`                    |
+| **Validate** | `dotnet build && dotnet format --verify-no-changes` | `npm run validate` (typecheck + lint + format) |
+
+> **STRICT LINTING REQUIRED**: See **`.gaia/skills/strict-linting/SKILL.md`** for mandatory configuration.
+> - **Frontend**: ESLint with `--max-warnings 0`, TypeScript strict mode, Prettier format check
+> - **Backend**: `TreatWarningsAsErrors=true`, StyleCop, Roslynator, SonarAnalyzer, .NET Analyzers
 
 ## Coverage Requirement
 
@@ -73,11 +78,31 @@ mcp__gaia__remember("gate", "phase_X_blocked", "[reason and what was tried]", "P
 
 ## Gate Summary
 
-| Gate       | Validates     | Failure Action             |
-| ---------- | ------------- | -------------------------- |
-| Build      | Compilation   | Fix syntax/type errors     |
-| Lint       | Code style    | Run auto-fix or manual fix |
-| Test       | Functionality | Debug failing tests        |
-| Coverage   | 100% coverage | Add missing tests          |
-| Functional | Features work | Fix broken functionality   |
-| Regression | No breakage   | Investigate root cause     |
+| Gate       | Validates            | Failure Action             |
+| ---------- | -------------------- | -------------------------- |
+| Build      | Compilation + Lint   | Fix syntax/type/lint errors |
+| Lint       | Code style (STRICT)  | Fix violations (zero warnings allowed) |
+| Test       | Functionality        | Debug failing tests        |
+| Coverage   | 100% coverage        | Add missing tests          |
+| Functional | Features work        | Fix broken functionality   |
+| Regression | No breakage          | Investigate root cause     |
+
+## Strict Linting Mandate
+
+**All projects MUST configure strict linting that fails builds:**
+
+### Frontend Requirements
+- ESLint with `--max-warnings 0`
+- TypeScript `strict: true` with all strict flags
+- Prettier format checking in CI
+- No `any` types allowed
+- No unused variables/imports
+
+### Backend Requirements  
+- `TreatWarningsAsErrors=true` in Directory.Build.props
+- StyleCop.Analyzers package
+- Roslynator.Analyzers package
+- SonarAnalyzer.CSharp package
+- `dotnet format --verify-no-changes --severity error` in CI
+
+> See **`.gaia/skills/strict-linting/SKILL.md`** for complete configuration files.
