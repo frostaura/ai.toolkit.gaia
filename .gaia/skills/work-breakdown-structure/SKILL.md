@@ -1,20 +1,59 @@
 ---
 name: work-breakdown-structure
-description: Guide for decomposing projects into Epics, Stories, Features, and Tasks. Use when planning features or capturing work in MCP tools.
+description: Guide for adaptive work breakdown based on task complexity. Uses flat task lists for Standard tasks, two-level hierarchy for Complex, and full WBS (Epic→Story→Feature→Task) for Enterprise only. Prevents over-engineering simple tasks.
 ---
 
 # Work Breakdown Structure (WBS)
 
-## Hierarchy
+## Adaptive Depth
 
-| Level       | Purpose                | Example                        |
-| ----------- | ---------------------- | ------------------------------ |
-| **Epic**    | Major objective        | "User Authentication System"   |
-| **Story**   | User-facing capability | "Users can register and login" |
-| **Feature** | Technical component    | "JWT token management"         |
-| **Task**    | Atomic unit (1-4 hrs)  | "Create JWT signing service"   |
+Match breakdown depth to task complexity:
 
-## ID Convention
+| Complexity | Breakdown Style |
+|------------|-----------------|
+| Trivial | None - just do it |
+| Simple | None - analyze → fix → verify |
+| Standard | Flat task list |
+| Complex | Two-level hierarchy |
+| Enterprise | Full 4-level WBS |
+
+## Breakdown Examples
+
+### Trivial/Simple
+```markdown
+No breakdown needed. Execute directly.
+```
+
+### Standard (Flat List)
+```markdown
+- [ ] Implement JWT service
+- [ ] Add login endpoint
+- [ ] Add refresh endpoint
+- [ ] Write tests
+```
+
+### Complex (Two Levels)
+```markdown
+## Feature: Authentication
+- [ ] JWT token service
+- [ ] Login/logout endpoints
+- [ ] Refresh token flow
+
+## Feature: User Management
+- [ ] Registration endpoint
+- [ ] Profile endpoints
+```
+
+### Enterprise (Full WBS)
+```markdown
+E-1: Epic - User Authentication System
+  E-1/S-1: Story - Users can login
+    E-1/S-1/F-1: Feature - JWT tokens
+      E-1/S-1/F-1/T-1: Task - Create JWT service
+      E-1/S-1/F-1/T-2: Task - Add token validation
+```
+
+## ID Convention (Enterprise Only)
 
 ```
 Epic:    E-[n]                    → E-1
@@ -23,36 +62,40 @@ Feature: E-[n]/S-[n]/F-[n]        → E-1/S-1/F-1
 Task:    E-[n]/S-[n]/F-[n]/T-[n]  → E-1/S-1/F-1/T-1
 ```
 
-## Minimum Decomposition by SDLC
-
-| Tier       | Epics | Stories | Features | Tasks |
-| ---------- | ----- | ------- | -------- | ----- |
-| Small      | 1     | 2+      | 3+       | 5+    |
-| Medium     | 2     | 4+      | 8+       | 15+   |
-| Large      | 3     | 8+      | 15+      | 30+   |
-| Enterprise | 5     | 15+     | 30+      | 60+   |
-
 ## MCP Task Format
 
-**Pattern**: `[TYPE] Title | Refs: doc#section | AC: Acceptance criteria`
+For Standard+ complexity:
 
-```bash
-# Epic
-mcp__gaia__update_task("E-1", "[EPIC] Auth System | Refs: security.md | AC: All auth flows work", "pending", "Architect")
+```javascript
+// Standard: Simple task
+update_task("T-1", 
+  "Implement JWT service | Refs: design.md#auth | AC: Valid tokens generated",
+  "Pending", "Developer")
 
-# Story
-mcp__gaia__update_task("E-1/S-1", "[STORY] User login | Refs: api.md#auth | AC: Login/logout E2E", "pending", "Builder")
+// Complex: Feature with tasks
+update_task("F-1", 
+  "[FEATURE] Authentication | Refs: design.md#auth | AC: Login flow works",
+  "Pending", "Developer")
 
-# Feature
-mcp__gaia__update_task("E-1/S-1/F-1", "[FEATURE] JWT tokens | Refs: security.md#jwt | AC: Token refresh works", "pending", "Builder")
-
-# Task
-mcp__gaia__update_task("E-1/S-1/F-1/T-1", "[TASK] JWT service | Refs: security.md#jwt | AC: Valid JWTs generated", "pending", "Builder")
+// Enterprise: Full hierarchy
+update_task("E-1/S-1/F-1/T-1",
+  "[TASK] JWT service | Refs: security.md#jwt | AC: Tokens valid",
+  "Pending", "Developer")
 ```
+
+## Task Description Format
+
+```
+[TYPE] Title | Refs: doc#section | AC: Acceptance criteria
+```
+
+Types: `[EPIC]`, `[STORY]`, `[FEATURE]`, `[TASK]`
 
 ## Rules
 
-- Every item MUST reference design docs
-- Every item MUST have testable acceptance criteria
-- Tasks should be 1-4 hours (exceptions: research, debugging)
-- **NEVER** create TODO.md or markdown task files - use MCP only
+- ✅ Match depth to complexity
+- ✅ Reference design docs
+- ✅ Include acceptance criteria
+- ✅ Use MCP tools only
+- ❌ Don't over-engineer simple tasks
+- ❌ Never create TODO.md files

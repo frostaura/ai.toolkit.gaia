@@ -1,140 +1,71 @@
 ---
 name: reflection
-description: Systematic reflection on completed work to capture learnings, patterns, and improvements
+description: Lightweight post-task reflection to capture significant learnings. Store patterns that worked, issues resolved, and decisions made. Not required for trivial tasks.
 ---
 
 # Reflection Skill
 
-Mandatory post-task reflection to build institutional knowledge and prevent repeated mistakes.
+Capture significant learnings after task completion.
 
 ## When to Reflect
 
-- ✅ After completing any task
-- ✅ After fixing an issue/bug
-- ✅ After encountering a blocker
-- ✅ After quality gate validation
-- ✅ After each feature implementation
+- ✅ After solving tricky problems
+- ✅ After fixing non-obvious bugs
+- ✅ After making architectural decisions
+- ✅ After failed approaches (to prevent repeating)
+- ❌ Not needed for trivial fixes
 
 ## Reflection Process
 
-**1. Recall Context** (before reflection)
-
-```
-recall("[task/feature/issue]") - Check past learnings
-recall("[technology]") - Review known patterns
-```
-
-**2. Analyze What Happened**
-
+### 1. Quick Analysis
 - What was the goal?
-- What approach was taken?
-- What worked well?
-- What failed or caused issues?
-- What was unexpected?
+- What approach worked?
+- What didn't work?
 
-**3. Capture Learnings** (mandatory `remember()` calls)
+### 2. Store Learnings
 
-**Success Patterns**:
-
-```
-remember("pattern", "[context]", "[what worked and why]", "ProjectWide")
-remember("best_practice", "[area]", "[approach that succeeded]", "ProjectWide")
+**Success patterns:**
+```javascript
+remember("pattern", "[context]", "[what worked]", "ProjectWide")
 ```
 
-**Issues & Resolutions**:
-
-```
-remember("issue", "[problem_key]", "[what failed + how fixed]", "ProjectWide")
-remember("workaround", "[limitation]", "[solution applied]", "ProjectWide")
+**Issues resolved:**
+```javascript
+remember("fix", "[issue_key]", "[problem + solution]", "ProjectWide")
 ```
 
-**Decisions & Rationale**:
-
-```
-remember("decision", "[choice]", "[why chosen + alternatives considered]", "ProjectWide")
-remember("tradeoff", "[decision]", "[benefits vs costs]", "ProjectWide")
+**Decisions made:**
+```javascript
+remember("decision", "[choice]", "[rationale]", "ProjectWide")
 ```
 
-**Warnings & Gotchas**:
-
-```
-remember("warning", "[technology/approach]", "[caveat/limitation]", "ProjectWide")
-remember("antipattern", "[context]", "[what NOT to do + why]", "ProjectWide")
+**Warnings discovered:**
+```javascript
+remember("warning", "[context]", "[gotcha to avoid]", "ProjectWide")
 ```
 
-**4. Identify Improvements**
+## Examples
 
-- What would you do differently next time?
-- What can be automated or simplified?
-- What documentation is missing?
+```javascript
+// After fixing a tricky bug
+remember("fix", "jwt_clock_skew", 
+  "Token validation failed due to clock skew between servers. Added 30s buffer.",
+  "ProjectWide")
 
-## Reflection Template
+// After finding good pattern
+remember("pattern", "error_handling_api",
+  "Use Result<T> pattern with typed errors. Controllers map to HTTP codes.",
+  "ProjectWide")
 
-```markdown
-## Reflection: [Task/Feature Name]
-
-**Goal**: [What was attempted]
-**Outcome**: [Success/Partial/Blocked]
-
-### What Worked
-
-- [Pattern/approach that succeeded]
-- [Effective tool/technique used]
-
-### What Failed
-
-- [Issue encountered]
-- [Root cause]
-- [How resolved]
-
-### Key Learnings
-
-- [Important discovery]
-- [Pattern to reuse]
-- [Antipattern to avoid]
-
-### Stored Memories
-
-- `remember("pattern", "X", "...")`
-- `remember("issue", "Y", "...")`
-- `remember("warning", "Z", "...")`
-
-### Next Time
-
-- [Improvement for future similar tasks]
+// After trying something that failed
+remember("warning", "vite_ssr_library_x",
+  "Library X incompatible with SSR mode. Use client-only import.",
+  "ProjectWide")
 ```
 
-## Critical Rules
+## Keep It Lightweight
 
-- ✅ Reflect AFTER every task completion
-- ✅ Use ProjectWide duration for permanent learnings
-- ✅ Capture both successes AND failures
-- ✅ Store specific, actionable knowledge
-- ✅ Include context in memory keys
-- ❌ Never skip reflection after issues
-- ❌ Never store vague/generic learnings
-- ❌ Never forget to check `recall()` first
-
-## Integration with Other Skills
-
-**With Web Research**:
-
-- Reflect on research quality and efficiency
-- Store best sources found
-- Note research patterns that worked
-
-**With Testing**:
-
-- Reflect on test coverage and effectiveness
-- Store common test patterns
-- Note edge cases discovered
-
-**With Implementation**:
-
-- Reflect on code quality and design
-- Store architectural patterns
-- Note technical debt created
-
----
-
-**Remember**: Reflection builds institutional memory. Every task is a learning opportunity.
+- One `remember()` call per significant learning
+- Descriptive keys for searchability
+- Concise but complete values
+- Don't over-document trivial work

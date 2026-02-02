@@ -1,54 +1,82 @@
 ---
 name: sdlc-tier-selection
-description: Guide for selecting the appropriate SDLC tier based on project complexity. Use when planning features, assessing scope, or starting new work.
+description: Guide for auto-detecting task complexity (Trivial/Simple/Standard/Complex/Enterprise) and selecting the appropriate process. Determines required design documents and workflow phases based on scope indicators.
 ---
 
 # SDLC Tier Selection
 
-## Repository State (Check First)
+## Complexity Detection
 
-| State                | Action                                           |
-| -------------------- | ------------------------------------------------ |
-| Empty (no `src/`)    | Start fresh with full design templates           |
-| Has code + designs   | Update existing designs, maintain compatibility  |
-| Has code, no designs | Analyze codebase, generate designs, then proceed |
+| Complexity | Time Estimate | Scope | Files | Process |
+|------------|---------------|-------|-------|---------|
+| **Trivial** | < 1 hour | Typo, 1-line fix | 1-2 | Fix → Verify |
+| **Simple** | < 1 day | Bug fix, tweak | 2-5 | Analyze → Fix → Verify |
+| **Standard** | 1-3 days | Single feature | 5-15 | Plan → Implement → Test → Deploy |
+| **Complex** | 3-7 days | Multiple features | 15+ | Design → Plan → Implement → Validate → Deploy |
+| **Enterprise** | 1+ weeks | Full system | Major | Full phased development |
 
-## SDLC Tiers
+> ⚠️ Time estimates are complexity indicators only. Never refuse scope based on time.
 
-> ⚠️ Time estimates are **HUMAN hours** for complexity assessment only. Never refuse scope based on time.
+## Process by Complexity
 
-| Tier           | Scope                        | Design Docs Required                    |
-| -------------- | ---------------------------- | --------------------------------------- |
-| **Micro**      | Bug fixes (<1 day)           | use-cases.md (if needed)                |
-| **Small**      | Single feature (1-3 days)    | use-cases.md + architecture.md + api.md |
-| **Medium**     | Multiple features (3-7 days) | + database.md                           |
-| **Large**      | Major changes (1-2 weeks)    | All 6 docs                              |
-| **Enterprise** | Full system (2+ weeks)       | All 6 docs                              |
+### Trivial
+No planning needed. Execute directly.
 
-## Phase Sequences
+### Simple
+```
+1. @Analyst: Quick investigation
+2. @Developer: Fix
+3. @Quality: Verify
+```
 
-**Micro**: Requirements → Design Update (if needed) → Implementation → Testing
+### Standard
+```
+1. @Planner: Create task list
+2. @Developer: Implement
+3. @Quality: Validate
+4. @Operator: Deploy
+```
 
-**Small**: Requirements → Design → Implementation → Testing → Deployment
+### Complex
+```
+1. @Planner: Create design docs
+2. @Planner: Create task hierarchy
+3. @Developer: Implement
+4. @Quality: Full validation
+5. @Operator: Deploy + Document
+```
 
-**Medium**: Requirements → System Design → Documentation → Implementation → QA → Deployment
+### Enterprise
+Full phased development with all agents.
 
-**Large**: Requirements → Architecture → Detailed Design → Documentation → Development → Testing → Quality Gates → Deployment
+## Design Docs by Complexity
 
-**Enterprise**: Discovery → System Architecture → Detailed Design → Compliance → Phased Development → Comprehensive Testing → Quality Gates → Infrastructure → Deployment → Post-Release
+| Complexity | Design Docs Required |
+|------------|---------------------|
+| Trivial | None |
+| Simple | None |
+| Standard | design.md |
+| Complex | design.md + relevant (api, data, security) |
+| Enterprise | Full set as needed |
 
-## Design Documents (in `.gaia/designs/`)
+## Repository State Check
 
-- `use-cases.md` - Use cases, user flows, API/UI journeys
-- `architecture.md` - System design and components
-- `api.md` - API endpoints and contracts
-- `database.md` - Schema and data models
-- `security.md` - Authentication and authorization
-- `frontend.md` - UI/UX patterns and components
+| State | Action |
+|-------|--------|
+| Empty (no src/) | Start fresh |
+| Has code + designs | Update existing |
+| Has code, no designs | Analyze first, create designs |
 
-## After Selection
+## Auto-Detection Indicators
 
-```bash
-mcp__gaia__remember("sdlc", "type", "[micro/small/medium/large/enterprise]", "ProjectWide")
-mcp__gaia__remember("sdlc", "phases", "[phase list]", "ProjectWide")
+**Trivial**: Single typo, comment fix, config value change
+**Simple**: Bug with known cause, small UI tweak, dependency update
+**Standard**: New endpoint, new component, feature addition
+**Complex**: New subsystem, major refactor, multi-service change
+**Enterprise**: New application, platform migration, major overhaul
+
+## Store Selection
+
+```javascript
+remember("complexity", "current_task", "[tier]", "SessionLength")
 ```

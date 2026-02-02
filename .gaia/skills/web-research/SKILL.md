@@ -1,82 +1,77 @@
 ---
 name: web-research
-description: Web research using fetch_webpage and Playwright MCP tools in headless mode
+description: Two-tier web research using fetch_webpage as primary for known URLs and Playwright MCP (headless) as fallback for searches. Requires 3+ sources, prioritizes official docs, includes versions/dates.
 ---
 
-# Web Research Skill
+# Web Research
 
-Two-tier approach: **fetch_webpage first** → Playwright MCP tools (headless) as fallback.
-
-> See **`.gaia/skills/reflection.md`** for post-research reflection process.
+Two-tier approach: **fetch_webpage first** → Playwright MCP (headless) fallback.
 
 ## Tier 1: fetch_webpage (Primary)
 
-Use for known URLs (docs, blogs, GitHub, APIs). Fast and efficient.
+Fast and efficient for known URLs:
 
-```typescript
+```javascript
 fetch_webpage({
   urls: ["https://react.dev/learn"],
-  query: "React hooks best practices",
-});
+  query: "React hooks best practices"
+})
 ```
 
-**Limitations**: No JS rendering, no searches, no interactions.
+**Best for**: Official docs, blogs, GitHub, API references
+**Limitations**: No JS rendering, no searches
 
-## Tier 2: Playwright MCP Tools (Fallback - Headless Mode)
+## Tier 2: Playwright MCP (Fallback)
 
-Use for: web searches, dynamic content, JS-rendered pages, interactions.
+Use for searches and dynamic content:
 
-> **IMPORTANT**: Playwright runs in **headless mode** for research. No visible browser window.
+```javascript
+browser_navigate({ url: "https://duckduckgo.com" })
+browser_snapshot()  // Get element refs
+browser_type({ ref: "[ref]", text: "query" })
+browser_press_key({ key: "Enter" })
+browser_wait_for({ text: "results" })
+browser_snapshot()  // Extract results
+```
 
-**Search Pattern**:
-
-1. Navigate: `mcp_playwright-mc_browser_navigate({ url: "https://duckduckgo.com" })`
-2. Snapshot: `mcp_playwright-mc_browser_snapshot()` - get element refs
-3. Type: `mcp_playwright-mc_browser_type({ element: "search", ref: "[ref]", text: "query" })`
-4. Submit: `mcp_playwright-mc_browser_key({ element: "search", ref: "[ref]", key: "Enter" })`
-5. Wait: `mcp_playwright-mc_browser_wait_for({ text: "results" })`
-6. Extract: `mcp_playwright-mc_browser_snapshot()` - parse results
-
-**Key Tools**: navigate, snapshot, click, type, key, wait_for, screenshot, evaluate
+**Note**: Runs **headless** (no visible browser).
 
 ## Quality Standards
 
-- ✅ Minimum 3 sources
-- ✅ Prioritize official docs
-- ✅ Include versions & dates
-- ✅ `recall()` before research
-- ✅ `remember()` key findings
-- ✅ Reflect after completion (see `.gaia/skills/reflection.md`)
+- ✅ Minimum 3 sources for claims
+- ✅ Prioritize official documentation
+- ✅ Include version numbers
+- ✅ Include publication dates
+- ✅ Cache findings via `remember()`
 
 ## Output Format
 
 ```markdown
 ✓ Research: [Topic]
-**[Answer]** (v[X], [Date])
 
-- Key finding 1
-- Key finding 2
-  **Source**: [URL]
-  **Method**: fetch_webpage / Playwright headless
+**Recommendation**: [Choice] (v[X.Y], [Date])
+
+Key findings:
+- Finding 1
+- Finding 2
+
+Sources: [URLs]
 ```
 
-## Post-Research Reflection
+## Memory Integration
 
-After completing research:
+```javascript
+// Before research
+recall("[topic]")
 
+// After research
+remember("research", "[topic]", "[findings + sources]", "ProjectWide")
 ```
-remember("research", "[topic]", "[key findings + sources]", "ProjectWide")
-remember("source", "[topic]", "[best URLs found]", "ProjectWide")
-remember("pattern", "research_[approach]", "[what worked well]", "ProjectWide")
-```
 
-## Critical Rules
+## Rules
 
-- ✅ Try fetch_webpage FIRST
-- ✅ Playwright runs headless (no GUI)
+- ✅ Try fetch_webpage first
 - ✅ Cite sources with URLs
-- ✅ Cache findings via `remember()`
-- ✅ Reflect on research quality/efficiency
-- ❌ Never skip fetch_webpage
-- ❌ Never present unverified info
-- ❌ Never skip post-research reflection
+- ✅ Cache key findings
+- ❌ Don't skip to Playwright for known URLs
+- ❌ Don't present unverified info

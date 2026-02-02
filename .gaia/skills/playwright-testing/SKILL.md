@@ -1,53 +1,47 @@
 ---
 name: playwright-testing
-description: Guide for using Playwright MCP tools for visual and functional regression testing. Use when testing features, validating UI, or running regression checks.
+description: Guide for using Playwright MCP tools directly for visual and functional testing. Test all pages at 4 breakpoints, all interactive states, and monitor console for errors. Use MCP tools only - NOT npm/npx commands or spec files.
 ---
 
-# Playwright Testing (via MCP Tools)
+# Playwright Testing
 
-Use Playwright MCP tools directly for testing - **NOT** npm/npx commands.
+Use Playwright MCP tools directly - **NOT** npm/npx commands or spec files.
 
-## Testing Types
+## Functional Testing (Interactive)
 
-### Functional Regression (Manual Testing)
-
-Interactively verify features work using Playwright MCP tools:
-
-```
-0. Spin up the entire stack via Docker Compose. Ensure no cache is used for front and backend projects. Database projects should not be cleared and retain data where possible.
+For each affected feature:
 1. Navigate to page/component
 2. Interact with elements (click, type, select)
 3. Verify expected behavior
 4. Check for console errors
 5. Test error states and edge cases
-```
 
-### Visual Regression (Screenshots)
+## Visual Testing (Screenshots)
 
-Capture and compare screenshots at all breakpoints:
-| Breakpoint | Width | Use Case |
-|------------|-------|----------|
+| Breakpoint | Width | Purpose |
+|------------|-------|---------|
 | Mobile | 320px | Small phones |
 | Tablet | 768px | Tablets/iPad |
 | Desktop | 1024px | Laptops |
-| Large | 1440px+ | Desktop monitors |
+| Large | 1440px+ | Monitors |
 
-### What to Test
+## Interactive States
 
-- **All pages** at every breakpoint
-- **Interactive states**: default, hover, focus, active, disabled, loading, error
-- **User workflows**: Complete user journeys end-to-end
-- **Data integrity**: Forms save correctly, displays show right data
-- **Error handling**: Invalid inputs, network failures, edge cases
+Test ALL for interactive elements:
 
-## Console Error Monitoring
+| State | Description |
+|-------|-------------|
+| Default | Normal appearance |
+| Hover | Mouse over |
+| Focus | Keyboard focus |
+| Active | Being clicked |
+| Disabled | Not interactive |
+| Loading | Async operation |
+| Error | Validation/error |
 
-Monitor browser console during all testing - flag ANY errors.
+## Test Checklist
 
-## Functional Test Checklist
-
-For each affected feature:
-
+For each feature:
 - [ ] Navigation works
 - [ ] Forms submit correctly
 - [ ] Data displays properly
@@ -55,18 +49,18 @@ For each affected feature:
 - [ ] Error states show correctly
 - [ ] No console errors
 
-## Visual Test Checklist
+## Visual Checklist
 
 - [ ] Screenshot at 320px
 - [ ] Screenshot at 768px
 - [ ] Screenshot at 1024px
 - [ ] Screenshot at 1440px
 - [ ] Compare with baseline
-- [ ] Flag unintended changes
 
 ## Key Rules
 
 - ✅ Use Playwright **MCP tools** directly
 - ✅ Test interactively (manual regression)
+- ✅ Check console for errors
 - ❌ Do NOT run `npx playwright test`
-- ❌ Do NOT create separate test spec files for regression
+- ❌ Do NOT create spec files for regression
