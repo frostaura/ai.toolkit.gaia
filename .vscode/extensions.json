@@ -2,11 +2,6 @@
     "recommendations": [
         // Database
         "ckolkman.vscode-postgres",
-        // AI/Copilot
-        "github.copilot",
-        "github.copilot-chat",
-        // Gaia AI Toolkit (Local Extension)
-        "gaia.gaia-plans-viewer",
         // .NET / C# Development
         "ms-dotnettools.csharp",
         "ms-dotnettools.csdevkit",

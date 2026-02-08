@@ -1,1 +1,22 @@
-../.gaia/mcp-config.json
+{
+    "mcpServers": {
+        "playwright": {
+            "transport": "stdio",
+            "type": "stdio",
+            "command": "npx",
+            "args": [
+                "@playwright/mcp@latest"
+            ]
+        },
+        "gaia": {
+            "transport": "stdio",
+            "type": "stdio",
+            "command": "dotnet",
+            "args": [
+                "run",
+                "--project",
+                ".github/mcps/gaia/src/fa.mcp.gaia/fa.mcp.gaia.csproj"
+            ]
+        }
+    }
+}
