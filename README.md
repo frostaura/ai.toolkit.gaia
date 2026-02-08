@@ -39,7 +39,7 @@ GAIA 6 is an optimized AI-driven development system featuring:
 | Agent | Purpose | Consolidates |
 |-------|---------|--------------|
 | **@Planner** | Strategy, design, research, orchestration | Gaia + Architect + Researcher |
-| **@Developer** | All code, tests, infrastructure | Builder |
+| **@Developer** | Implementation, tests, infrastructure, CI/CD maintenance | Builder |
 | **@Quality** | Testing, review, security validation | Tester + Reviewer |
 | **@Operator** | Git, deployments, documentation | Deployer + Documenter |
 | **@Analyst** | Fast codebase analysis, investigation | Explorer |
@@ -189,7 +189,7 @@ remember("pattern", "retry", "Use exponential backoff", "ProjectWide")
 | playwright-testing | E2E testing |
 | visual-excellence | UI standards |
 | web-research | Research patterns |
-| default-tech-stack | Tech defaults |
+| default-web-stack | Tech defaults |
 | strict-linting | Lint config |
 | reflection | Post-task learning |
 
