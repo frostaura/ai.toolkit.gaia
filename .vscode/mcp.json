@@ -1,0 +1,20 @@
+{
+    "servers": {
+        "playwright": {
+            "type": "stdio",
+            "command": "npx",
+            "args": [
+                "@playwright/mcp@latest"
+            ]
+        },
+        "gaia": {
+            "type": "stdio",
+            "command": "dotnet",
+            "args": [
+                "run",
+                "--project",
+                ".github/mcps/gaia/src/fa.mcp.gaia/fa.mcp.gaia.csproj"
+            ]
+        }
+    }
+}
