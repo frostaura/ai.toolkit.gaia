@@ -83,6 +83,10 @@ tests/          ← Automated tests
 
 ---
 
+<iframe src="https://www.linkedin.com/embed/feed/update/urn:li:share:7426684098947055617?collapsed=1" height="567" width="504" frameborder="0" allowfullscreen="" title="Embedded post"></iframe>
+
+---
+
 ## License
 
 MIT License - see [LICENSE](./LICENSE) for details.
