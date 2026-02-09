@@ -34,9 +34,9 @@ Build me a task management app with user login
 ### In the Terminal
 
 ```bash
-gh copilot
+npm i -g @github/copilot && copilot -p "<your project request>"
 
-# Then describe your project:
+# Example:
 # "Create a REST API for a blog with posts and comments"
 ```
 
