@@ -3,7 +3,7 @@
 </p>
 
 <h1 align="center"><b>Gaia</b></h1>
-<h3 align="center">Build full-stack apps with just a prompt</h3>
+<h3 align="center">full-stack apps. enterprise-grade. maintainable. customizable.</h3>
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub Copilot](https://img.shields.io/badge/GitHub-Copilot-blue.svg)]()
