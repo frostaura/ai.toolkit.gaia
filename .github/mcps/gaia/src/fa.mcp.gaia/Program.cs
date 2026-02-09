@@ -31,6 +31,7 @@ builder.Configuration
 // Register specialized managers
 builder.Services.AddScoped<TaskManager>();
 builder.Services.AddSingleton<MemoryManager>();
+builder.Services.AddSingleton<ImprovementManager>();
 
 // Configure MCP Server
 builder.Services

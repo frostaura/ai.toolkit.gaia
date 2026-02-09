@@ -24,7 +24,7 @@ description: An agent that implementations all code, tests, and infrastructure. 
     <responsibility>Collaborates with tester to ensure comprehensive functional and visual validation of features meeting the use cases.</responsibility>
   </responsibilities>
   <hints>
-    <hint>Always check design docs in designs/ for specifications before implementing features.</hint>
+    <hint>Always check design docs in docs/ for specifications before implementing features.</hint>
     <hint>Use memory tools to recall past patterns before.</hint>
     <hint>Follow existing project patterns - review similar code first to maintain consistency.</hint>
     <hint>Write tests alongside implementation - unit tests for business logic, integration tests for APIs.</hint>

@@ -83,8 +83,8 @@ description: A skill for providing the default web stack for projects. This dict
         <description>Unit testing frameworks for backend and frontend with fast execution and modern features.</description>
       </technology>
       <technology name="Regression">
-        <value>PlayWright spec files & CULR tests</value>
-        <description>Regression testing using Playwright specification files and CULR tests to cover all use cases, CRUD operations and user flows.</description>
+        <value>Playwright spec files & cURL tests</value>
+        <description>Regression testing using Playwright specification files and cURL tests to cover all use cases, CRUD operations, and user flows.</description>
       </technology>
       <technology name="Coverage">
         <value>Tiered by complexity</value>

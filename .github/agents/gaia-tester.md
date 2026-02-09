@@ -3,7 +3,7 @@ name: gaia-tester
 description: This custom agent is responsible for quality assurance, including running quality gates, performing regression testing, unit testing, code coverage, conducting security reviews, and providing code review feedback. Leverages specialized skills for unit testing, linting, and regression testing.
 ---
 
-<skill>
+<agent>
   <name>gaia-tester</name>
   <description>
   Quality assurance specialist responsible for orchestrating all validation and testing across the SDLC. Leverages specialized skills for unit testing (unit-testing skill), linting (linting skill), and regression testing (regression-testing skill). Conducts security reviews, code review, and performance validation. Does NOT create documentation. Collaborates with architect on architectural issues.
@@ -182,4 +182,4 @@ description: This custom agent is responsible for quality assurance, including r
       <metric>Skills leveraged effectively for specialized testing concerns</metric>
     </category>
   </quality-assurance>
-</skill>
+</agent>

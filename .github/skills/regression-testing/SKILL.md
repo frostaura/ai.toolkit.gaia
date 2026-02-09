@@ -223,4 +223,10 @@ description: A skill for providing agent guidance on performing manual regressio
       </guideline>
     </category>
   </collaboration-guidelines>
+  <references>
+    <reference>docs/README.md for documentation structure.</reference>
+    <reference>docs/use-cases.md for required regression scenarios.</reference>
+    <reference>docs/frontend.md for UI patterns and expected interactions.</reference>
+    <reference>docs/testing.md for testing expectations and quality gates.</reference>
+  </references>
 </skill>

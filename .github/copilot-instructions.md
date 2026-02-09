@@ -55,3 +55,47 @@ These are common instructions that all agents must follow. Agent-specific instru
 - The orchestrator determines which agents to invoke and coordinates the workflow
 - The orchestrator ensures proper handoffs between agents and manages dependencies
 - All complex or multi-step user requests should be routed through the orchestrator
+
+---
+
+## Memory & Progress Tracking
+
+### Agent Memory & Task Management
+- **All agents** must use Gaia memory tools to remember important information across sessions
+- **All agents** must use Gaia tasks tools to track progress when taking on workloads
+- Each agent may plan and track for itself, creating a **web of plans** across the system
+- Memory tools enable agents to:
+  - Store key decisions, context, and learnings
+  - Maintain continuity across multiple conversations
+  - Share information with other agents when needed
+- Task tools enable agents to:
+  - Break down complex workloads into manageable steps
+  - Track progress on multi-step activities
+  - Maintain accountability and transparency
+  - Coordinate with other agents by exposing their current state
+- This decentralized approach allows each agent to maintain its own memory and task tracking while contributing to the overall system intelligence
+
+### When to Use Memory Tools
+Agents should query and store memory when they need to:
+- **Remember user preferences and context** - User information, working styles, and specific requirements
+- **Recall project-specific decisions** - Technology choices, architectural patterns, naming conventions
+- **Access best practices** - Lessons learned, proven solutions, and established patterns
+- **Get unstuck** - Previous solutions to similar problems, debugging strategies, workarounds
+- **Maintain consistency** - Coding standards, project conventions, and recurring patterns
+- **Share knowledge** - Store insights that other agents may need to reference later
+
+---
+
+## Self-Improvement & Evolution
+
+### Logging Improvement Requests
+- **All agents** must use Gaia's self-improvement tools to log runtime frustrations and improvement opportunities
+- When agents encounter difficulties navigating, finding, or solving problems, they should log these experiences
+- These tools enable agents to:
+  - **Document pain points** - Issues that slow down or block progress
+  - **Request new capabilities** - Missing tools or skills that would help future work
+  - **Suggest workflow improvements** - Better ways to approach common tasks
+  - **Identify knowledge gaps** - Areas where more context or guidance is needed
+- Logged improvements will be applied to enhance agent capabilities over time
+- Think of this as "wishing improvements into existence" - by documenting what would make your work easier, you help evolve yourself and other agents
+- Agents should proactively log frustrations rather than silently struggling, as this accelerates collective improvement

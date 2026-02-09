@@ -22,7 +22,7 @@ namespace FrostAura.MCP.Gaia.Managers
     public class MemoryManager : IDisposable
     {
         private readonly ILogger<MemoryManager> _logger;
-        private const string PersistentMemoryPath = ".gaia/memory.json";
+        private const string PersistentMemoryPath = "docs/memory.json";
         private static readonly SemaphoreSlim _fileSemaphore = new(1, 1);
 
         // Thread-safe in-memory storage - session-level memories (lost on service restart)
