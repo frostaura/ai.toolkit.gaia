@@ -30,7 +30,6 @@
         "**/*py": true,
         "**/*.icon.gif": true,
         ".claude": true,
-        ".vscode": true,
         ".vs": true,
         "AGENTS.md": true,
         "CLAUDE.md": true,
