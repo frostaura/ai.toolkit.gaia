@@ -155,7 +155,7 @@ description: A skill for writing comprehensive unit tests across multiple platfo
       <assertions>
         <library>assert (built-in)</library>
         <example>assert result == expected</example>
-        <example>assert len(items) > 0</example>
+        <example>assert len(items) &gt; 0</example>
       </assertions>
       <mocking>
         <library>unittest.mock, pytest-mock</library>

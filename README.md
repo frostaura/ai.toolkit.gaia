@@ -13,86 +13,80 @@
 
 ## What is Gaia?
 
-Gaia is a team of AI agents that work together to build software for you. Just describe what you want, and Gaia handles the rest—architecture, code, tests, and documentation.
-
-**No complex setup. No learning curve. Just describe your idea.**
+Gaia is a **team of AI agents** designed to build and evolve software using **spec-driven development**.
+You describe your goal; Gaia coordinates architecture, implementation, testing, and documentation.
 
 ---
 
-## How to Use
+## How Gaia Works (Spec-Driven)
 
-### In VS Code
+- `docs/` is the **source of truth** for requirements and architecture.
+- **No drift**:
+  - If a spec describes a feature, it must exist in code.
+  - If code changes behavior, the spec must be updated.
+
+**Ownership:**
+- Architect owns `docs/` and architecture decisions.
+- Developer owns code/tests/migrations/infra.
+- Tester validates behavior and quality gates.
+- Analyst investigates bugs/perf and provides recommendations.
+- Orchestrator coordinates everything.
+
+The workflow contract lives in **`AGENTS.md`**.
+
+---
+
+## Using Gaia
+
+### In VS Code (recommended)
 
 1. Open your project folder in VS Code
-2. Make sure GitHub Copilot is enabled
-3. Start a chat and describe what you want to build
+2. Enable GitHub Copilot
+3. Start a chat and describe what you want
 
+Example:
 ```
 Build me a task management app with user login
 ```
 
-### In the Terminal
+### In the Terminal (Copilot CLI)
 
 ```bash
 npm i -g @github/copilot && copilot -p "<your project request>"
+```
 
-# Example:
-# "Create a REST API for a blog with posts and comments"
+Example:
+```bash
+copilot -p "Create a REST API for a blog with posts and comments"
 ```
 
 ---
 
-## Meet the Team
+## Repository Layout
 
-Gaia has 5 specialized agents that collaborate automatically:
+Gaia’s configuration lives in `.github/`:
 
-| Agent | What They Do |
-|-------|--------------|
-| **Orchestrator** | Coordinates the team and plans the work |
-| **Architect** | Designs the system and makes technology decisions |
-| **Developer** | Writes the code and tests |
-| **Tester** | Validates everything works correctly |
-| **Analyst** | Investigates issues and gathers insights |
+- `.github/copilot-instructions.md` — repo-wide Copilot context
+- `AGENTS.md` — agent workflow contract (permissions, delegation, tools)
+- `.github/agents/` — individual agent personas
+- `.github/skills/` — playbooks and best practices
+- `.github/mcp-config.json` — MCP servers (e.g. `gaia`, `playwright`)
 
-You don't need to talk to each agent—just describe your goal and they figure out what to do.
-
----
-
-## What Gaia Builds
-
-Gaia follows industry best practices to create:
-
-- Clean, maintainable code
-- Comprehensive tests
-- Clear documentation
-- Secure, scalable architecture
-
-The default stack includes .NET, React, PostgreSQL, and more—but Gaia adapts to your needs.
-
----
-
-## Project Structure
-
-When you use Gaia, your project will include:
-
+Application projects typically include:
 ```
-docs/           ← Design documents and specifications
-src/            ← Your application code
-tests/          ← Automated tests
+docs/           ← Specifications and design docs (Architect-owned)
+src/            ← Application code (Developer-owned)
+tests/          ← Automated tests (Developer-owned)
 ```
 
 ---
 
-## License
+## Notes for Gaia Maintainers
 
-MIT License - see [LICENSE](./LICENSE) for details.
+When scaffolding a new project, the **Architect** should replace this README with a project-specific README describing the actual application being built.
 
 ---
 
 <p align="center">
   <i>"In Greek mythology, Gaia is the personification of Earth and the ancestral mother of all life."</i>
 </p>
-
----
-
-> **Note for Gaia maintainers**: This README is a template for the Gaia toolkit itself. When scaffolding a new project for users, the **architect agent** should replace this with a project-specific README that describes the actual application being built.
