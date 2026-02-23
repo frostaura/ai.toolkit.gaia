@@ -19,7 +19,7 @@ namespace FrostAura.MCP.Gaia.Managers
     /// Uses a write queue to ensure no memories are lost when file is locked
     /// </summary>
     [McpServerToolType]
-    public class MemoryManager : IDisposable
+    public class MemoryManager
     {
         private readonly ILogger<MemoryManager> _logger;
         private const string ProjectsBasePath = "docs/projects";
@@ -37,7 +37,6 @@ namespace FrostAura.MCP.Gaia.Managers
         private static CancellationTokenSource? _cancellationTokenSource = new();
         private static readonly object _processorLock = new();
         private static bool _processorStarted = false;
-        private static bool _disposed = false;
 
         // Track pending writes for acknowledgment
         private static readonly ConcurrentDictionary<string, TaskCompletionSource<bool>> _pendingWrites = new();
@@ -72,7 +71,7 @@ namespace FrostAura.MCP.Gaia.Managers
         {
             lock (_processorLock)
             {
-                if (_processorStarted || _disposed) return;
+                if (_processorStarted) return;
 
                 // Reinitialize if previously disposed
                 if (_writeQueue == null || _writeQueue.IsAddingCompleted)
@@ -84,7 +83,6 @@ namespace FrostAura.MCP.Gaia.Managers
                     _cancellationTokenSource = new CancellationTokenSource();
                 }
 
-                _disposed = false;
                 _processorStarted = true;
 
                 _writeProcessorTask = Task.Run(async () =>
@@ -234,8 +232,8 @@ namespace FrostAura.MCP.Gaia.Managers
         /// </summary>
         private Task QueueWriteAsync(GaiaMemory memory, bool isDelete = false)
         {
-            // Check if disposed or queue unavailable - save synchronously as fallback
-            if (_disposed || _writeQueue == null || _writeQueue.IsAddingCompleted)
+            // Check if queue unavailable - save synchronously as fallback
+            if (_writeQueue == null || _writeQueue.IsAddingCompleted)
             {
                 _logger.LogWarning("[WRITE_QUEUE] Queue unavailable, saving synchronously | Key={Key}", memory.CompositeKey);
                 return SavePersistentMemoriesToDiskAsync();
@@ -410,35 +408,31 @@ namespace FrostAura.MCP.Gaia.Managers
         [McpServerTool]
         [Description("Store important decisions/context for later recalling. Upserts by category+key to prevent duplicates.")]
         public Task<RememberResponse> remember(
-            [Description("The project name this memory belongs to (e.g., 'my-web-app', 'gaia-toolkit'). Used to scope memories per project.")] string projectName = "default",
-            [Description("Category grouping for the memory (e.g., issue, workaround, config, pattern, decision)")] string category = "",
-            [Description("Unique key identifier within the category")] string key = "",
-            [Description("The actual content/value to remember")] string content = "",
-            [Description("Duration of memory persistence: SessionLength (lost on restart) or ProjectWide (permanently stored)")] MemoryDuration duration = MemoryDuration.SessionLength)
+            [Description("The memory to store")] RememberRequest request)
         {
             _logger.LogDebug(
                 "[MEMORY:STORE] Starting | Project={Project} | Category={Category} | Key={Key} | Duration={Duration} | ValueLength={ValueLength}",
-                projectName,
-                category,
-                key,
-                duration,
-                content?.Length ?? 0);
+                request.ProjectName,
+                request.Category,
+                request.Key,
+                request.Duration,
+                request.Value?.Length ?? 0);
 
             try
             {
                 var memory = new GaiaMemory
                 {
-                    ProjectName = SanitizeProjectName(projectName),
-                    Category = category,
-                    Key = key,
-                    Value = content ?? string.Empty,
-                    Duration = duration,
+                    ProjectName = SanitizeProjectName(request.ProjectName),
+                    Category = request.Category,
+                    Key = request.Key,
+                    Value = request.Value ?? string.Empty,
+                    Duration = request.Duration,
                     Updated = DateTime.UtcNow
                 };
                 var compositeKey = memory.CompositeKey;
 
                 // Select appropriate storage based on duration
-                var targetStorage = duration == MemoryDuration.ProjectWide
+                var targetStorage = request.Duration == MemoryDuration.ProjectWide
                     ? _persistentMemories
                     : _sessionMemories;
 
@@ -454,7 +448,7 @@ namespace FrostAura.MCP.Gaia.Managers
                 }
 
                 // For session memories, update immediately
-                if (duration == MemoryDuration.SessionLength)
+                if (request.Duration == MemoryDuration.SessionLength)
                 {
                     targetStorage[compositeKey] = memory;
                 }
@@ -472,11 +466,11 @@ namespace FrostAura.MCP.Gaia.Managers
                 {
                     _logger.LogInformation(
                         "[MEMORY:UPDATED] Project={Project} | Category={Category} | Key={Key} | Duration={Duration} | ValueLength={ValueLength} | Session={SessionCount} | Persistent={PersistentCount}",
-                        projectName,
-                        category,
-                        key,
-                        duration,
-                        content?.Length ?? 0,
+                        request.ProjectName,
+                        request.Category,
+                        request.Key,
+                        request.Duration,
+                        request.Value?.Length ?? 0,
                         _sessionMemories.Count,
                         _persistentMemories.Count);
                 }
@@ -484,11 +478,11 @@ namespace FrostAura.MCP.Gaia.Managers
                 {
                     _logger.LogInformation(
                         "[MEMORY:STORED] Project={Project} | Category={Category} | Key={Key} | Duration={Duration} | ValueLength={ValueLength} | Session={SessionCount} | Persistent={PersistentCount}",
-                        projectName,
-                        category,
-                        key,
-                        duration,
-                        content?.Length ?? 0,
+                        request.ProjectName,
+                        request.Category,
+                        request.Key,
+                        request.Duration,
+                        request.Value?.Length ?? 0,
                         _sessionMemories.Count,
                         _persistentMemories.Count);
                 }
@@ -496,7 +490,7 @@ namespace FrostAura.MCP.Gaia.Managers
                 return Task.FromResult(new RememberResponse
                 {
                     Success = true,
-                    Message = $"Memory {(isUpdate ? "updated" : "stored")} ({duration}): {category}/{key}",
+                    Message = $"Memory {(isUpdate ? "updated" : "stored")} ({request.Duration}): {request.Category}/{request.Key}",
                     WasUpdate = isUpdate,
                     Memory = memory
                 });
@@ -505,8 +499,8 @@ namespace FrostAura.MCP.Gaia.Managers
             {
                 _logger.LogError(ex,
                     "[MEMORY:STORE] Failed | Category={Category} | Key={Key} | Error={ErrorMessage}",
-                    category,
-                    key,
+                    request.Category,
+                    request.Key,
                     ex.Message);
 
                 return Task.FromResult(new RememberResponse
@@ -526,17 +520,15 @@ namespace FrostAura.MCP.Gaia.Managers
         [McpServerTool]
         [Description("Search previous decisions/context with fuzzy matching")]
         public Task<RecallResponse> recall(
-            [Description("The project name to search memories within (e.g., 'my-web-app', 'gaia-toolkit'). Memories are scoped per project.")] string projectName = "default",
-            [Description("Query to search for in memories (supports fuzzy search across category, key, and value)")] string query = "",
-            [Description("Maximum number of results to return (default: 20)")] int maxResults = 20)
+            [Description("The search request")] RecallRequest request)
         {
             var totalMemories = _sessionMemories.Count + _persistentMemories.Count;
 
             _logger.LogDebug(
                 "[MEMORY:RECALL] Starting | Project={Project} | Query={Query} | MaxResults={MaxResults} | Session={SessionCount} | Persistent={PersistentCount}",
-                projectName,
-                query,
-                maxResults,
+                request.ProjectName,
+                request.Query,
+                request.MaxResults,
                 _sessionMemories.Count,
                 _persistentMemories.Count);
 
@@ -544,24 +536,24 @@ namespace FrostAura.MCP.Gaia.Managers
             {
                 if (totalMemories == 0)
                 {
-                    _logger.LogInformation("[MEMORY:RECALL] No memories in store | Project={Project} | Query={Query}", projectName, query);
+                    _logger.LogInformation("[MEMORY:RECALL] No memories in store | Project={Project} | Query={Query}", request.ProjectName, request.Query);
 
                     return Task.FromResult(new RecallResponse
                     {
                         Count = 0,
                         TotalMatches = 0,
-                        Query = query,
+                        Query = request.Query,
                         Message = "No memories found. Use remember() to store memories first.",
                         Results = new List<MemorySearchResult>()
                     });
                 }
 
                 var scoredResults = new List<(GaiaMemory memory, double score)>();
-                var queryLower = query.ToLowerInvariant();
+                var queryLower = request.Query.ToLowerInvariant();
                 var queryWords = queryLower.Split(new[] { ' ', '-', '_', '.' }, StringSplitOptions.RemoveEmptyEntries);
 
                 // Aggregate all memories from both storages, filtered by project
-                var sanitizedProject = SanitizeProjectName(projectName);
+                var sanitizedProject = SanitizeProjectName(request.ProjectName);
                 var allMemories = _sessionMemories.Values
                     .Where(m => SanitizeProjectName(m.ProjectName) == sanitizedProject)
                     .Concat(_persistentMemories.Values
@@ -615,22 +607,22 @@ namespace FrostAura.MCP.Gaia.Managers
                 {
                     _logger.LogInformation(
                         "[MEMORY:RECALL] No matches | Query={Query} | SearchedMemories={SearchedCount}",
-                        query,
+                        request.Query,
                         totalMemories);
 
                     return Task.FromResult(new RecallResponse
                     {
                         Count = 0,
                         TotalMatches = 0,
-                        Query = query,
-                        Message = $"No memories found matching '{query}'",
+                        Query = request.Query,
+                        Message = $"No memories found matching '{request.Query}'",
                         Results = new List<MemorySearchResult>()
                     });
                 }
 
                 var topResults = scoredResults
                     .OrderByDescending(r => r.score)
-                    .Take(maxResults)
+                    .Take(request.MaxResults)
                     .Select(r => new MemorySearchResult
                     {
                         Memory = r.memory,
@@ -640,7 +632,7 @@ namespace FrostAura.MCP.Gaia.Managers
 
                 _logger.LogInformation(
                     "[MEMORY:RECALL] Completed | Query={Query} | TotalMatches={TotalMatches} | Returned={ReturnedCount} | TopScore={TopScore}",
-                    query,
+                    request.Query,
                     scoredResults.Count,
                     topResults.Count,
                     topResults.FirstOrDefault()?.Relevance ?? 0);
@@ -649,7 +641,7 @@ namespace FrostAura.MCP.Gaia.Managers
                 {
                     Count = topResults.Count,
                     TotalMatches = scoredResults.Count,
-                    Query = query,
+                    Query = request.Query,
                     Results = topResults
                 });
             }
@@ -657,14 +649,14 @@ namespace FrostAura.MCP.Gaia.Managers
             {
                 _logger.LogError(ex,
                     "[MEMORY:RECALL] Failed | Query={Query} | Error={ErrorMessage}",
-                    query,
+                    request.Query,
                     ex.Message);
 
                 return Task.FromResult(new RecallResponse
                 {
                     Count = 0,
                     TotalMatches = 0,
-                    Query = query,
+                    Query = request.Query,
                     Message = $"Error recalling memories: {ex.Message}",
                     Results = new List<MemorySearchResult>()
                 });
@@ -735,39 +727,5 @@ namespace FrostAura.MCP.Gaia.Managers
         /// <summary>
         /// Dispose and flush any pending writes
         /// </summary>
-        public void Dispose()
-        {
-            lock (_processorLock)
-            {
-                if (_disposed) return;
-                _disposed = true;
-                _processorStarted = false;
-            }
-
-            _logger.LogInformation("[MEMORY:DISPOSE] Disposing MemoryManager, flushing pending writes");
-
-            try
-            {
-                _cancellationTokenSource?.Cancel();
-
-                // Wait for write processor to complete (with timeout)
-                if (_writeProcessorTask != null)
-                {
-                    _writeProcessorTask.Wait(TimeSpan.FromSeconds(5));
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "[MEMORY:DISPOSE] Error during disposal | Error={ErrorMessage}", ex.Message);
-            }
-            finally
-            {
-                try
-                {
-                    _writeQueue?.CompleteAdding();
-                }
-                catch { /* Ignore if already completed */ }
-            }
-        }
     }
 }

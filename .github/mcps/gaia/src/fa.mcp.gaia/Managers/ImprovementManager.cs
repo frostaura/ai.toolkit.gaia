@@ -19,7 +19,7 @@ namespace FrostAura.MCP.Gaia.Managers
     /// Persists to docs/improvements.json for review and implementation
     /// </summary>
     [McpServerToolType]
-    public class ImprovementManager : IDisposable
+    public class ImprovementManager
     {
         private readonly ILogger<ImprovementManager> _logger;
         private const string ImprovementsPath = "docs/improvements.json";
@@ -34,7 +34,6 @@ namespace FrostAura.MCP.Gaia.Managers
         private static CancellationTokenSource? _cancellationTokenSource = new();
         private static readonly object _processorLock = new();
         private static bool _processorStarted = false;
-        private static bool _disposed = false;
 
         // Track pending writes for acknowledgment
         private static readonly ConcurrentDictionary<string, TaskCompletionSource<bool>> _pendingWrites = new();
@@ -67,7 +66,7 @@ namespace FrostAura.MCP.Gaia.Managers
         {
             lock (_processorLock)
             {
-                if (_processorStarted || _disposed) return;
+                if (_processorStarted) return;
 
                 // Reinitialize if previously disposed
                 if (_writeQueue == null || _writeQueue.IsAddingCompleted)
@@ -79,7 +78,6 @@ namespace FrostAura.MCP.Gaia.Managers
                     _cancellationTokenSource = new CancellationTokenSource();
                 }
 
-                _disposed = false;
                 _processorStarted = true;
 
                 _writeProcessorTask = Task.Run(async () =>
@@ -206,8 +204,8 @@ namespace FrostAura.MCP.Gaia.Managers
         /// </summary>
         private Task QueueWriteAsync(GaiaImprovement improvement)
         {
-            // Check if disposed or queue unavailable - save synchronously as fallback
-            if (_disposed || _writeQueue == null || _writeQueue.IsAddingCompleted)
+            // Check if queue unavailable - save synchronously as fallback
+            if (_writeQueue == null || _writeQueue.IsAddingCompleted)
             {
                 _logger.LogWarning("[WRITE_QUEUE] Queue unavailable, saving synchronously | Id={Id}", improvement.Id);
                 return SaveImprovementsToDiskAsync();
@@ -355,34 +353,27 @@ namespace FrostAura.MCP.Gaia.Managers
         [McpServerTool]
         [Description("Log an improvement request when you encounter frustrations, missing capabilities, or workflow inefficiencies. Use this to wish improvements into existence!")]
         public Task<LogImprovementResponse> log_improvement(
-            [Description("Type of improvement: PainPoint, MissingCapability, WorkflowImprovement, KnowledgeGap, Enhancement")] ImprovementType type = ImprovementType.Enhancement,
-            [Description("The agent logging this improvement (e.g., architect, developer, analyst, tester)")] string agent = "",
-            [Description("The project where this improvement was identified (optional, for cross-project context)")] string? projectName = null,
-            [Description("Brief title/summary of the improvement (2-10 words)")] string title = "",
-            [Description("Detailed description of the issue, frustration, or opportunity")] string description = "",
-            [Description("What was the agent trying to accomplish when this issue was encountered (optional)")] string? context = null,
-            [Description("Specific suggestions on how to address this improvement (optional)")] string? suggestion = null,
-            [Description("Priority level: Low, Medium, High, Critical (default: Medium)")] string priority = "Medium")
+            [Description("The improvement request to log")] LogImprovementRequest request)
         {
             _logger.LogDebug(
                 "[IMPROVEMENT:LOG] Starting | Agent={Agent} | Type={Type} | Title={Title}",
-                agent,
-                type,
-                title);
+                request.Agent,
+                request.Type,
+                request.Title);
 
             try
             {
                 var improvement = new GaiaImprovement
                 {
                     Id = Guid.NewGuid().ToString(),
-                    Type = type,
-                    Agent = agent,
-                    ProjectName = projectName,
-                    Title = title,
-                    Description = description,
-                    Context = context,
-                    Suggestion = suggestion,
-                    Priority = priority,
+                    Type = request.Type,
+                    Agent = request.Agent,
+                    ProjectName = request.ProjectName,
+                    Title = request.Title,
+                    Description = request.Description,
+                    Context = request.Context,
+                    Suggestion = request.Suggestion,
+                    Priority = request.Priority,
                     Status = "Logged",
                     Created = DateTime.UtcNow,
                     Updated = DateTime.UtcNow
@@ -396,16 +387,16 @@ namespace FrostAura.MCP.Gaia.Managers
 
                 _logger.LogInformation(
                     "[IMPROVEMENT:LOGGED] Agent={Agent} | Type={Type} | Priority={Priority} | Title={Title} | TotalImprovements={TotalImprovements}",
-                    agent,
-                    type,
-                    priority,
-                    title,
+                    request.Agent,
+                    request.Type,
+                    request.Priority,
+                    request.Title,
                     _improvements.Count);
 
                 return Task.FromResult(new LogImprovementResponse
                 {
                     Success = true,
-                    Message = $"Improvement logged successfully: {title}. Your feedback helps evolve the system!",
+                    Message = $"Improvement logged successfully: {request.Title}. Your feedback helps evolve the system!",
                     Improvement = improvement
                 });
             }
@@ -413,8 +404,8 @@ namespace FrostAura.MCP.Gaia.Managers
             {
                 _logger.LogError(ex,
                     "[IMPROVEMENT:LOG] Failed | Agent={Agent} | Type={Type} | Error={ErrorMessage}",
-                    agent,
-                    type,
+                    request.Agent,
+                    request.Type,
                     ex.Message);
 
                 return Task.FromResult(new LogImprovementResponse
@@ -528,42 +519,5 @@ namespace FrostAura.MCP.Gaia.Managers
             };
         }
 
-        /// <summary>
-        /// Dispose and flush any pending writes
-        /// </summary>
-        public void Dispose()
-        {
-            lock (_processorLock)
-            {
-                if (_disposed) return;
-                _disposed = true;
-                _processorStarted = false;
-            }
-
-            _logger.LogInformation("[IMPROVEMENT:DISPOSE] Disposing ImprovementManager, flushing pending writes");
-
-            try
-            {
-                _cancellationTokenSource?.Cancel();
-
-                // Wait for write processor to complete (with timeout)
-                if (_writeProcessorTask != null)
-                {
-                    _writeProcessorTask.Wait(TimeSpan.FromSeconds(5));
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "[IMPROVEMENT:DISPOSE] Error during disposal | Error={ErrorMessage}", ex.Message);
-            }
-            finally
-            {
-                try
-                {
-                    _writeQueue?.CompleteAdding();
-                }
-                catch { /* Ignore if already completed */ }
-            }
-        }
     }
 }

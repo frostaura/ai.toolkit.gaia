@@ -17,7 +17,7 @@ namespace FrostAura.MCP.Gaia.Managers
     /// Uses per-project isolation with TTL to prevent cross-user interference
     /// </summary>
     [McpServerToolType]
-    public class TaskManager : IDisposable
+    public class TaskManager
     {
         private readonly ILogger<TaskManager> _logger;
 
@@ -32,7 +32,6 @@ namespace FrostAura.MCP.Gaia.Managers
         private static Timer? _cleanupTimer;
         private static readonly object _cleanupLock = new();
         private static bool _cleanupStarted = false;
-        private static bool _disposed = false;
 
         // Cleanup interval (check every 5 minutes)
         private static readonly TimeSpan CleanupInterval = TimeSpan.FromMinutes(5);
@@ -59,7 +58,7 @@ namespace FrostAura.MCP.Gaia.Managers
         {
             lock (_cleanupLock)
             {
-                if (_cleanupStarted || _disposed) return;
+                if (_cleanupStarted) return;
 
                 _cleanupStarted = true;
                 _cleanupTimer = new Timer(
@@ -188,23 +187,19 @@ namespace FrostAura.MCP.Gaia.Managers
         [McpServerTool]
         [Description("Update or add a task with structured data")]
         public Task<UpdateTaskResponse> update_task(
-            [Description("The project name this task belongs to (e.g., 'my-web-app', 'gaia-toolkit'). Tasks are scoped per project.")] string projectName = "default",
-            [Description("Unique identifier for the task (e.g., E-1/S-1/F-1/T-1 for hierarchical WBS)")] string taskId = "",
-            [Description("Detailed description of what the task involves")] string description = "",
-            [Description("Current status of the task: Pending, InProgress, Completed, Blocked, or Cancelled")] GaiaTaskStatus status = GaiaTaskStatus.Pending,
-            [Description("The agent or person assigned to complete this task (optional)")] string? assignedTo = null)
+            [Description("The task to create or update")] UpdateTaskRequest request)
         {
             _logger.LogDebug(
                 "[TASK:UPDATE] Starting | Project={Project} | TaskId={TaskId} | Status={Status} | AssignedTo={AssignedTo}",
-                projectName,
-                taskId,
-                status,
-                assignedTo ?? "(unassigned)");
+                request.ProjectName,
+                request.TaskId,
+                request.Status,
+                request.AssignedTo ?? "(unassigned)");
 
             try
             {
-                var sanitizedProject = SanitizeProjectName(projectName);
-                var normalizedId = taskId?.Replace(" ", "_").ToLowerInvariant() ?? Guid.NewGuid().ToString();
+                var sanitizedProject = SanitizeProjectName(request.ProjectName);
+                var normalizedId = request.TaskId?.Replace(" ", "_").ToLowerInvariant() ?? Guid.NewGuid().ToString();
                 var store = GetOrCreateProjectStore(sanitizedProject);
                 var isUpdate = store.Tasks.TryGetValue(normalizedId, out var existingTask);
                 var previousStatus = existingTask?.Status;
@@ -213,9 +208,9 @@ namespace FrostAura.MCP.Gaia.Managers
                 {
                     ProjectName = sanitizedProject,
                     Id = normalizedId,
-                    Description = description,
-                    Status = status,
-                    AssignedTo = string.IsNullOrWhiteSpace(assignedTo) ? null : assignedTo,
+                    Description = request.Description,
+                    Status = request.Status,
+                    AssignedTo = string.IsNullOrWhiteSpace(request.AssignedTo) ? null : request.AssignedTo,
                     Created = existingTask?.Created ?? DateTime.UtcNow,
                     Updated = DateTime.UtcNow
                 };
@@ -229,7 +224,7 @@ namespace FrostAura.MCP.Gaia.Managers
                         sanitizedProject,
                         normalizedId,
                         previousStatus,
-                        status,
+                        request.Status,
                         task.AssignedTo ?? "(unassigned)",
                         store.Tasks.Count);
                 }
@@ -239,7 +234,7 @@ namespace FrostAura.MCP.Gaia.Managers
                         "[TASK:CREATED] Project={Project} | TaskId={TaskId} | Status={Status} | AssignedTo={AssignedTo} | ProjectTasks={ProjectTasks}",
                         sanitizedProject,
                         normalizedId,
-                        status,
+                        request.Status,
                         task.AssignedTo ?? "(unassigned)",
                         store.Tasks.Count);
                 }
@@ -247,7 +242,7 @@ namespace FrostAura.MCP.Gaia.Managers
                 return Task.FromResult(new UpdateTaskResponse
                 {
                     Success = true,
-                    Message = $"Task '{taskId}' {(isUpdate ? "updated" : "added")} with status: {status}",
+                    Message = $"Task '{request.TaskId}' {(isUpdate ? "updated" : "added")} with status: {request.Status}",
                     Task = task
                 });
             }
@@ -255,8 +250,8 @@ namespace FrostAura.MCP.Gaia.Managers
             {
                 _logger.LogError(ex,
                     "[TASK:UPDATE] Failed | Project={Project} | TaskId={TaskId} | Error={ErrorMessage}",
-                    projectName,
-                    taskId,
+                    request.ProjectName,
+                    request.TaskId,
                     ex.Message);
 
                 return Task.FromResult(new UpdateTaskResponse
@@ -332,24 +327,5 @@ namespace FrostAura.MCP.Gaia.Managers
             });
         }
 
-        /// <summary>
-        /// Dispose of managed resources
-        /// </summary>
-        public void Dispose()
-        {
-            lock (_cleanupLock)
-            {
-                if (_disposed) return;
-                _disposed = true;
-                _cleanupStarted = false;
-
-                _cleanupTimer?.Dispose();
-                _cleanupTimer = null;
-
-                _logger.LogInformation("[TASK:SHUTDOWN] TaskManager disposed | Projects={ProjectCount} | TotalTasks={TaskCount}",
-                    _projectStores.Count,
-                    _projectStores.Values.Sum(s => s.Tasks.Count));
-            }
-        }
     }
 }

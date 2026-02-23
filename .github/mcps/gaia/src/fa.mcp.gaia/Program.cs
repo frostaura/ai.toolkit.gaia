@@ -69,7 +69,7 @@ else
 
 static void RegisterManagers(IServiceCollection services)
 {
-    services.AddScoped<TaskManager>();
+    services.AddSingleton<TaskManager>();
     services.AddSingleton<MemoryManager>();
     services.AddSingleton<ImprovementManager>();
 }
