@@ -9,7 +9,10 @@ It complements:
 ## 0) Default Rule
 
 For anything beyond a single obvious action, **start with `gaia-workload-orchestrator`**.
-It decomposes the request, routes to the correct agent(s), and manages handoffs.
+It classifies the request into one of three tiers:
+- **Rapid** — trivial/straightforward changes: skip all ceremony, just execute directly.
+- **Standard** — moderate complexity: recall context, delegate to one agent, remember learnings.
+- **Full** — complex/cross-cutting work: full multi-agent orchestration with tasks, specs, and handoffs.
 
 ## 1) Spec-Driven Development
 
@@ -61,25 +64,31 @@ Hard rule: **If you spend >2 minutes outside your domain, delegate.**
 Gaia ships MCP servers in `.github/mcp-config.json` (e.g. `gaia`, `playwright`). Use them aggressively.
 
 ### Memory
-- **Always call `gaia-recall` first** before starting work.
+- **Always call `gaia-recall` first** before starting work (include `projectName`).
 - **Always call `gaia-remember`** after:
   - decisions + rationale
   - reusable patterns
   - workarounds/edge cases
   - user preferences/context
+- **Always pass `projectName`** to both `gaia-recall` and `gaia-remember`. Memories are scoped per project.
 
 Recommended categories: `pattern`, `decision`, `workaround`, `context`, `lesson`.
 
 ### Tasks
 For any multi-step work:
-- create tasks **before** starting (`gaia-update_task`)
+- create tasks **before** starting (`gaia-update_task` with `projectName`)
 - update progress **during**
 - mark complete **after**
+- **Always pass `projectName`** — tasks are scoped per project.
 Also use tasks for cross-agent handoffs.
 
 ### Improvements
-Log friction immediately with `gaia-log_improvement`:
+Log friction **immediately and aggressively** with `gaia-log_improvement`:
 - `PainPoint`, `MissingCapability`, `WorkflowImprovement`, `KnowledgeGap`
+- **Include `projectName`** in every improvement log for cross-project context.
+- Improvements are universal (not project-scoped) but must note which project triggered them.
+- **Do not wait** until end of session to log — log as soon as friction is detected.
+- When in doubt, **log it**. Over-logging is preferable to under-logging.
 
 Minimum: for complex tasks, log at least one improvement **if any friction occurred**.
 

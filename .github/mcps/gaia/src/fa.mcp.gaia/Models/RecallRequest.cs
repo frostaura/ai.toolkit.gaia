@@ -8,6 +8,9 @@ namespace FrostAura.MCP.Gaia.Models
     [Description("Request to search for memories")]
     public class RecallRequest
     {
+        [Description("The project name to search memories within (e.g., 'my-web-app', 'gaia-toolkit'). Memories are scoped per project.")]
+        public string ProjectName { get; set; } = "default";
+
         [Description("Query to search for in memories (supports fuzzy search across category, key, and value)")]
         public string Query { get; set; } = string.Empty;
 

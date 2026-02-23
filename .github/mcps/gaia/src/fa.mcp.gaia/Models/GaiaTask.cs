@@ -10,6 +10,9 @@ namespace FrostAura.MCP.Gaia.Models
     [Description("A task representing a unit of work to be completed")]
     public class GaiaTask
     {
+        [Description("The project this task belongs to (used for project-scoped task management)")]
+        public string ProjectName { get; set; } = "default";
+
         [Description("Unique identifier for the task (e.g., E-1/S-1/F-1/T-1 for hierarchical WBS)")]
         public string Id { get; set; } = string.Empty;
 

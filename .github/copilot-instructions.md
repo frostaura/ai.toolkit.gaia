@@ -34,3 +34,9 @@ For agent workflow rules, permissions, delegation, and tool requirements, see **
 - Bugs/perf/investigation → **Analyst**
 - Validation/regression/security review → **Tester**
 - Multi-step work/coordination → **Workload Orchestrator**
+
+## Project-Scoped Tools
+
+- All Gaia MCP tools (`recall`, `remember`, `update_task`, `read_tasks`, `clear_tasks`, `clear_memories`) require a **`projectName`** parameter. Memories and tasks are persisted per project.
+- `log_improvement` accepts an optional `projectName` for context. Improvements are universal but should note which project triggered them.
+- Derive the project name from the repository or workspace folder name and pass it consistently to all tool calls.

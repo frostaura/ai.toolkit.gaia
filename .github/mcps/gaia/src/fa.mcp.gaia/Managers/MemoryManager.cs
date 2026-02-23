@@ -22,7 +22,7 @@ namespace FrostAura.MCP.Gaia.Managers
     public class MemoryManager : IDisposable
     {
         private readonly ILogger<MemoryManager> _logger;
-        private const string PersistentMemoryPath = "docs/memory.json";
+        private const string ProjectsBasePath = "docs/projects";
         private static readonly SemaphoreSlim _fileSemaphore = new(1, 1);
 
         // Thread-safe in-memory storage - session-level memories (lost on service restart)
@@ -279,48 +279,68 @@ namespace FrostAura.MCP.Gaia.Managers
         }
 
         /// <summary>
-        /// Load persistent memories from disk
+        /// Get the file path for a project's memory file
+        /// </summary>
+        private static string GetProjectMemoryPath(string projectName)
+        {
+            var sanitized = SanitizeProjectName(projectName);
+            return Path.Combine(ProjectsBasePath, sanitized, "memory.json");
+        }
+
+        /// <summary>
+        /// Sanitize a project name for safe file system usage
+        /// </summary>
+        private static string SanitizeProjectName(string projectName)
+        {
+            if (string.IsNullOrWhiteSpace(projectName)) return "default";
+            var sanitized = new string(projectName.Where(c => char.IsLetterOrDigit(c) || c == '-' || c == '_' || c == '.').ToArray());
+            sanitized = sanitized.Trim('.').ToLowerInvariant();
+            return string.IsNullOrEmpty(sanitized) ? "default" : sanitized;
+        }
+
+        /// <summary>
+        /// Load persistent memories from disk (scans all project directories)
         /// </summary>
         private async Task LoadPersistentMemoriesAsync()
         {
             try
             {
-                if (!File.Exists(PersistentMemoryPath))
+                if (!Directory.Exists(ProjectsBasePath))
                 {
-                    _logger.LogDebug("[MEMORY:LOAD] No persistent memory file found at {Path}, creating empty file", PersistentMemoryPath);
-
-                    // Create the directory and empty file if it doesn't exist
-                    var directory = Path.GetDirectoryName(PersistentMemoryPath);
-                    if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
-                    {
-                        Directory.CreateDirectory(directory);
-                    }
-
-                    // Create an empty JSON array file
-                    await File.WriteAllTextAsync(PersistentMemoryPath, "[]");
-                    _logger.LogInformation("[MEMORY:LOAD] Created new persistent memory file at {Path}", PersistentMemoryPath);
+                    _logger.LogDebug("[MEMORY:LOAD] No projects directory found at {Path}, creating it", ProjectsBasePath);
+                    Directory.CreateDirectory(ProjectsBasePath);
                     return;
                 }
+
+                var memoryFiles = Directory.GetFiles(ProjectsBasePath, "memory.json", SearchOption.AllDirectories);
 
                 await _fileSemaphore.WaitAsync();
                 try
                 {
-                    var json = await File.ReadAllTextAsync(PersistentMemoryPath);
-                    var memories = JsonSerializer.Deserialize<List<GaiaMemory>>(json);
-
-                    if (memories != null)
+                    _persistentMemories.Clear();
+                    foreach (var file in memoryFiles)
                     {
-                        _persistentMemories.Clear();
-                        foreach (var memory in memories)
-                        {
-                            _persistentMemories[memory.CompositeKey] = memory;
-                        }
+                        var json = await File.ReadAllTextAsync(file);
+                        var memories = JsonSerializer.Deserialize<List<GaiaMemory>>(json);
 
-                        _logger.LogInformation(
-                            "[MEMORY:LOAD] Loaded {Count} persistent memories from {Path}",
-                            memories.Count,
-                            PersistentMemoryPath);
+                        if (memories != null)
+                        {
+                            foreach (var memory in memories)
+                            {
+                                _persistentMemories[memory.CompositeKey] = memory;
+                            }
+
+                            _logger.LogInformation(
+                                "[MEMORY:LOAD] Loaded {Count} memories from {Path}",
+                                memories.Count,
+                                file);
+                        }
                     }
+
+                    _logger.LogInformation(
+                        "[MEMORY:LOAD] Total: {Count} persistent memories loaded from {FileCount} project(s)",
+                        _persistentMemories.Count,
+                        memoryFiles.Length);
                 }
                 finally
                 {
@@ -334,7 +354,7 @@ namespace FrostAura.MCP.Gaia.Managers
         }
 
         /// <summary>
-        /// Save persistent memories to disk (called only by write processor)
+        /// Save persistent memories to disk grouped by project (called only by write processor)
         /// </summary>
         private async Task SavePersistentMemoriesToDiskAsync()
         {
@@ -343,24 +363,34 @@ namespace FrostAura.MCP.Gaia.Managers
                 await _fileSemaphore.WaitAsync();
                 try
                 {
-                    var directory = Path.GetDirectoryName(PersistentMemoryPath);
-                    if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                    // Group memories by project and save each to its own file
+                    var byProject = _persistentMemories.Values
+                        .GroupBy(m => SanitizeProjectName(m.ProjectName))
+                        .ToList();
+
+                    foreach (var group in byProject)
                     {
-                        Directory.CreateDirectory(directory);
+                        var path = GetProjectMemoryPath(group.Key);
+                        var directory = Path.GetDirectoryName(path);
+                        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                        {
+                            Directory.CreateDirectory(directory);
+                        }
+
+                        var memories = group.OrderBy(m => m.Category).ThenBy(m => m.Key).ToList();
+                        var json = JsonSerializer.Serialize(memories, new JsonSerializerOptions
+                        {
+                            WriteIndented = true
+                        });
+
+                        await File.WriteAllTextAsync(path, json);
+
+                        _logger.LogDebug(
+                            "[MEMORY:SAVE] Saved {Count} memories for project '{Project}' to {Path}",
+                            memories.Count,
+                            group.Key,
+                            path);
                     }
-
-                    var memories = _persistentMemories.Values.OrderBy(m => m.Category).ThenBy(m => m.Key).ToList();
-                    var json = JsonSerializer.Serialize(memories, new JsonSerializerOptions
-                    {
-                        WriteIndented = true
-                    });
-
-                    await File.WriteAllTextAsync(PersistentMemoryPath, json);
-
-                    _logger.LogDebug(
-                        "[MEMORY:SAVE] Saved {Count} persistent memories to {Path}",
-                        memories.Count,
-                        PersistentMemoryPath);
                 }
                 finally
                 {
@@ -383,7 +413,8 @@ namespace FrostAura.MCP.Gaia.Managers
             [Description("The memory to store")] RememberRequest request)
         {
             _logger.LogDebug(
-                "[MEMORY:STORE] Starting | Category={Category} | Key={Key} | Duration={Duration} | ValueLength={ValueLength}",
+                "[MEMORY:STORE] Starting | Project={Project} | Category={Category} | Key={Key} | Duration={Duration} | ValueLength={ValueLength}",
+                request.ProjectName,
                 request.Category,
                 request.Key,
                 request.Duration,
@@ -393,6 +424,7 @@ namespace FrostAura.MCP.Gaia.Managers
             {
                 var memory = new GaiaMemory
                 {
+                    ProjectName = SanitizeProjectName(request.ProjectName),
                     Category = request.Category,
                     Key = request.Key,
                     Value = request.Value ?? string.Empty,
@@ -435,7 +467,8 @@ namespace FrostAura.MCP.Gaia.Managers
                 if (isUpdate)
                 {
                     _logger.LogInformation(
-                        "[MEMORY:UPDATED] Category={Category} | Key={Key} | Duration={Duration} | ValueLength={ValueLength} | Session={SessionCount} | Persistent={PersistentCount}",
+                        "[MEMORY:UPDATED] Project={Project} | Category={Category} | Key={Key} | Duration={Duration} | ValueLength={ValueLength} | Session={SessionCount} | Persistent={PersistentCount}",
+                        request.ProjectName,
                         request.Category,
                         request.Key,
                         request.Duration,
@@ -446,7 +479,8 @@ namespace FrostAura.MCP.Gaia.Managers
                 else
                 {
                     _logger.LogInformation(
-                        "[MEMORY:STORED] Category={Category} | Key={Key} | Duration={Duration} | ValueLength={ValueLength} | Session={SessionCount} | Persistent={PersistentCount}",
+                        "[MEMORY:STORED] Project={Project} | Category={Category} | Key={Key} | Duration={Duration} | ValueLength={ValueLength} | Session={SessionCount} | Persistent={PersistentCount}",
+                        request.ProjectName,
                         request.Category,
                         request.Key,
                         request.Duration,
@@ -493,7 +527,8 @@ namespace FrostAura.MCP.Gaia.Managers
             var totalMemories = _sessionMemories.Count + _persistentMemories.Count;
 
             _logger.LogDebug(
-                "[MEMORY:RECALL] Starting | Query={Query} | MaxResults={MaxResults} | Session={SessionCount} | Persistent={PersistentCount}",
+                "[MEMORY:RECALL] Starting | Project={Project} | Query={Query} | MaxResults={MaxResults} | Session={SessionCount} | Persistent={PersistentCount}",
+                request.ProjectName,
                 request.Query,
                 request.MaxResults,
                 _sessionMemories.Count,
@@ -503,7 +538,7 @@ namespace FrostAura.MCP.Gaia.Managers
             {
                 if (totalMemories == 0)
                 {
-                    _logger.LogInformation("[MEMORY:RECALL] No memories in store | Query={Query}", request.Query);
+                    _logger.LogInformation("[MEMORY:RECALL] No memories in store | Project={Project} | Query={Query}", request.ProjectName, request.Query);
 
                     return Task.FromResult(new RecallResponse
                     {
@@ -519,8 +554,12 @@ namespace FrostAura.MCP.Gaia.Managers
                 var queryLower = request.Query.ToLowerInvariant();
                 var queryWords = queryLower.Split(new[] { ' ', '-', '_', '.' }, StringSplitOptions.RemoveEmptyEntries);
 
-                // Aggregate all memories from both storages
-                var allMemories = _sessionMemories.Values.Concat(_persistentMemories.Values);
+                // Aggregate all memories from both storages, filtered by project
+                var sanitizedProject = SanitizeProjectName(request.ProjectName);
+                var allMemories = _sessionMemories.Values
+                    .Where(m => SanitizeProjectName(m.ProjectName) == sanitizedProject)
+                    .Concat(_persistentMemories.Values
+                        .Where(m => SanitizeProjectName(m.ProjectName) == sanitizedProject));
 
                 foreach (var memory in allMemories)
                 {
@@ -630,29 +669,59 @@ namespace FrostAura.MCP.Gaia.Managers
         /// Clear all memories (useful for starting fresh)
         /// </summary>
         [McpServerTool]
-        [Description("Clear all memories from memory (useful for starting fresh)")]
-        public async Task<ClearResponse> clear_memories()
+        [Description("Clear all memories from memory (useful for starting fresh). Optionally scoped to a specific project.")]
+        public async Task<ClearResponse> clear_memories(
+            [Description("Optional project name to clear memories for. If not provided, clears all memories.")] string? projectName = null)
         {
-            var sessionCount = _sessionMemories.Count;
-            var persistentCount = _persistentMemories.Count;
+            int sessionCount;
+            int persistentCount;
+
+            if (!string.IsNullOrWhiteSpace(projectName))
+            {
+                var sanitizedProject = SanitizeProjectName(projectName);
+
+                var sessionKeysToRemove = _sessionMemories
+                    .Where(kvp => SanitizeProjectName(kvp.Value.ProjectName) == sanitizedProject)
+                    .Select(kvp => kvp.Key).ToList();
+                sessionCount = sessionKeysToRemove.Count;
+                foreach (var key in sessionKeysToRemove)
+                    _sessionMemories.TryRemove(key, out _);
+
+                var persistentKeysToRemove = _persistentMemories
+                    .Where(kvp => SanitizeProjectName(kvp.Value.ProjectName) == sanitizedProject)
+                    .Select(kvp => kvp.Key).ToList();
+                persistentCount = persistentKeysToRemove.Count;
+                foreach (var key in persistentKeysToRemove)
+                    _persistentMemories.TryRemove(key, out _);
+
+                await SavePersistentMemoriesToDiskAsync();
+
+                _logger.LogWarning(
+                    "[MEMORY:CLEAR] Memories cleared for project '{Project}' | SessionCleared={SessionCount} | PersistentCleared={PersistentCount}",
+                    sanitizedProject, sessionCount, persistentCount);
+            }
+            else
+            {
+                sessionCount = _sessionMemories.Count;
+                persistentCount = _persistentMemories.Count;
+
+                _sessionMemories.Clear();
+                _persistentMemories.Clear();
+
+                await SavePersistentMemoriesToDiskAsync();
+
+                _logger.LogWarning(
+                    "[MEMORY:CLEAR] All memories cleared | SessionCleared={SessionCount} | PersistentCleared={PersistentCount} | TotalCleared={TotalCount}",
+                    sessionCount, persistentCount, sessionCount + persistentCount);
+            }
+
             var totalCount = sessionCount + persistentCount;
-
-            _sessionMemories.Clear();
-            _persistentMemories.Clear();
-
-            // Clear the persistent file directly (bypass queue for immediate effect)
-            await SavePersistentMemoriesToDiskAsync();
-
-            _logger.LogWarning(
-                "[MEMORY:CLEAR] All memories cleared | SessionCleared={SessionCount} | PersistentCleared={PersistentCount} | TotalCleared={TotalCount}",
-                sessionCount,
-                persistentCount,
-                totalCount);
-
             return new ClearResponse
             {
                 Success = true,
-                Message = $"Cleared {totalCount} memories (Session: {sessionCount}, Persistent: {persistentCount})",
+                Message = string.IsNullOrWhiteSpace(projectName)
+                    ? $"Cleared {totalCount} memories (Session: {sessionCount}, Persistent: {persistentCount})"
+                    : $"Cleared {totalCount} memories for project '{projectName}' (Session: {sessionCount}, Persistent: {persistentCount})",
                 ClearedCount = totalCount
             };
         }

@@ -19,6 +19,10 @@ namespace FrostAura.MCP.Gaia.Models
         [Description("The agent that logged this improvement request")]
         public string Agent { get; set; } = string.Empty;
 
+        [Description("The project where this improvement was identified (optional, for context)")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? ProjectName { get; set; }
+
         [Description("Brief title/summary of the improvement")]
         public string Title { get; set; } = string.Empty;
 

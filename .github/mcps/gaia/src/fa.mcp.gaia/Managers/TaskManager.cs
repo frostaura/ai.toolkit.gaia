@@ -36,13 +36,15 @@ namespace FrostAura.MCP.Gaia.Managers
         [McpServerTool]
         [Description("Get current tasks from in-memory storage with optional filtering")]
         public Task<ReadTasksResponse> read_tasks(
+            [Description("The project name to filter tasks by (e.g., 'my-web-app', 'gaia-toolkit')")] string projectName = "default",
             [Description("Hide completed and cancelled tasks (default: false)")] bool hideCompleted = false)
         {
-            _logger.LogDebug("[TASK:READ] Starting | Filter={Filter}", hideCompleted ? "active only" : "all");
+            var sanitizedProject = SanitizeProjectName(projectName);
+            _logger.LogDebug("[TASK:READ] Starting | Project={Project} | Filter={Filter}", sanitizedProject, hideCompleted ? "active only" : "all");
 
             try
             {
-                var tasks = _tasks.Values.AsEnumerable();
+                var tasks = _tasks.Values.Where(t => SanitizeProjectName(t.ProjectName) == sanitizedProject).AsEnumerable();
 
                 if (hideCompleted)
                 {
@@ -93,20 +95,23 @@ namespace FrostAura.MCP.Gaia.Managers
             [Description("The task to create or update")] UpdateTaskRequest request)
         {
             _logger.LogDebug(
-                "[TASK:UPDATE] Starting | TaskId={TaskId} | Status={Status} | AssignedTo={AssignedTo}",
+                "[TASK:UPDATE] Starting | Project={Project} | TaskId={TaskId} | Status={Status} | AssignedTo={AssignedTo}",
+                request.ProjectName,
                 request.TaskId,
                 request.Status,
                 request.AssignedTo ?? "(unassigned)");
 
             try
             {
-                var normalizedId = request.TaskId?.Replace(" ", "_").ToLowerInvariant() ?? Guid.NewGuid().ToString();
+                var sanitizedProject = SanitizeProjectName(request.ProjectName);
+                var normalizedId = $"{sanitizedProject}/{request.TaskId?.Replace(" ", "_").ToLowerInvariant() ?? Guid.NewGuid().ToString()}";
                 var isUpdate = _tasks.TryGetValue(normalizedId, out var existingTask);
                 var previousStatus = existingTask?.Status;
 
                 var task = new GaiaTask
                 {
-                    Id = normalizedId,
+                    ProjectName = sanitizedProject,
+                    Id = request.TaskId?.Replace(" ", "_").ToLowerInvariant() ?? Guid.NewGuid().ToString(),
                     Description = request.Description,
                     Status = request.Status,
                     AssignedTo = string.IsNullOrWhiteSpace(request.AssignedTo) ? null : request.AssignedTo,
@@ -160,19 +165,53 @@ namespace FrostAura.MCP.Gaia.Managers
         }
 
         /// <summary>
+        /// Sanitize a project name for safe usage
+        /// </summary>
+        private static string SanitizeProjectName(string? projectName)
+        {
+            if (string.IsNullOrWhiteSpace(projectName)) return "default";
+            var sanitized = new string(projectName.Where(c => char.IsLetterOrDigit(c) || c == '-' || c == '_' || c == '.').ToArray());
+            sanitized = sanitized.Trim('.').ToLowerInvariant();
+            return string.IsNullOrEmpty(sanitized) ? "default" : sanitized;
+        }
+
+        /// <summary>
         /// Clear all tasks (useful for starting fresh)
         /// </summary>
         [McpServerTool]
         [Description("Clear all tasks from memory (useful for starting fresh)")]
-        public Task<ClearResponse> clear_tasks()
+        public Task<ClearResponse> clear_tasks(
+            [Description("Optional project name to clear tasks for. If not provided, clears all tasks.")] string? projectName = null)
         {
-            var count = _tasks.Count;
-            _tasks.Clear();
+            int count;
 
-            _logger.LogWarning(
-                "[TASK:CLEAR] All tasks cleared | ClearedCount={ClearedCount} | RemainingTasks={RemainingTasks}",
-                count,
-                _tasks.Count);
+            if (!string.IsNullOrWhiteSpace(projectName))
+            {
+                var sanitizedProject = SanitizeProjectName(projectName);
+                var keysToRemove = _tasks.Where(kvp => SanitizeProjectName(kvp.Value.ProjectName) == sanitizedProject)
+                    .Select(kvp => kvp.Key).ToList();
+                count = keysToRemove.Count;
+                foreach (var key in keysToRemove)
+                {
+                    _tasks.TryRemove(key, out _);
+                }
+
+                _logger.LogWarning(
+                    "[TASK:CLEAR] Tasks cleared for project '{Project}' | ClearedCount={ClearedCount} | RemainingTasks={RemainingTasks}",
+                    sanitizedProject,
+                    count,
+                    _tasks.Count);
+            }
+            else
+            {
+                count = _tasks.Count;
+                _tasks.Clear();
+
+                _logger.LogWarning(
+                    "[TASK:CLEAR] All tasks cleared | ClearedCount={ClearedCount} | RemainingTasks={RemainingTasks}",
+                    count,
+                    _tasks.Count);
+            }
 
             return Task.FromResult(new ClearResponse
             {

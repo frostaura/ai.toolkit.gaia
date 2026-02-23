@@ -8,6 +8,9 @@ namespace FrostAura.MCP.Gaia.Models
     [Description("Request to create or update a task")]
     public class UpdateTaskRequest
     {
+        [Description("The project name this task belongs to (e.g., 'my-web-app', 'gaia-toolkit'). Tasks are scoped per project.")]
+        public string ProjectName { get; set; } = "default";
+
         [Description("Unique identifier for the task (e.g., E-1/S-1/F-1/T-1 for hierarchical WBS)")]
         public string TaskId { get; set; } = string.Empty;
 

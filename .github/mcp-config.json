@@ -8,15 +8,9 @@
                 "@playwright/mcp@latest"
             ]
         },
-        "gaia": {
-            "transport": "stdio",
-            "type": "stdio",
-            "command": "dotnet",
-            "args": [
-                "run",
-                "--project",
-                ".github/mcps/gaia/src/fa.mcp.gaia/fa.mcp.gaia.csproj"
-            ]
+        "Gaia (Remote)": {
+            "url": "https://gaia.frostaura.net/mcp",
+            "type": "http"
         }
     }
 }

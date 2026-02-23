@@ -10,6 +10,9 @@ namespace FrostAura.MCP.Gaia.Models
     [Description("A memory entry storing knowledge, decisions, or context for future recall")]
     public class GaiaMemory
     {
+        [Description("The project this memory belongs to (used for project-scoped persistence)")]
+        public string ProjectName { get; set; } = "default";
+
         [Description("Category grouping for the memory (e.g., issue, workaround, config, pattern, decision)")]
         public string Category { get; set; } = string.Empty;
 
@@ -32,6 +35,6 @@ namespace FrostAura.MCP.Gaia.Models
         /// Composite key for dictionary storage (category/key)
         /// </summary>
         [JsonIgnore]
-        public string CompositeKey => $"{Category}/{Key}".ToLowerInvariant();
+        public string CompositeKey => $"{ProjectName}/{Category}/{Key}".ToLowerInvariant();
     }
 }

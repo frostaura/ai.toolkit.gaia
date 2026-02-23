@@ -370,6 +370,7 @@ namespace FrostAura.MCP.Gaia.Managers
                     Id = Guid.NewGuid().ToString(),
                     Type = request.Type,
                     Agent = request.Agent,
+                    ProjectName = request.ProjectName,
                     Title = request.Title,
                     Description = request.Description,
                     Context = request.Context,

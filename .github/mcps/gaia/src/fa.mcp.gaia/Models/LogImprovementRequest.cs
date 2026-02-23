@@ -14,6 +14,9 @@ namespace FrostAura.MCP.Gaia.Models
         [Description("The agent logging this improvement (e.g., architect, developer, analyst, tester)")]
         public string Agent { get; set; } = string.Empty;
 
+        [Description("The project where this improvement was identified (optional, for cross-project context)")]
+        public string? ProjectName { get; set; }
+
         [Description("Brief title/summary of the improvement (2-10 words)")]
         public string Title { get; set; } = string.Empty;
 

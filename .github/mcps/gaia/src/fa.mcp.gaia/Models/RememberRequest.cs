@@ -8,6 +8,9 @@ namespace FrostAura.MCP.Gaia.Models
     [Description("Request to store a memory for later recall")]
     public class RememberRequest
     {
+        [Description("The project name this memory belongs to (e.g., 'my-web-app', 'gaia-toolkit'). Used to scope memories per project.")]
+        public string ProjectName { get; set; } = "default";
+
         [Description("Category grouping for the memory (e.g., issue, workaround, config, pattern, decision)")]
         public string Category { get; set; } = string.Empty;
 
