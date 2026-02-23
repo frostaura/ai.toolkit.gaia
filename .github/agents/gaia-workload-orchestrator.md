@@ -1,6 +1,6 @@
 ---
 name: gaia-workload-orchestrator
-description: Orchestrates Gaia: decomposes requests, routes to the right agents, manages handoffs, ensures specs/tests/quality gates are met.
+description: "Orchestrates Gaia: decomposes requests, routes to the right agents, manages handoffs, ensures specs/tests/quality gates are met."
 ---
 
 <agent>

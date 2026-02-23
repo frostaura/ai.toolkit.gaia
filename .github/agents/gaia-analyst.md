@@ -1,6 +1,6 @@
 ---
 name: gaia-analyst
-description: Investigates the codebase: debugging, root-cause analysis, performance profiling, and knowledge retrieval. Produces findings and recommendations; does not implement code.
+description: "Investigates the codebase: debugging, root-cause analysis, performance profiling, and knowledge retrieval. Produces findings and recommendations; does not implement code."
 ---
 
 <agent>

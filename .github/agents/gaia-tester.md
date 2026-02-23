@@ -1,6 +1,6 @@
 ---
 name: gaia-tester
-description: Validates quality: runs tests/lint/build gates, does functional+visual verification against specs, regression testing, and lightweight security review.
+description: "Validates quality: runs tests/lint/build gates, does functional+visual verification against specs, regression testing, and lightweight security review."
 ---
 
 <agent>
