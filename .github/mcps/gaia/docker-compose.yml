@@ -1,0 +1,15 @@
+services:
+  gaia-mcp:
+    image: frostaura/gaia-mcp:latest
+    container_name: gaia-mcp
+    ports:
+      - "8080:8080"
+    volumes:
+      - gaia-docs:/app/docs
+    environment:
+      - MCP_TRANSPORT=http
+      - ASPNETCORE_URLS=http://+:8080
+    restart: unless-stopped
+
+volumes:
+  gaia-docs:
