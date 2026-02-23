@@ -4,42 +4,72 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-// Core MCP server - Essential tools for in-memory task and memory management
-var builder = Host.CreateApplicationBuilder(args);
+// Determine transport mode: "http" for remote/container deployment, "stdio" for local (default)
+var transport = Environment.GetEnvironmentVariable("MCP_TRANSPORT") ?? "stdio";
+var isHttpMode = transport.Equals("http", StringComparison.OrdinalIgnoreCase);
 
-// Configure logging - MCP uses stdio for communication, so logs go to stderr
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole(options =>
+if (isHttpMode)
 {
-    // All logs go to stderr to avoid interfering with MCP stdio communication
-    options.LogToStandardErrorThreshold = LogLevel.Trace;
-});
+    // HTTP/SSE transport - used when deployed as a remote MCP server in a container
+    var builder = WebApplication.CreateBuilder(args);
 
-// Add configuration
-builder.Configuration
-    .AddInMemoryCollection(new Dictionary<string, string?>
+    RegisterManagers(builder.Services);
+
+    // Configure MCP Server with HTTP transport
+    builder.Services
+        .AddMcpServer()
+        .WithHttpTransport()
+        .WithToolsFromAssembly();
+
+    var app = builder.Build();
+
+    app.MapMcp("/mcp");
+
+    await app.RunAsync();
+}
+else
+{
+    // STDIO transport - used when running locally via mcp-config.json
+    var builder = Host.CreateApplicationBuilder(args);
+
+    // Configure logging - MCP uses stdio for communication, so logs go to stderr
+    builder.Logging.ClearProviders();
+    builder.Logging.AddConsole(options =>
     {
-        ["Application:Name"] = "fa.mcp.gaia",
-        ["Application:Version"] = "2.0.0",
-        // Set log levels - FrostAura namespace gets detailed logging
-        ["Logging:LogLevel:Default"] = "Warning",
-        ["Logging:LogLevel:FrostAura.MCP.Gaia"] = "Information",
-        ["Logging:LogLevel:Microsoft.Hosting.Lifetime"] = "Warning",
-        ["Logging:LogLevel:ModelContextProtocol"] = "Warning"
+        // All logs go to stderr to avoid interfering with MCP stdio communication
+        options.LogToStandardErrorThreshold = LogLevel.Trace;
     });
 
-// Register specialized managers
-builder.Services.AddScoped<TaskManager>();
-builder.Services.AddSingleton<MemoryManager>();
-builder.Services.AddSingleton<ImprovementManager>();
+    // Add configuration
+    builder.Configuration
+        .AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["Application:Name"] = "fa.mcp.gaia",
+            ["Application:Version"] = "2.0.0",
+            // Set log levels - FrostAura namespace gets detailed logging
+            ["Logging:LogLevel:Default"] = "Warning",
+            ["Logging:LogLevel:FrostAura.MCP.Gaia"] = "Information",
+            ["Logging:LogLevel:Microsoft.Hosting.Lifetime"] = "Warning",
+            ["Logging:LogLevel:ModelContextProtocol"] = "Warning"
+        });
 
-// Configure MCP Server
-builder.Services
-    .AddMcpServer()
-    .WithStdioServerTransport()
-    .WithToolsFromAssembly();
+    RegisterManagers(builder.Services);
 
-var host = builder.Build();
+    // Configure MCP Server
+    builder.Services
+        .AddMcpServer()
+        .WithStdioServerTransport()
+        .WithToolsFromAssembly();
 
-// Start the host directly - no database migration needed
-await host.RunAsync();
+    var host = builder.Build();
+
+    // Start the host directly - no database migration needed
+    await host.RunAsync();
+}
+
+static void RegisterManagers(IServiceCollection services)
+{
+    services.AddScoped<TaskManager>();
+    services.AddSingleton<MemoryManager>();
+    services.AddSingleton<ImprovementManager>();
+}
