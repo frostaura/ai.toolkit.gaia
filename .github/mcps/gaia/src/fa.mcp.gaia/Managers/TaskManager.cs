@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using FrostAura.MCP.Gaia.Models;
 using Microsoft.Extensions.Logging;
@@ -13,21 +14,113 @@ namespace FrostAura.MCP.Gaia.Managers
     /// <summary>
     /// Task Manager - Essential tools for in-memory task management
     /// Data is ephemeral and will be lost when the service stops
+    /// Uses per-project isolation with TTL to prevent cross-user interference
     /// </summary>
     [McpServerToolType]
-    public class TaskManager
+    public class TaskManager : IDisposable
     {
         private readonly ILogger<TaskManager> _logger;
 
-        // Thread-safe in-memory storage - data is ephemeral (lost on service restart)
-        private static readonly ConcurrentDictionary<string, GaiaTask> _tasks = new();
+        // Thread-safe per-project storage - each project gets isolated task storage
+        // This prevents remote MCP users from overriding each other's tasks
+        private static readonly ConcurrentDictionary<string, ProjectTaskStore> _projectStores = new();
+
+        // TTL for project stores (default: 24 hours of inactivity)
+        private static readonly TimeSpan DefaultTtl = TimeSpan.FromHours(24);
+
+        // Background cleanup processor
+        private static Timer? _cleanupTimer;
+        private static readonly object _cleanupLock = new();
+        private static bool _cleanupStarted = false;
+        private static bool _disposed = false;
+
+        // Cleanup interval (check every 5 minutes)
+        private static readonly TimeSpan CleanupInterval = TimeSpan.FromMinutes(5);
 
         public TaskManager(ILogger<TaskManager> logger)
         {
             _logger = logger;
+
+            // Start the background cleanup processor (only once across all instances)
+            StartCleanupProcessor();
+
+            var totalTasks = _projectStores.Values.Sum(s => s.Tasks.Count);
             _logger.LogInformation(
-                "[STARTUP] TaskManager initialized | Storage=InMemory | TaskCount={TaskCount}",
-                _tasks.Count);
+                "[STARTUP] TaskManager initialized | Storage=InMemory | Projects={ProjectCount} | TotalTasks={TaskCount} | TTL={TTL}",
+                _projectStores.Count,
+                totalTasks,
+                DefaultTtl);
+        }
+
+        /// <summary>
+        /// Start the background cleanup timer for TTL expiration
+        /// </summary>
+        private void StartCleanupProcessor()
+        {
+            lock (_cleanupLock)
+            {
+                if (_cleanupStarted || _disposed) return;
+
+                _cleanupStarted = true;
+                _cleanupTimer = new Timer(
+                    CleanupExpiredStores,
+                    null,
+                    CleanupInterval,
+                    CleanupInterval);
+
+                _logger.LogInformation(
+                    "[TASK:CLEANUP] Background cleanup processor started | Interval={Interval} | TTL={TTL}",
+                    CleanupInterval,
+                    DefaultTtl);
+            }
+        }
+
+        /// <summary>
+        /// Cleanup callback - removes expired project stores
+        /// </summary>
+        private void CleanupExpiredStores(object? state)
+        {
+            try
+            {
+                var expiredProjects = _projectStores
+                    .Where(kvp => kvp.Value.IsExpired(DefaultTtl))
+                    .Select(kvp => kvp.Key)
+                    .ToList();
+
+                foreach (var projectName in expiredProjects)
+                {
+                    if (_projectStores.TryRemove(projectName, out var store))
+                    {
+                        _logger.LogInformation(
+                            "[TASK:CLEANUP] Expired project store removed | Project={Project} | TaskCount={TaskCount} | LastAccessed={LastAccessed}",
+                            projectName,
+                            store.Tasks.Count,
+                            store.LastAccessed);
+                    }
+                }
+
+                if (expiredProjects.Count > 0)
+                {
+                    _logger.LogInformation(
+                        "[TASK:CLEANUP] Cleanup completed | RemovedProjects={RemovedCount} | RemainingProjects={RemainingCount}",
+                        expiredProjects.Count,
+                        _projectStores.Count);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "[TASK:CLEANUP] Cleanup failed | Error={ErrorMessage}", ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Get or create a project task store (thread-safe)
+        /// </summary>
+        private ProjectTaskStore GetOrCreateProjectStore(string sanitizedProject)
+        {
+            var store = _projectStores.GetOrAdd(sanitizedProject, name => new ProjectTaskStore(name));
+            store.Touch(); // Update last accessed time
+            return store;
         }
 
         /// <summary>
@@ -44,7 +137,8 @@ namespace FrostAura.MCP.Gaia.Managers
 
             try
             {
-                var tasks = _tasks.Values.Where(t => SanitizeProjectName(t.ProjectName) == sanitizedProject).AsEnumerable();
+                var store = GetOrCreateProjectStore(sanitizedProject);
+                var tasks = store.Tasks.Values.AsEnumerable();
 
                 if (hideCompleted)
                 {
@@ -63,16 +157,18 @@ namespace FrostAura.MCP.Gaia.Managers
                 };
 
                 _logger.LogInformation(
-                    "[TASK:READ] Completed | Filter={Filter} | TotalInStore={TotalTasks} | Returned={ReturnedCount}",
+                    "[TASK:READ] Completed | Project={Project} | Filter={Filter} | TotalInStore={TotalTasks} | Returned={ReturnedCount}",
+                    sanitizedProject,
                     response.Filter,
-                    _tasks.Count,
+                    store.Tasks.Count,
                     taskList.Count);
 
                 return Task.FromResult(response);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "[TASK:READ] Failed | Filter={Filter} | Error={ErrorMessage}",
+                _logger.LogError(ex, "[TASK:READ] Failed | Project={Project} | Filter={Filter} | Error={ErrorMessage}",
+                    sanitizedProject,
                     hideCompleted ? "active only" : "all",
                     ex.Message);
 
@@ -104,14 +200,15 @@ namespace FrostAura.MCP.Gaia.Managers
             try
             {
                 var sanitizedProject = SanitizeProjectName(request.ProjectName);
-                var normalizedId = $"{sanitizedProject}/{request.TaskId?.Replace(" ", "_").ToLowerInvariant() ?? Guid.NewGuid().ToString()}";
-                var isUpdate = _tasks.TryGetValue(normalizedId, out var existingTask);
+                var normalizedId = request.TaskId?.Replace(" ", "_").ToLowerInvariant() ?? Guid.NewGuid().ToString();
+                var store = GetOrCreateProjectStore(sanitizedProject);
+                var isUpdate = store.Tasks.TryGetValue(normalizedId, out var existingTask);
                 var previousStatus = existingTask?.Status;
 
                 var task = new GaiaTask
                 {
                     ProjectName = sanitizedProject,
-                    Id = request.TaskId?.Replace(" ", "_").ToLowerInvariant() ?? Guid.NewGuid().ToString(),
+                    Id = normalizedId,
                     Description = request.Description,
                     Status = request.Status,
                     AssignedTo = string.IsNullOrWhiteSpace(request.AssignedTo) ? null : request.AssignedTo,
@@ -119,26 +216,28 @@ namespace FrostAura.MCP.Gaia.Managers
                     Updated = DateTime.UtcNow
                 };
 
-                _tasks[normalizedId] = task;
+                store.Tasks[normalizedId] = task;
 
                 if (isUpdate)
                 {
                     _logger.LogInformation(
-                        "[TASK:UPDATED] TaskId={TaskId} | PreviousStatus={PreviousStatus} | NewStatus={NewStatus} | AssignedTo={AssignedTo} | TotalTasks={TotalTasks}",
+                        "[TASK:UPDATED] Project={Project} | TaskId={TaskId} | PreviousStatus={PreviousStatus} | NewStatus={NewStatus} | AssignedTo={AssignedTo} | ProjectTasks={ProjectTasks}",
+                        sanitizedProject,
                         normalizedId,
                         previousStatus,
                         request.Status,
                         task.AssignedTo ?? "(unassigned)",
-                        _tasks.Count);
+                        store.Tasks.Count);
                 }
                 else
                 {
                     _logger.LogInformation(
-                        "[TASK:CREATED] TaskId={TaskId} | Status={Status} | AssignedTo={AssignedTo} | TotalTasks={TotalTasks}",
+                        "[TASK:CREATED] Project={Project} | TaskId={TaskId} | Status={Status} | AssignedTo={AssignedTo} | ProjectTasks={ProjectTasks}",
+                        sanitizedProject,
                         normalizedId,
                         request.Status,
                         task.AssignedTo ?? "(unassigned)",
-                        _tasks.Count);
+                        store.Tasks.Count);
                 }
 
                 return Task.FromResult(new UpdateTaskResponse
@@ -151,7 +250,8 @@ namespace FrostAura.MCP.Gaia.Managers
             catch (Exception ex)
             {
                 _logger.LogError(ex,
-                    "[TASK:UPDATE] Failed | TaskId={TaskId} | Error={ErrorMessage}",
+                    "[TASK:UPDATE] Failed | Project={Project} | TaskId={TaskId} | Error={ErrorMessage}",
+                    request.ProjectName,
                     request.TaskId,
                     ex.Message);
 
@@ -188,29 +288,36 @@ namespace FrostAura.MCP.Gaia.Managers
             if (!string.IsNullOrWhiteSpace(projectName))
             {
                 var sanitizedProject = SanitizeProjectName(projectName);
-                var keysToRemove = _tasks.Where(kvp => SanitizeProjectName(kvp.Value.ProjectName) == sanitizedProject)
-                    .Select(kvp => kvp.Key).ToList();
-                count = keysToRemove.Count;
-                foreach (var key in keysToRemove)
-                {
-                    _tasks.TryRemove(key, out _);
-                }
 
-                _logger.LogWarning(
-                    "[TASK:CLEAR] Tasks cleared for project '{Project}' | ClearedCount={ClearedCount} | RemainingTasks={RemainingTasks}",
-                    sanitizedProject,
-                    count,
-                    _tasks.Count);
+                if (_projectStores.TryGetValue(sanitizedProject, out var store))
+                {
+                    count = store.Tasks.Count;
+                    store.Tasks.Clear();
+                    store.Touch(); // Update last accessed time
+
+                    _logger.LogWarning(
+                        "[TASK:CLEAR] Tasks cleared for project '{Project}' | ClearedCount={ClearedCount} | RemainingProjects={RemainingProjects}",
+                        sanitizedProject,
+                        count,
+                        _projectStores.Count);
+                }
+                else
+                {
+                    count = 0;
+                    _logger.LogInformation(
+                        "[TASK:CLEAR] No tasks found for project '{Project}'",
+                        sanitizedProject);
+                }
             }
             else
             {
-                count = _tasks.Count;
-                _tasks.Clear();
+                count = _projectStores.Values.Sum(s => s.Tasks.Count);
+                _projectStores.Clear();
 
                 _logger.LogWarning(
-                    "[TASK:CLEAR] All tasks cleared | ClearedCount={ClearedCount} | RemainingTasks={RemainingTasks}",
+                    "[TASK:CLEAR] All tasks cleared | ClearedCount={ClearedCount} | ClearedProjects={ClearedProjects}",
                     count,
-                    _tasks.Count);
+                    _projectStores.Count);
             }
 
             return Task.FromResult(new ClearResponse
@@ -219,6 +326,26 @@ namespace FrostAura.MCP.Gaia.Managers
                 Message = $"Cleared {count} tasks from memory",
                 ClearedCount = count
             });
+        }
+
+        /// <summary>
+        /// Dispose of managed resources
+        /// </summary>
+        public void Dispose()
+        {
+            lock (_cleanupLock)
+            {
+                if (_disposed) return;
+                _disposed = true;
+                _cleanupStarted = false;
+
+                _cleanupTimer?.Dispose();
+                _cleanupTimer = null;
+
+                _logger.LogInformation("[TASK:SHUTDOWN] TaskManager disposed | Projects={ProjectCount} | TotalTasks={TaskCount}",
+                    _projectStores.Count,
+                    _projectStores.Values.Sum(s => s.Tasks.Count));
+            }
         }
     }
 }
