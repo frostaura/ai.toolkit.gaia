@@ -355,27 +355,34 @@ namespace FrostAura.MCP.Gaia.Managers
         [McpServerTool]
         [Description("Log an improvement request when you encounter frustrations, missing capabilities, or workflow inefficiencies. Use this to wish improvements into existence!")]
         public Task<LogImprovementResponse> log_improvement(
-            [Description("The improvement request to log")] LogImprovementRequest request)
+            [Description("Type of improvement: PainPoint, MissingCapability, WorkflowImprovement, KnowledgeGap, Enhancement")] ImprovementType type = ImprovementType.Enhancement,
+            [Description("The agent logging this improvement (e.g., architect, developer, analyst, tester)")] string agent = "",
+            [Description("The project where this improvement was identified (optional, for cross-project context)")] string? projectName = null,
+            [Description("Brief title/summary of the improvement (2-10 words)")] string title = "",
+            [Description("Detailed description of the issue, frustration, or opportunity")] string description = "",
+            [Description("What was the agent trying to accomplish when this issue was encountered (optional)")] string? context = null,
+            [Description("Specific suggestions on how to address this improvement (optional)")] string? suggestion = null,
+            [Description("Priority level: Low, Medium, High, Critical (default: Medium)")] string priority = "Medium")
         {
             _logger.LogDebug(
                 "[IMPROVEMENT:LOG] Starting | Agent={Agent} | Type={Type} | Title={Title}",
-                request.Agent,
-                request.Type,
-                request.Title);
+                agent,
+                type,
+                title);
 
             try
             {
                 var improvement = new GaiaImprovement
                 {
                     Id = Guid.NewGuid().ToString(),
-                    Type = request.Type,
-                    Agent = request.Agent,
-                    ProjectName = request.ProjectName,
-                    Title = request.Title,
-                    Description = request.Description,
-                    Context = request.Context,
-                    Suggestion = request.Suggestion,
-                    Priority = request.Priority,
+                    Type = type,
+                    Agent = agent,
+                    ProjectName = projectName,
+                    Title = title,
+                    Description = description,
+                    Context = context,
+                    Suggestion = suggestion,
+                    Priority = priority,
                     Status = "Logged",
                     Created = DateTime.UtcNow,
                     Updated = DateTime.UtcNow
@@ -389,16 +396,16 @@ namespace FrostAura.MCP.Gaia.Managers
 
                 _logger.LogInformation(
                     "[IMPROVEMENT:LOGGED] Agent={Agent} | Type={Type} | Priority={Priority} | Title={Title} | TotalImprovements={TotalImprovements}",
-                    request.Agent,
-                    request.Type,
-                    request.Priority,
-                    request.Title,
+                    agent,
+                    type,
+                    priority,
+                    title,
                     _improvements.Count);
 
                 return Task.FromResult(new LogImprovementResponse
                 {
                     Success = true,
-                    Message = $"Improvement logged successfully: {request.Title}. Your feedback helps evolve the system!",
+                    Message = $"Improvement logged successfully: {title}. Your feedback helps evolve the system!",
                     Improvement = improvement
                 });
             }
@@ -406,8 +413,8 @@ namespace FrostAura.MCP.Gaia.Managers
             {
                 _logger.LogError(ex,
                     "[IMPROVEMENT:LOG] Failed | Agent={Agent} | Type={Type} | Error={ErrorMessage}",
-                    request.Agent,
-                    request.Type,
+                    agent,
+                    type,
                     ex.Message);
 
                 return Task.FromResult(new LogImprovementResponse

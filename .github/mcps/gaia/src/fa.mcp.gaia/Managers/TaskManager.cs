@@ -188,19 +188,23 @@ namespace FrostAura.MCP.Gaia.Managers
         [McpServerTool]
         [Description("Update or add a task with structured data")]
         public Task<UpdateTaskResponse> update_task(
-            [Description("The task to create or update")] UpdateTaskRequest request)
+            [Description("The project name this task belongs to (e.g., 'my-web-app', 'gaia-toolkit'). Tasks are scoped per project.")] string projectName = "default",
+            [Description("Unique identifier for the task (e.g., E-1/S-1/F-1/T-1 for hierarchical WBS)")] string taskId = "",
+            [Description("Detailed description of what the task involves")] string description = "",
+            [Description("Current status of the task: Pending, InProgress, Completed, Blocked, or Cancelled")] GaiaTaskStatus status = GaiaTaskStatus.Pending,
+            [Description("The agent or person assigned to complete this task (optional)")] string? assignedTo = null)
         {
             _logger.LogDebug(
                 "[TASK:UPDATE] Starting | Project={Project} | TaskId={TaskId} | Status={Status} | AssignedTo={AssignedTo}",
-                request.ProjectName,
-                request.TaskId,
-                request.Status,
-                request.AssignedTo ?? "(unassigned)");
+                projectName,
+                taskId,
+                status,
+                assignedTo ?? "(unassigned)");
 
             try
             {
-                var sanitizedProject = SanitizeProjectName(request.ProjectName);
-                var normalizedId = request.TaskId?.Replace(" ", "_").ToLowerInvariant() ?? Guid.NewGuid().ToString();
+                var sanitizedProject = SanitizeProjectName(projectName);
+                var normalizedId = taskId?.Replace(" ", "_").ToLowerInvariant() ?? Guid.NewGuid().ToString();
                 var store = GetOrCreateProjectStore(sanitizedProject);
                 var isUpdate = store.Tasks.TryGetValue(normalizedId, out var existingTask);
                 var previousStatus = existingTask?.Status;
@@ -209,9 +213,9 @@ namespace FrostAura.MCP.Gaia.Managers
                 {
                     ProjectName = sanitizedProject,
                     Id = normalizedId,
-                    Description = request.Description,
-                    Status = request.Status,
-                    AssignedTo = string.IsNullOrWhiteSpace(request.AssignedTo) ? null : request.AssignedTo,
+                    Description = description,
+                    Status = status,
+                    AssignedTo = string.IsNullOrWhiteSpace(assignedTo) ? null : assignedTo,
                     Created = existingTask?.Created ?? DateTime.UtcNow,
                     Updated = DateTime.UtcNow
                 };
@@ -225,7 +229,7 @@ namespace FrostAura.MCP.Gaia.Managers
                         sanitizedProject,
                         normalizedId,
                         previousStatus,
-                        request.Status,
+                        status,
                         task.AssignedTo ?? "(unassigned)",
                         store.Tasks.Count);
                 }
@@ -235,7 +239,7 @@ namespace FrostAura.MCP.Gaia.Managers
                         "[TASK:CREATED] Project={Project} | TaskId={TaskId} | Status={Status} | AssignedTo={AssignedTo} | ProjectTasks={ProjectTasks}",
                         sanitizedProject,
                         normalizedId,
-                        request.Status,
+                        status,
                         task.AssignedTo ?? "(unassigned)",
                         store.Tasks.Count);
                 }
@@ -243,7 +247,7 @@ namespace FrostAura.MCP.Gaia.Managers
                 return Task.FromResult(new UpdateTaskResponse
                 {
                     Success = true,
-                    Message = $"Task '{request.TaskId}' {(isUpdate ? "updated" : "added")} with status: {request.Status}",
+                    Message = $"Task '{taskId}' {(isUpdate ? "updated" : "added")} with status: {status}",
                     Task = task
                 });
             }
@@ -251,8 +255,8 @@ namespace FrostAura.MCP.Gaia.Managers
             {
                 _logger.LogError(ex,
                     "[TASK:UPDATE] Failed | Project={Project} | TaskId={TaskId} | Error={ErrorMessage}",
-                    request.ProjectName,
-                    request.TaskId,
+                    projectName,
+                    taskId,
                     ex.Message);
 
                 return Task.FromResult(new UpdateTaskResponse
