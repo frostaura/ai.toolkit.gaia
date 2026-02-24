@@ -15,16 +15,10 @@ if (isHttpMode)
 
     RegisterManagers(builder.Services);
 
-    // Configure MCP Server with HTTP transport (stateless mode)
-    // Stateless mode round-trips client info in the Mcp-Session-Id header
-    // instead of storing sessions in memory, so server restarts and
-    // redeployments don't cause "Session not found" errors.
+    // Configure MCP Server with HTTP transport
     builder.Services
         .AddMcpServer()
-        .WithHttpTransport(options =>
-        {
-            options.Stateless = true;
-        })
+        .WithHttpTransport()
         .WithToolsFromAssembly();
 
     var app = builder.Build();
