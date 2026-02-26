@@ -14,7 +14,11 @@ if (isHttpMode)
     // Configure MCP Server with HTTP transport
     builder.Services
         .AddMcpServer()
-        .WithHttpTransport()
+        .WithHttpTransport(options =>
+        {
+            options.IdleTimeout = Timeout.InfiniteTimeSpan;
+            options.MaxIdleSessionCount = int.MaxValue;
+        })
         .WithToolsFromAssembly();
 
     var app = builder.Build();
