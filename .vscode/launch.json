@@ -6,9 +6,9 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/.github/mcps/gaia/src/fa.mcp.gaia/bin/Debug/net9.0/fa.mcp.gaia.dll",
+            "program": "${workspaceFolder}/.github/mcp/src/Gaia.Mcp.Server/bin/Debug/net10.0/Gaia.Mcp.Server.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/.github/mcps/gaia/src/fa.mcp.gaia",
+            "cwd": "${workspaceFolder}/.github/mcp/src/Gaia.Mcp.Server",
             "env": {
                 "MCP_TRANSPORT": "http",
                 "ASPNETCORE_ENVIRONMENT": "Development",
@@ -26,9 +26,9 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/.github/mcps/gaia/src/fa.mcp.gaia/bin/Debug/net9.0/fa.mcp.gaia.dll",
+            "program": "${workspaceFolder}/.github/mcp/src/Gaia.Mcp.Server/bin/Debug/net10.0/Gaia.Mcp.Server.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/.github/mcps/gaia/src/fa.mcp.gaia",
+            "cwd": "${workspaceFolder}/.github/mcp/src/Gaia.Mcp.Server",
             "env": {
                 "MCP_TRANSPORT": "stdio",
                 "ASPNETCORE_ENVIRONMENT": "Development"

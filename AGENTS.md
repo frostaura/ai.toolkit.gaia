@@ -1,80 +1,65 @@
-# Gaia: Agent Workflow Contract (AGENTS.md)
+# Gaia Operating Contract (AGENTS)
 
-This file defines **how Gaia runs agentic workflows** in this repository.
-It complements `.github/copilot-instructions.md`, `.github/agents/*.md`, and `.github/skills/**/SKILL.md`.
+This file is the **source of truth** for how Gaia agents collaborate.
 
-## 0) Default Rule
+## Non-negotiables
 
-For anything beyond a single obvious action, **start with `gaia-workload-orchestrator`**.
-It classifies the request into one of three tiers:
-- **Rapid** — trivial/straightforward: skip ceremony, just execute.
-- **Standard** — moderate: recall context, delegate to one agent, remember learnings.
-- **Full** — complex/cross-cutting: full multi-agent orchestration with tasks, specs, and handoffs.
+1) **Docs-first truth**
+- `/docs/` is authoritative.
+- Docs/code drift is **blocking**. Gaia fixes drift autonomously before feature work.
 
-## 1) Spec-Driven Development
+2) **Repo Explorer always first**
+- Every request starts with a Repo Explorer survey.
+- Orchestrator does not plan until survey completes.
 
-- `docs/` is the **single source of truth** for requirements, architecture, and use cases.
-- **No drift**: spec ↔ code must stay in sync at all times.
+3) **Orchestrator supremacy**
+- Workload Orchestrator owns the plan and the canonical MCP task graph.
+- Other agents may suggest tasks; orchestrator creates/edits the real tasks.
 
-## 2) Authority & Permissions
+4) **CI is mandatory and must be green**
+- Missing CI or failing CI is **blocking** and fixed first.
 
-| Domain | Owner | Others |
-|--------|-------|--------|
-| `docs/`, architecture, tech stack | **gaia-architect** | Request changes via Architect |
-| Code, tests, migrations, infra | **gaia-developer** | Propose guidance only |
-| Debugging, root-cause, perf | **gaia-analyst** | Findings → Developer implements |
-| Quality gates, validation | **gaia-tester** | Reports → Developer/Architect fix |
+5) **HTTP API work is docker-first**
+- If the project exposes an HTTP API and docker-compose is missing, add it **before** implementing/changing use cases.
+- Standard: `docker-compose.yml` at repo root + `.env.example` + `Makefile` targets.
 
-Default stack: `.github/skills/default-web-stack/SKILL.md`
+6) **Use-case changes require heavier verification**
+When work adds/changes/removes a use case:
+- Add/update web integration specs (Playwright) where applicable.
+- Run manual regression:
+  - backend via curl against docker stack
+  - web via Playwright MCP tools
 
-## 3) Delegation Is Mandatory
+7) **Completion is enforced by MCP**
+A task is only “done” if:
+- docs updated when behavior changes
+- required gates satisfied
+- proof args recorded in MCP `mark_done` call (paths/labels only)
+- blockers resolved
 
-**Never struggle alone. Delegate early.** If you spend >2 minutes outside your domain, hand off.
+8) **Skill drift is blocking**
+If repo conventions change, update all affected skills in the same effort.
 
-- Architect → specs, design, tech-stack, `docs/` changes
-- Developer → code, tests, migrations, infra
-- Analyst → ambiguous bugs, perf, deep investigation
-- Tester → validation, regression, security review
-- Orchestrator → multi-step or cross-agent coordination
+## Use-case change decision
+- Orchestrator decides whether change is a use-case change.
+- If uncertain: default to YES.
+- Record a 1-line rationale.
 
-## 4) Gaia MCP Tools Are Mandatory
+## Task graph rules
+- Planning must comprehensively capture all required work as tasks.
+- New tasks may be added in-flight for discovered TODOs/risks.
+- No orphan TODOs: convert into tasks or blockers.
 
-All tools require **`projectName`** (derived from repo/workspace name). Use them aggressively.
+## Proof policy (low-context)
+MCP `mark_done` requires:
+- `changed_files[]` (paths)
+- `tests_added[]` (paths)
+- `manual_regression[]` (labels like `curl`, `playwright-mcp`)
 
-| Tool | When |
-|------|------|
-| `gaia-recall` | **Always first** — before starting any work |
-| `gaia-remember` | After decisions, patterns, workarounds, user preferences |
-| `gaia-update_task` | Before/during/after multi-step work; cross-agent handoffs |
-| `gaia-log_improvement` | **Immediately** on any friction — don't wait. Over-log > under-log |
-
-Memory categories: `pattern`, `decision`, `workaround`, `context`, `lesson`.
-Improvement types: `PainPoint`, `MissingCapability`, `WorkflowImprovement`, `KnowledgeGap`, `Enhancement`.
-
-## 5) Common Agent Behaviors
-
-Every agent **must**:
-1. Pass `projectName` consistently to all Gaia MCP tool calls.
-2. Call `gaia-recall` at task start; `gaia-remember` for significant learnings.
-3. Log friction immediately via `gaia-log_improvement` with `projectName`.
-4. Check `.github/skills/**/SKILL.md` for relevant skills before domain work.
-5. Use the structured handoff format (§7) when delegating.
-
-## 6) Skills Are Mandatory
-
-Before domain work, check for relevant skills in `.github/skills/**/SKILL.md`.
-If a recurring need lacks a skill, log an improvement request.
-
-## 7) Handoff Format
-
-When handing work to another agent, include:
-- **Project name** (always)
-- **Objective** (what success looks like)
-- **Context** (what you learned; links/paths; constraints)
-- **Inputs** (files touched, commands, expected output)
-- **Risks / open questions**
-- **Next actions** (1–3 bullets)
-
-## 8) Folder-Specific Rules (Optional)
-
-Subtrees may add a nested `AGENTS.md` for additional constraints. Nested rules must not contradict this root contract.
+## Completion summary
+Orchestrator writes one paragraph max:
+- docs touched
+- code touched
+- tests paths
+- manual regression labels
+- how to run locally (1–2 commands)

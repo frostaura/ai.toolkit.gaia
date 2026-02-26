@@ -1,38 +1,20 @@
-# Gaia: GitHub Copilot Instructions (Repository-Wide)
+# Copilot Instructions (Repo-Level)
 
-These instructions apply to **all Copilot usage in this repo** (VS Code Chat, CLI, and suggestions).
-For agent workflow rules, permissions, delegation, and tools, see **`AGENTS.md`**.
+## Always-on rules
+- Start with **Repo Explorer**.
+- `/docs/` is source of truth; any drift is **blocking** and fixed first.
+- Orchestrator owns the plan and MCP task graph.
+- CI must exist and be green; missing/failing CI is **blocking**.
+- HTTP APIs are docker-first (compose + Makefile) before use-case changes.
+- Use-case changes require Playwright specs (web) + manual regression (curl + Playwright MCP).
+- Completion is enforced by MCP `mark_done` proof args.
+- Skill drift is blocking.
 
-## North Star: Spec-Driven Design
-
-- `docs/` is the single source of truth for requirements and architecture.
-- Code ↔ spec must stay in sync: behavior changes need specs; specs need implementations.
-
-## Where to Look First
-
-1. `docs/` — requirements, architecture, use cases
-2. `.github/skills/**/SKILL.md` — proven patterns and playbooks
-3. Existing code/tests — repo conventions
-4. `.github/agents/*.md` — agent personas and boundaries
-
-## Default Quality Bar
-
-- Small, cohesive, reversible changes.
-- Follow existing naming, structure, and patterns.
-- Tests for non-trivial behavior.
-- Explicit > clever. No new dependencies without consulting `.github/skills/default-web-stack/SKILL.md`.
-
-## Routing Cheatsheet
-
-| Need | Route to |
-|------|----------|
-| Spec/architecture/docs | **Architect** |
-| Code/tests/migrations/infra | **Developer** |
-| Bugs/perf/investigation | **Analyst** |
-| Validation/regression/security | **Tester** |
-| Multi-step/coordination | **Orchestrator** |
-
-## Project-Scoped Tools
-
-- All Gaia MCP tools require **`projectName`** (derive from repo/workspace folder name).
-- Common agent behaviors (recall, remember, log improvements) are defined in `AGENTS.md §5`.
+## Routing
+- Planning + task graph → Workload Orchestrator
+- Repo survey → Repo Explorer
+- Enforcement / veto → Quality Gatekeeper
+- Architecture → Architect
+- Implementation → Developer
+- Tests → Tester
+- Requirements analysis → Analyst
