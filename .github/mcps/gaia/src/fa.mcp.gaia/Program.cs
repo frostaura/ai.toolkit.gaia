@@ -1,8 +1,4 @@
 ﻿using FrostAura.MCP.Gaia.Managers;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 // Determine transport mode: "http" for remote/container deployment, "stdio" for local (default)
 var transport = Environment.GetEnvironmentVariable("MCP_TRANSPORT") ?? "stdio";

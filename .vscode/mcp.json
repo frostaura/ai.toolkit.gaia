@@ -7,6 +7,10 @@
                 "@playwright/mcp@latest"
             ]
         },
+        "Gaia (Local)": {
+            "url": "http://localhost:5059/mcp",
+            "type": "http"
+        },
         "Gaia (Remote)": {
             "url": "https://gaia.frostaura.net/mcp",
             "type": "http"

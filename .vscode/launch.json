@@ -1,0 +1,40 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Gaia MCP (HTTP)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/.github/mcps/gaia/src/fa.mcp.gaia/bin/Debug/net9.0/fa.mcp.gaia.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/.github/mcps/gaia/src/fa.mcp.gaia",
+            "env": {
+                "MCP_TRANSPORT": "http",
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "ASPNETCORE_URLS": "http://localhost:5059"
+            },
+            "stopAtEntry": false,
+            "console": "internalConsole",
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "Now listening on:\\s+(https?://\\S+)"
+            }
+        },
+        {
+            "name": "Debug Gaia MCP (STDIO)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/.github/mcps/gaia/src/fa.mcp.gaia/bin/Debug/net9.0/fa.mcp.gaia.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/.github/mcps/gaia/src/fa.mcp.gaia",
+            "env": {
+                "MCP_TRANSPORT": "stdio",
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "stopAtEntry": false,
+            "console": "internalConsole"
+        }
+    ]
+}
