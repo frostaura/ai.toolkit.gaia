@@ -55,15 +55,15 @@ public sealed class MemoryTool
     [McpServerTool(Name = "memory_recall"), Description(
         "Recall all stored facts for a project, or filter by key prefix. Every Gaia agent should " +
         "call this at the start of a session to load project context (build commands, conventions, " +
-        "env vars) before doing work. Use keyPrefix to scope recall to a namespace. " +
+        "env vars) before doing work. Use key to scope recall to a namespace (prefix match). " +
         "Example: Developer agent starts work and calls memory_recall(project='my-api') to get all " +
-        "facts, or memory_recall(project='my-api', keyPrefix='env/') to get only environment variables.")]
-    public async Task<List<MemoryItem>> Recall(string project, string? keyPrefix = null)
+        "facts, or memory_recall(project='my-api', key='env/') to get only environment variables.")]
+    public async Task<List<MemoryItem>> Recall(string project, string? key = null)
     {
         var items = await _store.LoadAsync(project);
-        if (keyPrefix is not null)
+        if (key is not null)
         {
-            items = items.Where(m => m.Key.StartsWith(keyPrefix, StringComparison.OrdinalIgnoreCase)).ToList();
+            items = items.Where(m => m.Key.StartsWith(key, StringComparison.OrdinalIgnoreCase)).ToList();
         }
         return items;
     }

@@ -9,12 +9,10 @@ namespace Gaia.Mcp.Server.Tools;
 public sealed class TasksTool
 {
     private readonly JsonTaskStore _store;
-    private readonly string _repoRoot;
 
-    public TasksTool(JsonTaskStore store, string repoRoot)
+    public TasksTool(JsonTaskStore store)
     {
         _store = store;
-        _repoRoot = repoRoot;
     }
 
     [McpServerTool(Name = "tasks_create"), Description(
@@ -78,7 +76,7 @@ public sealed class TasksTool
     [McpServerTool(Name = "tasks_mark_done"), Description(
         "Mark a task as done. Enforces Gaia completion policy: all blockers must be resolved, " +
         "required gates satisfied, and proof args (changed_files, tests_added, manual_regression " +
-        "labels) must reference real paths. Returns a structured error with code and message if " +
+        "labels) must be provided. Returns a structured error with code and message if " +
         "validation fails, so the agent can fix issues and retry. " +
         "Example: tasks_mark_done(project='my-api', id='abc123', changedFiles=['src/Login.cs'], " +
         "testsAdded=['tests/LoginTests.cs'], manualRegressionLabels=['curl','playwright-mcp']).")]
@@ -94,13 +92,20 @@ public sealed class TasksTool
         {
             var task = tasks.Single(t => t.Id == id);
 
-            task.Proof.ChangedFiles = changedFiles.ToList();
-            task.Proof.TestsAdded = testsAdded.ToList();
-            task.Proof.ManualRegression = manualRegressionLabels.ToList();
+            // Validate with candidate proof before mutating the task.
+            var candidateProof = new ProofArgs
+            {
+                ChangedFiles = changedFiles.ToList(),
+                TestsAdded = testsAdded.ToList(),
+                ManualRegression = manualRegressionLabels.ToList()
+            };
+            var original = task.Proof;
+            task.Proof = candidateProof;
 
-            var err = CompletionValidator.ValidateMarkDone(task, _repoRoot);
+            var err = CompletionValidator.ValidateMarkDone(task);
             if (err is not null)
             {
+                task.Proof = original; // Revert — keep mutation atomic.
                 response = new { ok = false, error = new { code = err.Code, message = err.Message } };
                 return;
             }

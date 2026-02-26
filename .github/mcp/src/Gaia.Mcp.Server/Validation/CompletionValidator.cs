@@ -4,7 +4,7 @@ namespace Gaia.Mcp.Server.Validation;
 
 public static class CompletionValidator
 {
-    public static ToolError? ValidateMarkDone(TaskItem task, string repoRoot)
+    public static ToolError? ValidateMarkDone(TaskItem task)
     {
         if (task.Blockers.Count > 0)
         {
@@ -23,20 +23,8 @@ public static class CompletionValidator
             );
         }
 
-        // Validate proof paths exist
-        var missing = new List<string>();
-        foreach (var p in task.Proof.ChangedFiles.Concat(task.Proof.TestsAdded))
-        {
-            var full = System.IO.Path.Combine(repoRoot, p);
-            if (!File.Exists(full) && !Directory.Exists(full)) missing.Add(p);
-        }
-        if (missing.Count > 0)
-        {
-            return new ToolError(
-                ErrorCodes.MissingProofPaths,
-                $"Proof references missing paths: {string.Join(", ", missing)}"
-            );
-        }
+        // Proof paths are accepted as labels; no filesystem check.
+        // The MCP server may run remotely and cannot access the client's repo.
 
         // Gate satisfaction check
         var missingGates = task.RequiredGates.Except(task.GatesSatisfied).ToList();

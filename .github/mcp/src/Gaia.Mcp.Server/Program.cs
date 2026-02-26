@@ -6,11 +6,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 var dataDir = Environment.GetEnvironmentVariable("GAIA_DATA_DIR")
     ?? Path.Combine(AppContext.BaseDirectory, "data");
-var repoRoot = Environment.GetEnvironmentVariable("GAIA_REPO_ROOT")
-    ?? Directory.GetCurrentDirectory();
 
 var store = new JsonTaskStore(dataDir);
-var tasksTool = new TasksTool(store, repoRoot);
+var tasksTool = new TasksTool(store);
 
 var memoryStore = new ThreadSafeJsonStore<MemoryItem>(dataDir, ".memory.json");
 var memoryTool = new MemoryTool(memoryStore);
