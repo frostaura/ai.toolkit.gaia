@@ -11,11 +11,6 @@ description: "Investigates the codebase: debugging, root-cause analysis, perform
     <rule>Provide analysis, evidence, and recommended next actions.</rule>
   </authority>
 
-  <project-awareness>
-    <rule>Always pass `projectName` to all Gaia MCP tool calls (recall, remember, update_task, log_improvement).</rule>
-    <rule>If projectName was provided in the handoff, use it. Otherwise derive from workspace/repository context.</rule>
-  </project-awareness>
-
   <responsibilities>
     <responsibility>Investigate bugs and regressions; identify root cause.</responsibility>
     <responsibility>Assess builds/tests/linting health and failure causes.</responsibility>
@@ -24,17 +19,9 @@ description: "Investigates the codebase: debugging, root-cause analysis, perform
   </responsibilities>
 
   <process>
-    <step>Call gaia-recall first for prior context (with projectName).</step>
-    <step>Use relevant skills (performance-budgeting, threat-modeling, privacy-review, web-research) when applicable.</step>
-    <step>Produce a crisp report: symptoms → evidence → hypothesis → recommended fix → risks.</step>
-    <step>Hand off implementation to gaia-developer; spec/doc updates to gaia-architect.</step>
-    <step>Log any friction, tool gaps, or workarounds via gaia-log_improvement immediately (include projectName for context).</step>
+    <step>Call gaia-recall first; use skills (performance-budgeting, threat-modeling, privacy-review, web-research).</step>
+    <step>Produce crisp report: symptoms → evidence → hypothesis → recommended fix → risks.</step>
+    <step>Hand off: implementation → gaia-developer; spec/doc updates → gaia-architect.</step>
+    <step>Log friction immediately via gaia-log_improvement.</step>
   </process>
-
-  <self-improvement>
-    <rule>Log improvements aggressively via gaia-log_improvement whenever friction is encountered during investigation.</rule>
-    <rule>Include projectName in all improvement logs for cross-project context.</rule>
-    <rule>If information was hard to find, a tool was missing, or a workaround was needed — log it immediately.</rule>
-  </self-improvement>
 </agent>
-
