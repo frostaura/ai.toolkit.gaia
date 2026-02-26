@@ -1,10 +1,11 @@
+using System.ComponentModel;
 using Gaia.Mcp.Server.Models;
 using Gaia.Mcp.Server.Storage;
 using Gaia.Mcp.Server.Validation;
+using ModelContextProtocol.Server;
 
 namespace Gaia.Mcp.Server.Tools;
 
-// Tool methods are designed to be wired into an MCP host.
 public sealed class TasksTool
 {
     private readonly JsonTaskStore _store;
@@ -16,6 +17,7 @@ public sealed class TasksTool
         _repoRoot = repoRoot;
     }
 
+    [McpServerTool(Name = "tasks_create"), Description("Create a new task for a project.")]
     public TaskItem Create(string project, string title, IEnumerable<string>? requiredGates = null)
     {
         var tasks = _store.Load(project);
@@ -32,6 +34,7 @@ public sealed class TasksTool
         return task;
     }
 
+    [McpServerTool(Name = "tasks_list"), Description("List all tasks for a project.")]
     public List<TaskItem> List(string project) => _store.Load(project);
 
     public TaskItem Update(string project, string id, Action<TaskItem> mutate)
@@ -43,6 +46,7 @@ public sealed class TasksTool
         return task;
     }
 
+    [McpServerTool(Name = "tasks_mark_done"), Description("Mark a task as done with proof args.")]
     public object MarkDone(
         string project,
         string id,
@@ -69,6 +73,7 @@ public sealed class TasksTool
         return new { ok = true, task_id = id };
     }
 
+    [McpServerTool(Name = "tasks_flag_needs_input"), Description("Flag a task as needing human input.")]
     public TaskItem FlagNeedsInput(string project, string id, IEnumerable<string> questions)
     {
         return Update(project, id, t =>

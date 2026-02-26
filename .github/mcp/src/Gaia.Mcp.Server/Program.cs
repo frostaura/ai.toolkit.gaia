@@ -1,17 +1,27 @@
-// Gaia MCP Server (skeleton)
-// NOTE: This repo ships a reference implementation layout. Wire it into your MCP runtime of choice.
+var builder = WebApplication.CreateBuilder(args);
 
-using Gaia.Mcp.Server.Tools;
+var dataDir = Environment.GetEnvironmentVariable("GAIA_DATA_DIR")
+    ?? Path.Combine(AppContext.BaseDirectory, "data");
+var repoRoot = Environment.GetEnvironmentVariable("GAIA_REPO_ROOT")
+    ?? Directory.GetCurrentDirectory();
 
-namespace Gaia.Mcp.Server;
+var store = new JsonTaskStore(dataDir);
+var tasksTool = new TasksTool(store, repoRoot);
 
-public static class Program
-{
-    public static void Main(string[] args)
+builder.Services
+    .AddMcpServer(options =>
     {
-        // Intentionally minimal.
-        // Register tools with your MCP host / JSON-RPC bridge.
-        // Tools are implemented as pure services so they can be hosted anywhere.
-        Console.WriteLine("Gaia.Mcp.Server skeleton. Host integration required.");
-    }
-}
+        options.ServerInfo = new()
+        {
+            Name = "gaia-mcp",
+            Version = "1.0.0"
+        };
+    })
+    .WithHttpTransport()
+    .WithTools(tasksTool);
+
+var app = builder.Build();
+
+app.MapMcp();
+
+app.Run();
