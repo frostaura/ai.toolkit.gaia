@@ -61,7 +61,9 @@ public sealed class MemoryTool
         "env vars) before doing work. Use key to scope recall to a namespace (prefix match). " +
         "Example: Developer agent starts work and calls memory_recall(project='my-api') to get all " +
         "facts, or memory_recall(project='my-api', key='env/') to get only environment variables.")]
-    public async Task<List<MemoryItem>> Recall(string project, string? key = null)
+    public async Task<List<MemoryItem>> Recall(
+        [Description("Project identifier to recall facts for. Returns all stored facts for this project (unless filtered by key).")] string project,
+        [Description("Optional key or key prefix to filter results. If provided, returns only facts whose key starts with this value (prefix match, case-insensitive). Omit to return all facts for the project. Example: 'env/' returns all env-namespaced facts.")] string? key = null)
     {
         var items = await _store.LoadAsync(project);
         if (key is not null)

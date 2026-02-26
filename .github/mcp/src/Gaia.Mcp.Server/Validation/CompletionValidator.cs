@@ -14,12 +14,17 @@ public static class CompletionValidator
             );
         }
 
-        // Proof args required (paths/labels only)
-        if (task.Proof.ChangedFiles.Count == 0 || task.Proof.TestsAdded.Count == 0)
+        // Proof args required (paths/labels only) — all three must be non-empty
+        if (task.Proof.ChangedFiles.Count == 0 || task.Proof.TestsAdded.Count == 0 || task.Proof.ManualRegression.Count == 0)
         {
+            var missing = new List<string>();
+            if (task.Proof.ChangedFiles.Count == 0) missing.Add("changedFiles");
+            if (task.Proof.TestsAdded.Count == 0) missing.Add("testsAdded");
+            if (task.Proof.ManualRegression.Count == 0) missing.Add("manualRegressionLabels");
             return new ToolError(
                 ErrorCodes.MissingProofArgs,
-                "mark_done requires proof args: changed_files[], tests_added[], manual_regression[] (labels)."
+                $"mark_done requires all three proof arrays to be non-empty. Missing: {string.Join(", ", missing)}. " +
+                "Each array must contain at least one entry (file path or label)."
             );
         }
 

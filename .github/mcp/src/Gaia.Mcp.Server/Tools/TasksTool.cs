@@ -24,6 +24,7 @@ public sealed class TasksTool
     public async Task<TaskItem> Create(
         [Description("Project identifier that scopes this task. Must match the project name used across all Gaia tools (tasks, memory, self-improve) for consistency. Example: 'my-api'.")] string project,
         [Description("Short, action-oriented title summarizing what this task accomplishes. Should be specific enough to be actionable without reading the description. Example: 'Add Playwright specs for login flow'.")] string title,
+        [Description("Optional longer description providing context, acceptance criteria, or implementation notes for the task. Omit if the title is self-explanatory.")] string? description = null,
         [Description("Optional list of gate labels that must ALL be satisfied before tasks_mark_done will accept this task as complete. Each gate is a string label (e.g. 'ci-green', 'docs-updated', 'lint-clean'). Gates are satisfied by calling tasks_update with gatesSatisfied. If omitted, no gates are enforced.")] string[]? requiredGates = null)
     {
         TaskItem task = null!;
@@ -34,6 +35,7 @@ public sealed class TasksTool
                 Id = Guid.NewGuid().ToString("N"),
                 Project = project,
                 Title = title,
+                Description = description,
                 Status = "todo",
                 RequiredGates = requiredGates?.ToList() ?? new()
             };
@@ -60,7 +62,9 @@ public sealed class TasksTool
         [Description("Project identifier the task belongs to.")] string project,
         [Description("The unique task ID (32-char hex string) returned by tasks_create. Must match exactly.")] string id,
         [Description("New title for the task. Pass null/omit to keep the current title unchanged.")] string? title = null,
+        [Description("New description for the task. Pass null/omit to keep the current description unchanged.")] string? description = null,
         [Description("New status for the task. Allowed values: 'todo', 'doing', 'done'. Note: prefer tasks_mark_done over setting status to 'done' directly, as mark_done enforces proof and gate validation. Pass null/omit to keep current status.")] string? status = null,
+        [Description("List of gate labels that must be satisfied before mark_done succeeds (e.g. ['ci-green', 'docs-updated']). Replaces the entire requiredGates list. Pass null/omit to keep current required gates unchanged.")] string[]? requiredGates = null,
         [Description("List of gate labels now satisfied (e.g. ['ci-green', 'docs-updated']). Replaces the entire gatesSatisfied list. Must be a subset of the task's requiredGates. Pass null/omit to keep current gates unchanged.")] string[]? gatesSatisfied = null,
         [Description("List of blocker strings. Replaces the entire blockers list. Use to add or clear blockers. To clear all blockers, pass an empty array []. Unresolved blockers prevent tasks_mark_done from succeeding. Pass null/omit to keep current blockers unchanged.")] string[]? blockers = null)
     {
@@ -69,7 +73,9 @@ public sealed class TasksTool
         {
             var task = tasks.Single(t => t.Id == id);
             if (title is not null) task.Title = title;
+            if (description is not null) task.Description = description;
             if (status is not null) task.Status = status;
+            if (requiredGates is not null) task.RequiredGates = requiredGates.ToList();
             if (gatesSatisfied is not null) task.GatesSatisfied = gatesSatisfied.ToList();
             if (blockers is not null) task.Blockers = blockers.ToList();
             result = task;
