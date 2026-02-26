@@ -23,7 +23,7 @@ public sealed class TasksTool
         "can optionally require gates (e.g. 'ci-green', 'docs-updated') that must be satisfied before " +
         "mark_done succeeds. Example: after Repo Explorer survey, Orchestrator calls tasks_create with " +
         "project='my-api', title='Add Playwright specs for login flow', requiredGates=['ci-green','docs-updated'].")]
-    public async Task<TaskItem> Create(string project, string title, IEnumerable<string>? requiredGates = null)
+    public async Task<TaskItem> Create(string project, string title, string[]? requiredGates = null)
     {
         TaskItem task = null!;
         await _store.MutateAsync(project, tasks =>
@@ -59,8 +59,8 @@ public sealed class TasksTool
         string id,
         string? title = null,
         string? status = null,
-        IEnumerable<string>? gatesSatisfied = null,
-        IEnumerable<string>? blockers = null)
+        string[]? gatesSatisfied = null,
+        string[]? blockers = null)
     {
         TaskItem result = null!;
         await _store.MutateAsync(project, tasks =>
@@ -85,9 +85,9 @@ public sealed class TasksTool
     public async Task<object> MarkDone(
         string project,
         string id,
-        IEnumerable<string> changedFiles,
-        IEnumerable<string> testsAdded,
-        IEnumerable<string> manualRegressionLabels)
+        string[] changedFiles,
+        string[] testsAdded,
+        string[] manualRegressionLabels)
     {
         object response = null!;
         await _store.MutateAsync(project, tasks =>
@@ -118,7 +118,7 @@ public sealed class TasksTool
         "Example: Analyst is unsure whether a use-case change is breaking: " +
         "tasks_flag_needs_input(project='my-api', id='abc123', questions=['Is removing the /v1 " +
         "endpoint a breaking change? Should we keep a redirect?']).")]
-    public async Task<TaskItem> FlagNeedsInput(string project, string id, IEnumerable<string> questions)
+    public async Task<TaskItem> FlagNeedsInput(string project, string id, string[] questions)
     {
         TaskItem result = null!;
         await _store.MutateAsync(project, tasks =>
