@@ -34,6 +34,6 @@ builder.Services
 
 var app = builder.Build();
 
-app.MapMcp();
+app.MapMcp("/mcp");
 
 app.Run();
