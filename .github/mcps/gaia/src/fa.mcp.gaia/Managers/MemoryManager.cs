@@ -359,6 +359,24 @@ namespace FrostAura.MCP.Gaia.Managers
                         .GroupBy(m => SanitizeProjectName(m.ProjectName))
                         .ToList();
 
+                    var expectedPaths = byProject
+                        .Select(group => Path.GetFullPath(GetProjectMemoryPath(group.Key)))
+                        .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+                    if (Directory.Exists(ProjectsBasePath))
+                    {
+                        var existingMemoryFiles = Directory.GetFiles(ProjectsBasePath, "memory.json", SearchOption.AllDirectories);
+                        foreach (var existingPath in existingMemoryFiles)
+                        {
+                            var fullExistingPath = Path.GetFullPath(existingPath);
+                            if (!expectedPaths.Contains(fullExistingPath))
+                            {
+                                File.Delete(fullExistingPath);
+                                _logger.LogDebug("[MEMORY:SAVE] Deleted stale memory file at {Path}", fullExistingPath);
+                            }
+                        }
+                    }
+
                     foreach (var group in byProject)
                     {
                         var path = GetProjectMemoryPath(group.Key);
@@ -400,7 +418,7 @@ namespace FrostAura.MCP.Gaia.Managers
         /// </summary>
         [McpServerTool]
         [Description("Store important decisions/context for later recalling. Upserts by category+key to prevent duplicates.")]
-        public Task<RememberResponse> remember(
+        public async Task<RememberResponse> remember(
             [Description("The memory to store")] RememberRequest request)
         {
             _logger.LogDebug(
@@ -451,8 +469,8 @@ namespace FrostAura.MCP.Gaia.Managers
                     // Immediately update in-memory for read consistency
                     _persistentMemories[compositeKey] = memory;
 
-                    // Queue for disk persistence (fire-and-forget with guaranteed delivery)
-                    _ = QueueWriteAsync(memory, isDelete: false);
+                    // Queue for disk persistence and wait for acknowledgment
+                    await QueueWriteAsync(memory, isDelete: false);
                 }
 
                 if (isUpdate)
@@ -480,13 +498,13 @@ namespace FrostAura.MCP.Gaia.Managers
                         _persistentMemories.Count);
                 }
 
-                return Task.FromResult(new RememberResponse
+                return new RememberResponse
                 {
                     Success = true,
                     Message = $"Memory {(isUpdate ? "updated" : "stored")} ({request.Duration}): {request.Category}/{request.Key}",
                     WasUpdate = isUpdate,
                     Memory = memory
-                });
+                };
             }
             catch (Exception ex)
             {
@@ -496,13 +514,13 @@ namespace FrostAura.MCP.Gaia.Managers
                     request.Key,
                     ex.Message);
 
-                return Task.FromResult(new RememberResponse
+                return new RememberResponse
                 {
                     Success = false,
                     Message = $"Error storing memory: {ex.Message}",
                     WasUpdate = false,
                     Memory = null
-                });
+                };
             }
         }
 

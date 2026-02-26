@@ -345,7 +345,7 @@ namespace FrostAura.MCP.Gaia.Managers
         /// </summary>
         [McpServerTool]
         [Description("Log an improvement request when you encounter frustrations, missing capabilities, or workflow inefficiencies. Use this to wish improvements into existence!")]
-        public Task<LogImprovementResponse> log_improvement(
+        public async Task<LogImprovementResponse> log_improvement(
             [Description("The improvement request to log")] LogImprovementRequest request)
         {
             _logger.LogDebug(
@@ -375,8 +375,8 @@ namespace FrostAura.MCP.Gaia.Managers
                 // Immediately update in-memory for read consistency
                 _improvements[improvement.Id] = improvement;
 
-                // Queue for disk persistence (fire-and-forget with guaranteed delivery)
-                _ = QueueWriteAsync(improvement);
+                // Queue for disk persistence and wait for acknowledgment
+                await QueueWriteAsync(improvement);
 
                 _logger.LogInformation(
                     "[IMPROVEMENT:LOGGED] Agent={Agent} | Type={Type} | Priority={Priority} | Title={Title} | TotalImprovements={TotalImprovements}",
@@ -386,12 +386,12 @@ namespace FrostAura.MCP.Gaia.Managers
                     request.Title,
                     _improvements.Count);
 
-                return Task.FromResult(new LogImprovementResponse
+                return new LogImprovementResponse
                 {
                     Success = true,
                     Message = $"Improvement logged successfully: {request.Title}. Your feedback helps evolve the system!",
                     Improvement = improvement
-                });
+                };
             }
             catch (Exception ex)
             {
@@ -401,12 +401,12 @@ namespace FrostAura.MCP.Gaia.Managers
                     request.Type,
                     ex.Message);
 
-                return Task.FromResult(new LogImprovementResponse
+                return new LogImprovementResponse
                 {
                     Success = false,
                     Message = $"Error logging improvement: {ex.Message}",
                     Improvement = null
-                });
+                };
             }
         }
 
