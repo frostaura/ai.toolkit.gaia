@@ -25,7 +25,10 @@ public sealed class MemoryTool
         "(upsert). Keys should be descriptive and namespaced (e.g. 'build/command', 'env/DATABASE_URL'). " +
         "Example: after Repo Explorer discovers the build command, it calls " +
         "memory_remember(project='my-api', key='build/command', value='dotnet build src/Api.csproj').")]
-    public async Task<MemoryItem> Remember(string project, string key, string value)
+    public async Task<MemoryItem> Remember(
+        [Description("Project identifier that scopes this memory entry. Must match the project name used across all Gaia tools (tasks, memory, self-improve) for consistency. Example: 'my-api'.")] string project,
+        [Description("Descriptive, namespaced key for the fact being stored. Use '/' to create logical namespaces (e.g. 'build/command', 'env/DATABASE_URL', 'convention/branch-naming', 'stack/language'). If the key already exists, its value is updated (upsert semantics). Keys are case-sensitive.")] string key,
+        [Description("The fact value to store. Should be a concise, durable piece of knowledge — a command, a URL, a convention description, or a config value. Avoid storing ephemeral or session-specific information.")] string value)
     {
         MemoryItem result = null!;
         await _store.MutateAsync(project, items =>
@@ -74,7 +77,9 @@ public sealed class MemoryTool
         "Keeps memory clean and prevents agents from acting on stale information. " +
         "Example: after migrating from npm to pnpm, call " +
         "memory_forget(project='my-app', key='build/command') then re-store the updated command.")]
-    public async Task<object> Forget(string project, string key)
+    public async Task<object> Forget(
+        [Description("Project identifier the fact belongs to.")] string project,
+        [Description("Exact key of the fact to remove. Must match the stored key exactly (case-sensitive). Use memory_recall to discover existing keys if unsure.")] string key)
     {
         var removed = false;
         await _store.MutateAsync(project, items =>
@@ -91,7 +96,8 @@ public sealed class MemoryTool
         "This is destructive — all memorized conventions, build commands, and env vars are lost. " +
         "Example: after a major repo restructure, Orchestrator calls " +
         "memory_clear(project='my-api') then triggers a fresh Repo Explorer survey.")]
-    public async Task<object> Clear(string project)
+    public async Task<object> Clear(
+        [Description("Project identifier whose entire memory store will be wiped. This is destructive — all stored conventions, build commands, env vars, and other facts for this project are permanently deleted.")] string project)
     {
         await _store.SaveAsync(project, new());
         return new { ok = true, project };

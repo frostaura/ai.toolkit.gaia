@@ -28,7 +28,10 @@ public sealed class SelfImproveTool
         "Example: Quality Gatekeeper notices CI keeps failing on forgotten lint step: " +
         "self_improve_log(project='my-api', suggestion='Add lint gate to required_gates for all " +
         "tasks to prevent CI failures from unfixed lint issues', category='ci').")]
-    public async Task<ImprovementItem> Log(string project, string suggestion, string? category = null)
+    public async Task<ImprovementItem> Log(
+        [Description("Project identifier providing context for the suggestion. Links the improvement to a specific project so it can be filtered and reviewed per-project.")] string project,
+        [Description("The improvement suggestion text. Should be a clear, actionable description of what to change or adopt. Describe the problem observed and the recommended fix. Example: 'Add lint gate to required_gates for all tasks to prevent CI failures'.")] string suggestion,
+        [Description("Optional category label to group suggestions for easier filtering. Recommended categories: 'workflow', 'testing', 'ci', 'documentation', 'tool-usage', 'loop-breaker'. Use 'loop-breaker' specifically for escape strategies when stuck in recurring blockers. Omit if no category applies.")] string? category = null)
     {
         var item = new ImprovementItem
         {
@@ -48,7 +51,9 @@ public sealed class SelfImproveTool
         "recurring blocker — your past self may have already logged a way out. " +
         "Example: Orchestrator reviews lessons learned before planning: " +
         "self_improve_list() for all, or self_improve_list(category='loop-breaker') for escape tips.")]
-    public async Task<List<ImprovementItem>> List(string? project = null, string? category = null)
+    public async Task<List<ImprovementItem>> List(
+        [Description("Optional project identifier to filter suggestions. Only suggestions logged for this project are returned. Omit to return suggestions across all projects.")] string? project = null,
+        [Description("Optional category label to filter suggestions (e.g. 'workflow', 'ci', 'loop-breaker'). Case-insensitive matching. Omit to return all categories.")] string? category = null)
     {
         var items = await _store.LoadAsync(GlobalKey);
         if (project is not null)
@@ -67,7 +72,8 @@ public sealed class SelfImproveTool
         "your improvement backlog clean and records what you have learned and adopted. " +
         "Example: after Orchestrator adds a lint gate to the default required_gates list based " +
         "on a past lesson, it calls self_improve_mark_applied(id='abc123') to close the loop.")]
-    public async Task<object> MarkApplied(string id)
+    public async Task<object> MarkApplied(
+        [Description("The unique ID (32-char hex string) of the self-improvement suggestion to mark as applied. Obtain this from the id field in self_improve_list results.")] string id)
     {
         var found = false;
         await _store.MutateAsync(GlobalKey, items =>
@@ -88,7 +94,8 @@ public sealed class SelfImproveTool
         "are no longer relevant after a major process overhaul. " +
         "Example: after a full process review, clear stale lessons for a retired project: " +
         "self_improve_clear(project='old-service').")]
-    public async Task<object> Clear(string? project = null)
+    public async Task<object> Clear(
+        [Description("Optional project identifier. If provided, only suggestions for this project are removed. If omitted, ALL suggestions across all projects are wiped. Use with caution when omitting — this clears the entire global improvement backlog.")] string? project = null)
     {
         if (project is null)
         {
