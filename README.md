@@ -4,6 +4,7 @@
 
 <h1 align="center"><b>Gaia</b></h1>
 <h3 align="center">full-stack apps. enterprise-grade. maintainable. customizable.</h3>
+<i>v7</i>
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub Copilot](https://img.shields.io/badge/GitHub-Copilot-blue.svg)]()
