@@ -3,7 +3,6 @@ namespace Gaia.Mcp.Server.Models;
 public static class ErrorCodes
 {
     public const string MissingProofArgs = "GAIA_TASKS_ERR_MISSING_PROOF_ARGS";
-    public const string MissingProofPaths = "GAIA_TASKS_ERR_MISSING_PROOF_PATHS";
     public const string BlockersUnresolved = "GAIA_TASKS_ERR_BLOCKERS_UNRESOLVED";
     public const string GatesUnsatisfied = "GAIA_TASKS_ERR_GATES_UNSATISFIED";
     public const string NeedsInputUnresolved = "GAIA_TASKS_ERR_NEEDS_INPUT_UNRESOLVED";

@@ -19,8 +19,15 @@ Ensure use cases are validated by the right tests at the right boundaries.
 ## Non-negotiables
 
 - Prefer existing test conventions; standardize only when missing.
+- Document test strategies in `/docs/testing/` using `TEST-000-template.md` as the template (naming: `TEST-NNN-short-title.md`).
 - Do not mark tasks done; orchestrator uses MCP tools.
 - If tests cannot run due to env/credentials: raise blockers immediately.
+
+## MCP tools (use aggressively)
+
+- `memory_remember(project, key, value)`: persist test patterns, fixture conventions, and env-specific testing details.
+- `memory_recall(project)`: check prior test conventions before authoring tests.
+- `tasks_create` / `tasks_update`: can be used for isolated sub-task tracking when delegated complex testing work.
 
 ## Skills to use
 

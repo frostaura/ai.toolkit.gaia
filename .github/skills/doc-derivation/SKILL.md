@@ -25,10 +25,10 @@ This work is **blocking**: do it before feature work.
 
 A comprehensive `/docs/` set that reflects the real system:
 
-- `/docs/use-cases/` (one use case per file; each with `UC-###`)
-- `/docs/architecture/` (system overview + key decisions)
-- `/docs/testing/` (how tests are structured + how to run)
-- `/docs/README.md` (docs index + source-of-truth statement)
+- `/docs/use-cases/` — one use case per file; use `UC-000-template.md` (naming: `UC-NNN-short-title.md`)
+- `/docs/architecture/` — system overview + key decisions; use `ARCH-000-template.md` (naming: `ARCH-NNN-short-title.md`)
+- `/docs/testing/` — how tests are structured + how to run; use `TEST-000-template.md` (naming: `TEST-NNN-short-title.md`)
+- `/docs/README.md` — docs index + source-of-truth statement
 
 ## Constraints
 

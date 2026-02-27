@@ -21,6 +21,11 @@ Make work unambiguous and testable: clear acceptance criteria, edge cases, and r
 - Tie criteria to observable outcomes.
 - If ambiguous: propose MCQ/yes-no questions for “needs input”.
 
+## MCP tools (use aggressively)
+
+- `memory_recall(project)`: retrieve prior context (known requirements, edge cases, risk patterns) before analysis.
+- `memory_remember(project, key, value)`: persist analytical findings (risk patterns, requirement clarifications).
+
 ## Skills to use
 
 - `gaia-process`

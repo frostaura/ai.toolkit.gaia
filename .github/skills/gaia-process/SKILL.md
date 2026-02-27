@@ -7,36 +7,25 @@ description: End-to-end Gaia SDLC workflow (Repo Explorer → drift/CI fixes →
 
 ## When to use
 
-Use this skill for **every request** to ensure docs/code/CI/skills stay in sync and work is delivered with the required quality gates. Agent Skills can include instructions + referenced resources/scripts. :contentReference[oaicite:0]{index=0}
+Use this skill for **every request** to ensure docs/code/CI/skills stay in sync and work is delivered with the required quality gates.
+
+> All rules, gates, roles, and MCP tool signatures live in `AGENTS.md`. This skill is the **procedural workflow only**.
 
 ## Inputs
 
 - User request (feature/bug/refactor/docs)
 - Current repo state (unknown until Repo Explorer runs)
-- Available MCP tools (tasks, memories, self-improve)
+- Available MCP tools: `tasks_*`, `memory_*`, `self_improve_*` (see `AGENTS.md §7`)
 
-## Required outcomes
+## Step 0 — Load context (fast)
 
-- Repo reality understood (survey)
-- Drift resolved (docs ↔ code) **before** feature work
-- CI exists and is green (or fixed) **before** feature work
-- Task graph fully captured in MCP (with gates + blockers)
-- Delivery meets gates; completion recorded via MCP proof args
-- QA Gatekeeper approval (veto respected)
-
-## Step 0 — Read the repo contracts (fast)
-
-1. Read `AGENTS.md` (non-negotiables + roles + gating).
-2. Read `.github/copilot-instructions.md` (always-on rules).
-3. Identify existing conventions:
-   - Make targets (preferred)
-   - CI workflows
-   - test folders and naming
-   - docker-compose presence for HTTP APIs
+1. Read `AGENTS.md` (canonical rules, roles, gates, MCP tools, proof, Definition of Done).
+2. Call `memory_recall(project)` and `self_improve_list()` to load prior context and lessons.
+3. Identify existing conventions (Make targets, CI workflows, test folders, docker-compose).
 
 ## Step 1 — Repo Explorer FIRST (always)
 
-Delegate to **Repo Explorer** and request a compact “Repo Survey”:
+Delegate to **Repo Explorer** (`SKILL: repository-audit`) for a compact "Repo Survey":
 
 - Stack(s) and build system
 - `/docs` presence + gaps
@@ -48,7 +37,8 @@ Delegate to **Repo Explorer** and request a compact “Repo Survey”:
 - Makefile presence and targets
 - skill drift signal (skills vs reality)
 
-Repo Explorer may include a **Suggested Task List**, but the orchestrator owns the actual MCP task graph.
+Repo Explorer stores discovered conventions via `memory_remember(project, key, value)`.
+Orchestrator owns the actual MCP task graph.
 
 ## Step 2 — Hard blockers (resolve before feature work)
 
@@ -62,14 +52,14 @@ If any of the following are true, create blocking tasks and fix autonomously fir
 Drift resolution direction:
 
 - Decide case-by-case; if unsure, default to docs.
-- If “code wins” implies behavior/use-case change → apply use-case gates (below).
+- If “code wins” implies behavior/use-case change → apply use-case gates.
 
 ## Step 3 — Build the Task Graph (orchestrator supremacy)
 
-Create MCP tasks to cover **all** work:
+Call `tasks_create(project, title, requiredGates[])` for **all** work:
 
 - Foundations (CI, lint/format, docker-compose, Makefile targets)
-- Docs/spec (create/derive/update)
+- Docs/spec (create/derive/update — use templates in `/docs/`)
 - Implementation
 - Tests (unit + integration/e2e as required)
 - Manual regression (labels only)
@@ -77,31 +67,16 @@ Create MCP tasks to cover **all** work:
 
 In-flight discovery:
 
-- If you uncover TODOs, gaps, or new risks: add tasks immediately.
+- If you uncover TODOs, gaps, or new risks: call `tasks_create` immediately.
 - “No TODO left behind”: turn TODOs into MCP tasks or `blockers[]`.
 
 ## Step 4 — Decide gates per task (explicit)
 
-For each MCP task, set `required_gates[]` explicitly (do not guess later):
-Baseline gates (always):
-
-- `lint`
-- `build`
-- `ci`
-
-Use-case change gates (when adding/changing/removing a use case):
-
-- `integration` (and/or `e2e` where applicable)
-- `manual-regression`
-  Rules:
-- Web: require Playwright specs when none exist; otherwise follow existing test framework.
-- Manual regression:
-  - backend: curl-like checks against docker-compose stack
-  - web: Playwright MCP manual walkthrough
+For each MCP task, set `required_gates[]` explicitly per `AGENTS.md §10 Canonical gate vocabulary`.
 
 If tests/regression cannot be run:
 
-- call MCP to add `blockers[]` / “needs input” questions
+- call `tasks_flag_needs_input(project, id, questions[])` to block on human input
 - do parallelizable work, but completion stays blocked
 
 ## Step 5 — Execute with delegation
@@ -114,17 +89,19 @@ Delegate by intent:
 - Test authoring → Tester
 - Independent verification → Quality Gatekeeper
 
-Subagent requests must be **tight** (inputs + expected output + constraints) to avoid context bloat. Clear personas and boundaries improve agent reliability. :contentReference[oaicite:1]{index=1}
+Subagent requests must be **tight** (inputs + expected output + constraints) to avoid context bloat.
 
 ## Step 6 — Completion proof (MCP-enforced, low-context)
 
-To mark DONE for a task, call MCP `mark_done` with:
+Call `tasks_mark_done(project, id, changedFiles[], testsAdded[], manualRegressionLabels[])`:
 
-- `changed_files[]` (paths)
-- `tests_added[]` (paths)
-- `manual_regression[]` (labels like `curl`, `playwright-mcp`)
-  Do not paste logs; store only paths/labels.
-  MCP should refuse completion with clear error codes/messages when missing. :contentReference[oaicite:2]{index=2}
+- `changedFiles[]` (paths)
+- `testsAdded[]` (paths)
+- `manualRegressionLabels[]` (labels like `curl`, `playwright-mcp`)
+
+Do not paste logs; store only paths/labels.
+Store discovered conventions via `memory_remember(project, key, value)`.
+Log lessons learned via `self_improve_log(project, suggestion, category)`.
 
 ## Step 7 — QA Gatekeeper review (veto)
 
@@ -151,8 +128,7 @@ End with **one short paragraph**:
 
 ## References (read/consult)
 
-- `AGENTS.md` (repo constitution)
-- `.github/copilot-instructions.md` (repo instructions)
+- `AGENTS.md` (repo constitution — canonical rules, MCP tools, gates)
 - `.github/agents/` (role definitions)
 - `.github/skills/` (procedures)
 - `Makefile` (canonical local commands)

@@ -55,6 +55,12 @@ You are independent from implementation and can veto completion.
 - If approved: “APPROVED” + 1–3 bullets (what you checked).
 - If not approved: “NOT DONE” + a short checklist of missing items.
 
+## MCP tools (use aggressively)
+
+- `tasks_list(project)`: review all task states, gates, and proof before approving.
+- `self_improve_log(project, suggestion)`: log process improvements when you spot recurring veto patterns.
+- `memory_recall(project)`: check prior conventions before verifying.
+
 ## Skills to consult
 
 - `spec-consistency`

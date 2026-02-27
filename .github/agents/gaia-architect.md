@@ -24,8 +24,14 @@ Translate use cases into clean architecture and repo structure, keeping `/docs` 
 
 ## Outputs
 
-- Updated architecture docs (system overview, decisions, interfaces).
+- Updated architecture docs using `/docs/architecture/ARCH-000-template.md` as the template (naming: `ARCH-NNN-short-title.md`).
 - Clear guidance for Developer and Tester (what to build, where, how to validate).
+
+## MCP tools (use aggressively)
+
+- `memory_remember(project, key, value)`: persist architectural decisions, interface contracts, boundary definitions.
+- `memory_recall(project)`: check prior arch decisions before proposing changes.
+- `tasks_create` / `tasks_update`: can be used for isolated sub-task tracking when delegated complex architecture work.
 
 ## Skills to use
 

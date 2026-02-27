@@ -77,19 +77,48 @@ To mark a task done, the orchestrator must call MCP with proof args:
 - `manual_regression[]` (labels like `curl`, `playwright-mcp`)
   Proof is link-only (paths/labels). Do NOT paste long logs.
 
-## 7) Task model (MCP)
+## 7) Task model (MCP tools)
 
-- Status: `todo | doing | done`
-- Blockers: `blockers[]` (non-empty means not completable)
-- Gates: orchestrator sets `required_gates[]` explicitly per task
-- MCP must refuse `mark_done` with clear error codes + actionable messages if:
-  - blockers exist
-  - required_gates unmet
-  - proof args missing/invalid (paths must exist)
+Task tools (`tasks_*`):
 
-“Needs human input” mode:
+- `tasks_create(project, title, requiredGates[])` — create a new task.
+- `tasks_list(project)` — list all tasks and their state.
+- `tasks_update(project, id, ...)` — update status/gates/blockers.
+- `tasks_mark_done(project, id, changedFiles[], testsAdded[], manualRegressionLabels[])` — complete with proof.
+- `tasks_flag_needs_input(project, id, questions[])` — block on human input.
+- `tasks_delete(project, id)` / `tasks_clear(project)` — cleanup.
 
-- If blocked by missing info/credentials, call MCP to add blockers/questions and continue with parallelizable work.
+Memory tools (`memory_*`):
+
+- `memory_remember(project, key, value)` — persist a stable fact.
+- `memory_recall(project, key?)` — recall facts (call at session start).
+- `memory_forget(project, key)` / `memory_clear(project)` — cleanup.
+
+Self-improvement tools (`self_improve_*`):
+
+- `self_improve_log(project, suggestion, category?)` — log a lesson learned.
+- `self_improve_list(project?, category?)` — review lessons (call at session start).
+- `self_improve_mark_applied(id)` / `self_improve_clear(project?)` — manage backlog.
+
+Task fields:
+
+- `status`: `todo | doing | done`
+- `blockers[]`: non-empty means not completable
+- `required_gates[]`: set explicitly per task by orchestrator
+- `gates_satisfied[]`: updated as gates pass
+- `proof`: `changed_files[]`, `tests_added[]`, `manual_regression[]`
+
+`tasks_mark_done` refuses with error codes when:
+
+- `GAIA_TASKS_ERR_BLOCKERS_UNRESOLVED` — blockers exist
+- `GAIA_TASKS_ERR_NEEDS_INPUT_UNRESOLVED` — human input pending
+- `GAIA_TASKS_ERR_GATES_UNSATISFIED` — required gates not met
+- `GAIA_TASKS_ERR_MISSING_PROOF_ARGS` — proof arrays empty
+
+"Needs human input" mode:
+
+- Call `tasks_flag_needs_input(project, id, questions[])` to block on human input.
+- Continue parallelizable work while waiting.
 
 ## 8) Skills policy (keep current)
 
@@ -100,14 +129,43 @@ To mark a task done, the orchestrator must call MCP with proof args:
 ## 9) Subagents (context hygiene)
 
 - Use subagents for isolated exploration/research/review to avoid bloating the main context.
-- Subagents must receive a clear task + expected output and return only a concise result. :contentReference[oaicite:1]{index=1}
+- Subagents must receive a clear task + expected output and return only a concise result.
+- Subagents can use `tasks_*` tools for their own isolated task tracking when delegated complex work.
 
-## 10) Definition of Done (hard gate)
+## 10) Canonical gate vocabulary
+
+Use these labels consistently in `required_gates[]` and `gates_satisfied[]`:
+
+| Gate                | Meaning                                |
+| ------------------- | -------------------------------------- |
+| `lint`              | Lint/format passes                     |
+| `build`             | Project builds successfully            |
+| `ci`                | CI workflow is green                   |
+| `unit`              | Unit tests pass                        |
+| `integration`       | Integration tests pass (HTTP boundary) |
+| `e2e`               | E2E / Playwright specs pass            |
+| `manual-regression` | Manual regression performed            |
+| `docs-updated`      | Docs reflect behavior changes          |
+| `docker-ready`      | docker-compose stack runs              |
+
+Manual regression labels (for `manual_regression[]` proof):
+
+- `curl` — API regression via curl against compose stack
+- `playwright-mcp` — Web regression via Playwright MCP tools
+
+## 11) Definition of Done (hard gate)
 
 A task is DONE only when:
 
 - Required docs/spec are updated (when behavior changes),
 - CI exists and is green (or will be green once merged, per current branch checks),
 - Required gates pass for the task (as declared in `required_gates[]`),
-- Proof args are recorded via MCP,
+- Proof args are recorded via `tasks_mark_done`,
 - Quality Gatekeeper approves (orchestrator must comply with veto).
+
+## 12) Memory and self-improvement (use aggressively)
+
+- **Every session start**: call `memory_recall(project)` and `self_improve_list()` to load context.
+- **Repo Explorer**: `memory_remember` discovered conventions (build commands, env vars, stack details).
+- **After mistakes/inefficiencies**: call `self_improve_log` to record lessons for future sessions.
+- **After applying a lesson**: call `self_improve_mark_applied` to close the loop.

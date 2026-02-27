@@ -42,12 +42,12 @@ Look for (examples, not exhaustive):
 Inspect `/docs`:
 
 - Does it exist?
-- Is there `/docs/use-cases/`?
-- Are use cases “one per file” and do they have `UC-###`?
-- Is there `/docs/architecture/`?
+- Is there `/docs/use-cases/`? Are use cases one-per-file with `UC-NNN` naming?
+- Is there `/docs/architecture/`? Are decisions documented with `ARCH-NNN` naming?
+- Is there `/docs/testing/`? Are test strategies documented with `TEST-NNN` naming?
   Report:
-- What’s present
-- What’s missing
+- What's present
+- What's missing (templates exist at `*-000-template.md` in each folder)
 - Any obvious staleness/duplication
 
 ## Step 3 — Drift checks (blocking signals)

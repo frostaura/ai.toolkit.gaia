@@ -34,21 +34,31 @@ Deliver spec-driven work with maximum quality and speed by:
 4. **Integrate**: Ensure work merges cleanly and stays consistent.
 5. **Enforce**: Respect QA veto; never mark done without gates + proof.
 
+## MCP tools (use aggressively)
+
+- **Session start**: `memory_recall(project)` + `self_improve_list()` to load prior context and lessons.
+- **Planning & execution**: `tasks_create`, `tasks_update`, `tasks_mark_done`, `tasks_flag_needs_input`, `tasks_list`, `tasks_delete`, `tasks_clear`.
+- **After discovering conventions**: `memory_remember(project, key, value)` to persist stable facts.
+- **After mistakes/inefficiencies**: `self_improve_log(project, suggestion)` to record lessons for future sessions.
+- **After applying a lesson**: `self_improve_mark_applied(id)` to close the loop.
+
 ## Workflow (always)
 
-1. Use `SKILL: repository-audit` (delegate to Repo Explorer).
-2. Resolve blockers in this order:
+1. Call `memory_recall(project)` + `self_improve_list()` (load context).
+2. Use `SKILL: repository-audit` (delegate to Repo Explorer).
+3. Resolve blockers in this order:
    - docs↔code drift
    - CI missing/failing
    - skill drift
    - docker-compose missing for HTTP API
-3. Create MCP tasks for all work (use `SKILL: tasking-and-proof`).
-4. Decide if request changes use cases:
-   - If unsure: default to “use-case change”.
-5. Execute via delegation:
+4. Create MCP tasks for all work (use `SKILL: tasking-and-proof`).
+5. Decide if request changes use cases:
+   - If unsure: default to "use-case change".
+6. Execute via delegation:
    - Architect, Developer, Tester as needed.
-6. Require QA Gatekeeper review (always).
-7. Mark tasks done via MCP with proof args only (paths/labels).
+7. Require QA Gatekeeper review (always).
+8. Mark tasks done via MCP with proof args only (paths/labels).
+9. `self_improve_log` any lessons learned during the session.
 
 ## Use-case change detection (your responsibility)
 

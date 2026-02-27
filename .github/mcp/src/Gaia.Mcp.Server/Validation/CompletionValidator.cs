@@ -6,11 +6,24 @@ public static class CompletionValidator
 {
     public static ToolError? ValidateMarkDone(TaskItem task)
     {
+        // Check NEEDS_INPUT blockers first for a more specific error message
+        if (task.Blockers.Any(b => b.StartsWith("NEEDS_INPUT:", StringComparison.OrdinalIgnoreCase)))
+        {
+            var needsInput = task.Blockers.Where(b => b.StartsWith("NEEDS_INPUT:", StringComparison.OrdinalIgnoreCase)).ToList();
+            return new ToolError(
+                ErrorCodes.NeedsInputUnresolved,
+                $"Task '{task.Id}' has unresolved human input requests: {string.Join(" | ", needsInput)}. " +
+                "Resolve these via tasks_update(blockers=[]) before calling tasks_mark_done."
+            );
+        }
+
+        // Then check remaining generic blockers
         if (task.Blockers.Count > 0)
         {
             return new ToolError(
                 ErrorCodes.BlockersUnresolved,
-                $"Task '{task.Id}' has unresolved blockers: {string.Join(" | ", task.Blockers)}"
+                $"Task '{task.Id}' has unresolved blockers: {string.Join(" | ", task.Blockers)}. " +
+                "Clear blockers via tasks_update(blockers=[]) before calling tasks_mark_done."
             );
         }
 
@@ -28,25 +41,14 @@ public static class CompletionValidator
             );
         }
 
-        // Proof paths are accepted as labels; no filesystem check.
-        // The MCP server may run remotely and cannot access the client's repo.
-
         // Gate satisfaction check
         var missingGates = task.RequiredGates.Except(task.GatesSatisfied).ToList();
         if (missingGates.Count > 0)
         {
             return new ToolError(
                 ErrorCodes.GatesUnsatisfied,
-                $"Required gates not satisfied: {string.Join(", ", missingGates)}. Update gates_satisfied[] before mark_done."
-            );
-        }
-
-        // Needs-input unresolved is modeled as blockers; keep explicit code option
-        if (task.Blockers.Any(b => b.StartsWith("NEEDS_INPUT:", StringComparison.OrdinalIgnoreCase)))
-        {
-            return new ToolError(
-                ErrorCodes.NeedsInputUnresolved,
-                "Needs human input is still unresolved. Resolve blockers or remove NEEDS_INPUT entries before mark_done."
+                $"Required gates not satisfied: {string.Join(", ", missingGates)}. " +
+                "Call tasks_update(gatesSatisfied=[...]) before tasks_mark_done."
             );
         }
 

@@ -22,6 +22,13 @@ Implement requested changes correctly and sustainably, matching `/docs` and repo
 - If you discover TODOs/gaps: report to orchestrator for task creation.
 - Do not dump long logs; reference paths/commands.
 
+## MCP tools (use aggressively)
+
+- `memory_remember(project, key, value)`: persist code patterns, conventions, and env-specific details discovered during implementation.
+- `memory_recall(project)`: check prior conventions before implementing.
+- `tasks_create` / `tasks_update`: can be used for isolated sub-task tracking when delegated complex implementation work.
+- `self_improve_log(project, suggestion)`: log implementation lessons (e.g., tricky patterns, workarounds).
+
 ## Skills to use
 
 - Relevant stack default skill

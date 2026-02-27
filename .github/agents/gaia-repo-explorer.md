@@ -44,6 +44,11 @@ Return a **Repo Survey** with:
   - fix skill drift
   - add docker-compose for HTTP API (if needed)
 
+## MCP tools (use aggressively)
+
+- `memory_remember(project, key, value)`: persist discovered conventions (build commands, env vars, stack details, folder structure).
+- `memory_recall(project)`: check if conventions were already recorded in a prior session.
+
 ## Skill to follow
 
 - Use `SKILL: repository-audit`
