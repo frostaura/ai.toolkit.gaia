@@ -1,17 +1,10 @@
 {
     "servers": {
-        "playwright": {
-            "type": "stdio",
-            "command": "npx",
-            "args": [
-                "@playwright/mcp@latest"
-            ]
-        },
-        "Gaia (Local)": {
+        "gaia-local": {
             "url": "http://localhost:5059/mcp",
             "type": "http"
         },
-        "Gaia (Remote)": {
+        "gaia-remote": {
             "url": "https://gaia.frostaura.net/mcp",
             "type": "http"
         }
