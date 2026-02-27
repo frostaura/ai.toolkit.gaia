@@ -5,7 +5,7 @@
 <h1 align="center"><b>Gaia</b></h1>
 <h3 align="center">full-stack apps. enterprise-grade. maintainable. customizable.</h3>
 
-[![Version 7](https://img.shields.io/badge/Version-7%20Agents-purple.svg)]()
+[![Version 7](https://img.shields.io/badge/Version-7-purple.svg)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub Copilot](https://img.shields.io/badge/GitHub-Copilot-blue.svg)]()
 
