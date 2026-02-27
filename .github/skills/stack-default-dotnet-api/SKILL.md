@@ -1,6 +1,6 @@
 ---
 name: stack-default-dotnet-api
-description: Opinionated baseline for .NET HTTP APIs: analyzers/formatting, unit+integration strategy, docker-compose, Makefile targets, and CI wiring.
+description: "Opinionated baseline for .NET HTTP APIs: analyzers/formatting, unit+integration strategy, docker-compose, Makefile targets, and CI wiring."
 ---
 
 # Stack Default: .NET HTTP API

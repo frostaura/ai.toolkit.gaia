@@ -1,6 +1,6 @@
 ---
 name: stack-default-dotnet-maui
-description: Opinionated baseline for .NET MAUI apps: analyzers/format, tests where feasible, Makefile targets, and CI wiring (build validation).
+description: "Opinionated baseline for .NET MAUI apps: analyzers/format, tests where feasible, Makefile targets, and CI wiring (build validation)."
 ---
 
 # Stack Default: .NET MAUI

@@ -1,6 +1,6 @@
 ---
 name: manual-regression-api
-description: Manual backend regression via curl-like HTTP checks against the docker-compose stack. Required for API use-case changes (label: curl).
+description: "Manual backend regression via curl-like HTTP checks against the docker-compose stack. Required for API use-case changes (label: curl)."
 ---
 
 # Manual Regression (API via docker-compose + curl)

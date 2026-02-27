@@ -1,6 +1,6 @@
 ---
 name: stack-default-flutter
-description: Opinionated baseline for Flutter apps: format/analyze, tests, Makefile targets, and CI wiring (no docker unless backend exists separately).
+description: "Opinionated baseline for Flutter apps: format/analyze, tests, Makefile targets, and CI wiring (no docker unless backend exists separately)."
 ---
 
 # Stack Default: Flutter

@@ -1,6 +1,6 @@
 ---
 name: dockerize-http-api
-description: Add docker-compose for HTTP APIs (required before implementing/changing use cases). Provide .env.example + Make targets: up/down/test/lint/build.
+description: "Add docker-compose for HTTP APIs (required before implementing/changing use cases). Provide .env.example + Make targets: up/down/test/lint/build."
 ---
 
 # Dockerize HTTP API (Compose-First)

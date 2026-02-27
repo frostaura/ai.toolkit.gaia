@@ -1,6 +1,6 @@
 ---
 name: stack-default-web-ts
-description: Opinionated baseline for JS/TS web repos: lint/format, tests, Playwright, docker (if HTTP API), Makefile targets, and CI wiring.
+description: "Opinionated baseline for JS/TS web repos: lint/format, tests, Playwright, docker (if HTTP API), Makefile targets, and CI wiring."
 ---
 
 # Stack Default: Web (JS/TS)

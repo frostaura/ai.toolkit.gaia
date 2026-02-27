@@ -1,6 +1,6 @@
 ---
 name: stack-default-python
-description: Opinionated baseline for Python projects: ruff-based lint/format, pytest, optional dockerization for services, Makefile targets, and CI wiring.
+description: "Opinionated baseline for Python projects: ruff-based lint/format, pytest, optional dockerization for services, Makefile targets, and CI wiring."
 ---
 
 # Stack Default: Python
