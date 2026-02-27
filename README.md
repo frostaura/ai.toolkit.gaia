@@ -3,6 +3,7 @@
 </p>
 
 <h1 align="center"><b>Gaia</b></h1>
+<h2 align="center"><i>research scientist edition</i></h2>
 <h3 align="center">full-stack apps. enterprise-grade. maintainable. customizable.</h3>
 
 [![Version 7](https://img.shields.io/badge/Version-7-purple.svg)]()
