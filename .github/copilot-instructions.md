@@ -1,38 +1,29 @@
-# Gaia: GitHub Copilot Instructions (Repository-Wide)
+# GitHub Copilot — Repository Instructions (Gaia)
 
-These instructions apply to **all Copilot usage in this repo** (VS Code Chat, CLI, and suggestions).
-For agent workflow rules, permissions, delegation, and tools, see **`AGENTS.md`**.
+> **Read `AGENTS.md` first.** It is the canonical constitution for all rules, roles, gates, MCP tools, and policies.
+> This file adds only VS Code / Copilot-specific operating guidance.
 
-## North Star: Spec-Driven Design
+## Bootstrap (every session)
 
-- `docs/` is the single source of truth for requirements and architecture.
-- Code ↔ spec must stay in sync: behavior changes need specs; specs need implementations.
+1. Read `AGENTS.md` (non-negotiables, roles, gates, MCP tools, proof, Definition of Done).
+2. Call `memory_recall(project)` and `self_improve_list()` to load prior context and lessons.
+3. Delegate to **Repo Explorer** (`SKILL: repository-audit`) before planning.
 
-## Where to Look First
+## Agents and skills (use them aggressively)
 
-1. `docs/` — requirements, architecture, use cases
-2. `.github/skills/**/SKILL.md` — proven patterns and playbooks
-3. Existing code/tests — repo conventions
-4. `.github/agents/*.md` — agent personas and boundaries
+- Delegate to agents defined in `.github/agents/` for separation of concerns.
+- Use skills in `.github/skills/` for repeatable workflows.
+- If repo conventions change, update all affected skills in the same change set (skill drift is blocking).
 
-## Default Quality Bar
+## Output discipline (context hygiene)
 
-- Small, cohesive, reversible changes.
-- Follow existing naming, structure, and patterns.
-- Tests for non-trivial behavior.
-- Explicit > clever. No new dependencies without consulting `.github/skills/default-web-stack/SKILL.md`.
+- Keep responses concise and action-oriented.
+- Summaries: 1 short paragraph max (docs touched, code touched, tests, manual regression labels).
+- Avoid dumping tool output; reference file paths and commands instead.
+- Do NOT paste large logs. Proof is paths/labels only.
 
-## Routing Cheatsheet
+## Defaults
 
-| Need | Route to |
-|------|----------|
-| Spec/architecture/docs | **Architect** |
-| Code/tests/migrations/infra | **Developer** |
-| Bugs/perf/investigation | **Analyst** |
-| Validation/regression/security | **Tester** |
-| Multi-step/coordination | **Orchestrator** |
+By default, the gaia-workload-orchestrator agent should be heavily considered for any task that involves coordinating multiple steps, managing dependencies, or ensuring that tasks are completed in a specific order. This agent is designed to handle complex workflows and can help ensure that all necessary steps are completed efficiently and effectively.
 
-## Project-Scoped Tools
-
-- All Gaia MCP tools require **`projectName`** (derive from repo/workspace folder name).
-- Common agent behaviors (recall, remember, log improvements) are defined in `AGENTS.md §5`.
+When calling Gaia tools, always print the actual tool name for traceability. The same applies for skills and Gaia MCP tools too.

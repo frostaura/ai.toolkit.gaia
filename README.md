@@ -26,6 +26,7 @@ You describe your goal; Gaia coordinates architecture, implementation, testing, 
   - If code changes behavior, the spec must be updated.
 
 **Ownership:**
+
 - Architect owns `docs/` and architecture decisions.
 - Developer owns code/tests/migrations/infra.
 - Tester validates behavior and quality gates.
@@ -45,6 +46,7 @@ The workflow contract lives in **`AGENTS.md`**.
 3. Start a chat and describe what you want
 
 Example:
+
 ```
 Build me a task management app with user login
 ```
@@ -52,12 +54,13 @@ Build me a task management app with user login
 ### In the Terminal (Copilot CLI)
 
 ```bash
-npm i -g @github/copilot && copilot -p "<your project request>"
+npm i -g @github/copilot && copilot -p "<your project request>" --yolo
 ```
 
 Example:
+
 ```bash
-copilot -p "Create a REST API for a blog with posts and comments"
+copilot -p "Create a REST API for a blog with posts and comments"  --yolo
 ```
 
 ---
@@ -73,6 +76,7 @@ Gaia’s configuration lives in `.github/`:
 - `.github/mcp-config.json` — MCP servers (e.g. `gaia`, `playwright`)
 
 Application projects typically include:
+
 ```
 docs/           ← Specifications and design docs (Architect-owned)
 src/            ← Application code (Developer-owned)

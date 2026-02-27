@@ -31,8 +31,6 @@
         "**/*.icon.gif": true,
         ".claude": true,
         ".vs": true,
-        "AGENTS.md": true,
-        "CLAUDE.md": true,
         "LICENSE": true
     },
     "vscode_vibrancy.enableAutoTheme": true,

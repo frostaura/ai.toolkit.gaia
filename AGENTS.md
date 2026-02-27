@@ -1,80 +1,171 @@
-# Gaia: Agent Workflow Contract (AGENTS.md)
+# Gaia: Agent Constitution (AGENTS.md)
 
-This file defines **how Gaia runs agentic workflows** in this repository.
-It complements `.github/copilot-instructions.md`, `.github/agents/*.md`, and `.github/skills/**/SKILL.md`.
+## 0) Non-negotiables (always true)
 
-## 0) Default Rule
+- `/docs/` is the source of truth.
+- Repo Explorer runs first on every request.
+- If docs ↔ code drift is detected: STOP feature work and fix drift autonomously first.
+- CI must exist and be green. If CI is failing: fix CI first.
+- If the project exposes an HTTP API: docker-compose (or equivalent) is required before implementing/changing use cases.
+- “Done” is blocked unless required gates are met and proof is recorded via MCP task args.
+- Skills must match reality. If skills drift from repo behavior: fix skills before proceeding.
 
-For anything beyond a single obvious action, **start with `gaia-workload-orchestrator`**.
-It classifies the request into one of three tiers:
-- **Rapid** — trivial/straightforward: skip ceremony, just execute.
-- **Standard** — moderate: recall context, delegate to one agent, remember learnings.
-- **Full** — complex/cross-cutting: full multi-agent orchestration with tasks, specs, and handoffs.
+## 1) Core roles (agent roster)
 
-## 1) Spec-Driven Development
+- Workload Orchestrator (supreme planner): owns the plan, tasks, and execution order.
+- Repo Explorer: surveys repo state and suggests tasks.
+- Architect: shapes architecture + updates `/docs/architecture/`.
+- Developer: implements changes and keeps conventions intact.
+- Tester: authors unit/integration/e2e tests as required by gates.
+- Quality Gatekeeper (veto): independently verifies gates + proof; can declare NOT DONE.
+- Analyst (optional): clarifies acceptance criteria, risks, edge cases.
 
-- `docs/` is the **single source of truth** for requirements, architecture, and use cases.
-- **No drift**: spec ↔ code must stay in sync at all times.
+## 2) Orchestrator supremacy (planning rules)
 
-## 2) Authority & Permissions
+- The orchestrator is the single source of truth for the plan and task graph.
+- Planning must capture _all_ work as tasks: foundations + docs + implementation + tests + QA review.
+- New tasks may be added in-flight (e.g., newly discovered TODOs, missing foundations, scope risks).
+- TODO policy: no “TODO left behind”.
+  - Either create an MCP task for it, or add it as a blocker on an existing task.
 
-| Domain | Owner | Others |
-|--------|-------|--------|
-| `docs/`, architecture, tech stack | **gaia-architect** | Request changes via Architect |
-| Code, tests, migrations, infra | **gaia-developer** | Propose guidance only |
-| Debugging, root-cause, perf | **gaia-analyst** | Findings → Developer implements |
-| Quality gates, validation | **gaia-tester** | Reports → Developer/Architect fix |
+## 3) Repo Explorer (always first)
 
-Default stack: `.github/skills/default-web-stack/SKILL.md`
+Repo Explorer must produce a compact “Repo Survey” in chat:
 
-## 3) Delegation Is Mandatory
+- Stack(s) detected, build system, package manager, runtime.
+- `/docs` presence + freshness + gaps; docs ↔ code alignment.
+- CI presence and status (exists? green?).
+- Lint/format tooling presence and usage.
+- Test setup presence (unit/integration/e2e).
+- Dockerization status (esp. for HTTP APIs).
+- Conventions (folders, naming, scripts/Makefile).
+  Repo Explorer also suggests a task list; orchestrator creates the real MCP tasks.
 
-**Never struggle alone. Delegate early.** If you spend >2 minutes outside your domain, hand off.
+## 4) Drift policy (blocking)
 
-- Architect → specs, design, tech-stack, `docs/` changes
-- Developer → code, tests, migrations, infra
-- Analyst → ambiguous bugs, perf, deep investigation
-- Tester → validation, regression, security review
-- Orchestrator → multi-step or cross-agent coordination
+- If docs and code disagree:
+  - Orchestrator chooses resolution direction case-by-case (default to docs if unsure).
+  - If choosing “code wins”: treat as use-case change and apply use-case gates.
+- Drift resolution is blocking: no new feature work until resolved.
 
-## 4) Gaia MCP Tools Are Mandatory
+## 5) Quality gates (baseline + triggers)
 
-All tools require **`projectName`** (derived from repo/workspace name). Use them aggressively.
+Baseline (your “Fast” mode):
 
-| Tool | When |
-|------|------|
-| `gaia-recall` | **Always first** — before starting any work |
-| `gaia-remember` | After decisions, patterns, workarounds, user preferences |
-| `gaia-update_task` | Before/during/after multi-step work; cross-agent handoffs |
-| `gaia-log_improvement` | **Immediately** on any friction — don't wait. Over-log > under-log |
+- Lint + Build are always required.
+- CI must run lint/build/tests as applicable.
 
-Memory categories: `pattern`, `decision`, `workaround`, `context`, `lesson`.
-Improvement types: `PainPoint`, `MissingCapability`, `WorkflowImprovement`, `KnowledgeGap`, `Enhancement`.
+Use-case change trigger:
 
-## 5) Common Agent Behaviors
+- If the orchestrator decides a task adds/changes/removes a use case:
+  - Require Playwright integration specs for web (or equivalent if already present).
+  - Require manual regression:
+    - backend: curl-like checks against docker-compose stack
+    - web: Playwright MCP manual walkthrough
+  - If tests cannot be run: task completion is blocked.
 
-Every agent **must**:
-1. Pass `projectName` consistently to all Gaia MCP tool calls.
-2. Call `gaia-recall` at task start; `gaia-remember` for significant learnings.
-3. Log friction immediately via `gaia-log_improvement` with `projectName`.
-4. Check `.github/skills/**/SKILL.md` for relevant skills before domain work.
-5. Use the structured handoff format (§7) when delegating.
+Docker-first trigger:
 
-## 6) Skills Are Mandatory
+- If HTTP API and docker-compose missing: add docker-compose + `.env.example` + Make targets before use-case work.
 
-Before domain work, check for relevant skills in `.github/skills/**/SKILL.md`.
-If a recurring need lacks a skill, log an improvement request.
+## 6) Proof (low-context, MCP-enforced)
 
-## 7) Handoff Format
+To mark a task done, the orchestrator must call MCP with proof args:
 
-When handing work to another agent, include:
-- **Project name** (always)
-- **Objective** (what success looks like)
-- **Context** (what you learned; links/paths; constraints)
-- **Inputs** (files touched, commands, expected output)
-- **Risks / open questions**
-- **Next actions** (1–3 bullets)
+- `changed_files[]` (paths)
+- `tests_added[]` (paths)
+- `manual_regression[]` (labels like `curl`, `playwright-mcp`)
+  Proof is link-only (paths/labels). Do NOT paste long logs.
 
-## 8) Folder-Specific Rules (Optional)
+## 7) Task model (MCP tools)
 
-Subtrees may add a nested `AGENTS.md` for additional constraints. Nested rules must not contradict this root contract.
+Task tools (`tasks_*`):
+
+- `tasks_create(project, title, requiredGates[])` — create a new task.
+- `tasks_list(project)` — list all tasks and their state.
+- `tasks_update(project, id, ...)` — update status/gates/blockers.
+- `tasks_mark_done(project, id, changedFiles[], testsAdded[], manualRegressionLabels[])` — complete with proof.
+- `tasks_flag_needs_input(project, id, questions[])` — block on human input.
+- `tasks_delete(project, id)` / `tasks_clear(project)` — cleanup.
+
+Memory tools (`memory_*`):
+
+- `memory_remember(project, key, value)` — persist a stable fact.
+- `memory_recall(project, key?)` — recall facts (call at session start).
+- `memory_forget(project, key)` / `memory_clear(project)` — cleanup.
+
+Self-improvement tools (`self_improve_*`):
+
+- `self_improve_log(project, suggestion, category?)` — log a lesson learned.
+- `self_improve_list(project?, category?)` — review lessons (call at session start).
+- `self_improve_mark_applied(id)` / `self_improve_clear(project?)` — manage backlog.
+
+Task fields:
+
+- `status`: `todo | doing | done`
+- `blockers[]`: non-empty means not completable
+- `required_gates[]`: set explicitly per task by orchestrator
+- `gates_satisfied[]`: updated as gates pass
+- `proof`: `changed_files[]`, `tests_added[]`, `manual_regression[]`
+
+`tasks_mark_done` refuses with error codes when:
+
+- `GAIA_TASKS_ERR_BLOCKERS_UNRESOLVED` — blockers exist
+- `GAIA_TASKS_ERR_NEEDS_INPUT_UNRESOLVED` — human input pending
+- `GAIA_TASKS_ERR_GATES_UNSATISFIED` — required gates not met
+- `GAIA_TASKS_ERR_MISSING_PROOF_ARGS` — proof arrays empty
+
+"Needs human input" mode:
+
+- Call `tasks_flag_needs_input(project, id, questions[])` to block on human input.
+- Continue parallelizable work while waiting.
+
+## 8) Skills policy (keep current)
+
+- Skills are executable playbooks; keep each ≤150 lines.
+- If repo conventions change (lint, tests, CI, docker, Make targets), update all affected skills in the same change set.
+- QA Gatekeeper must veto if skills no longer reflect reality.
+
+## 9) Subagents (context hygiene)
+
+- Use subagents for isolated exploration/research/review to avoid bloating the main context.
+- Subagents must receive a clear task + expected output and return only a concise result.
+- Subagents can use `tasks_*` tools for their own isolated task tracking when delegated complex work.
+
+## 10) Canonical gate vocabulary
+
+Use these labels consistently in `required_gates[]` and `gates_satisfied[]`:
+
+| Gate                | Meaning                                |
+| ------------------- | -------------------------------------- |
+| `lint`              | Lint/format passes                     |
+| `build`             | Project builds successfully            |
+| `ci`                | CI workflow is green                   |
+| `unit`              | Unit tests pass                        |
+| `integration`       | Integration tests pass (HTTP boundary) |
+| `e2e`               | E2E / Playwright specs pass            |
+| `manual-regression` | Manual regression performed            |
+| `docs-updated`      | Docs reflect behavior changes          |
+| `docker-ready`      | docker-compose stack runs              |
+
+Manual regression labels (for `manual_regression[]` proof):
+
+- `curl` — API regression via curl against compose stack
+- `playwright-mcp` — Web regression via Playwright MCP tools
+
+## 11) Definition of Done (hard gate)
+
+A task is DONE only when:
+
+- Required docs/spec are updated (when behavior changes),
+- CI exists and is green (or will be green once merged, per current branch checks),
+- Required gates pass for the task (as declared in `required_gates[]`),
+- Proof args are recorded via `tasks_mark_done`,
+- Quality Gatekeeper approves (orchestrator must comply with veto).
+
+## 12) Memory and self-improvement (use aggressively)
+
+- **Every session start**: call `memory_recall(project)` and `self_improve_list()` to load context.
+- **Repo Explorer**: `memory_remember` discovered conventions (build commands, env vars, stack details).
+- **After mistakes/inefficiencies**: call `self_improve_log` to record lessons for future sessions.
+- **After applying a lesson**: call `self_improve_mark_applied` to close the loop.

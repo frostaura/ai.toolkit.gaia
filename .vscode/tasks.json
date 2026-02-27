@@ -7,7 +7,7 @@
             "command": "dotnet",
             "args": [
                 "build",
-                "${workspaceFolder}/.github/mcps/gaia/src/fa.mcp.gaia/fa.mcp.gaia.csproj"
+                "${workspaceFolder}/.github/mcp/src/Gaia.Mcp.Server/Gaia.Mcp.Server.csproj"
             ],
             "problemMatcher": "$msCompile",
             "group": {
