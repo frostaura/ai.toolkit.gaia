@@ -25,3 +25,5 @@
 ## Defaults
 
 By default, the gaia-workload-orchestrator agent should be heavily considered for any task that involves coordinating multiple steps, managing dependencies, or ensuring that tasks are completed in a specific order. This agent is designed to handle complex workflows and can help ensure that all necessary steps are completed efficiently and effectively.
+
+When calling Gaia tools, always print the actual tool name for traceability. The same applies for skills and Gaia MCP tools too.
