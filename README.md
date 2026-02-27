@@ -5,11 +5,12 @@
 <h1 align="center"><b>Gaia</b></h1>
 <p align="center"><i>research scientist edition</i></p>
 <h3 align="center">full-stack apps. enterprise-grade. maintainable. customizable.</h3>
-
-[![Version 7](https://img.shields.io/badge/Version-7-purple.svg)]()
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![GitHub Copilot](https://img.shields.io/badge/GitHub-Copilot-blue.svg)]()
-[![GitHub Copilot CLI](https://img.shields.io/badge/GitHub-Copilot%20CLI-blue.svg)]()
+<p align="center">
+  [![Version 7](https://img.shields.io/badge/Version-7-purple.svg)]()
+  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+  [![GitHub Copilot](https://img.shields.io/badge/GitHub-Copilot-blue.svg)]()
+  [![GitHub Copilot CLI](https://img.shields.io/badge/GitHub-Copilot%20CLI-blue.svg)]()
+</p>
 
 ---
 
