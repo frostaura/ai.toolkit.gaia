@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/.github/" />
+  <Folder Name="/.github/mcp-workflows/" />
+  <Folder Name="/.github/mcp-workflows/src/">
+    <Project Path=".github/mcp-workflows/src/Gaia.Workflows.Server/Gaia.Workflows.Server.csproj" />
+  </Folder>
+  <Folder Name="/.github/mcp-workflows/tests/">
+    <Project Path=".github/mcp-workflows/tests/Gaia.Workflows.Server.Tests/Gaia.Workflows.Server.Tests.csproj" />
+  </Folder>
+  <Folder Name="/.github/mcp/" />
+  <Folder Name="/.github/mcp/src/">
+    <Project Path=".github/mcp/src/Gaia.Mcp.Server/Gaia.Mcp.Server.csproj" />
+  </Folder>
+  <Folder Name="/.github/mcp/tests/">
+    <Project Path=".github/mcp/tests/Gaia.Mcp.Server.IntegrationTests/Gaia.Mcp.Server.IntegrationTests.csproj" />
+    <Project Path=".github/mcp/tests/Gaia.Mcp.Server.Tests/Gaia.Mcp.Server.Tests.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,21 @@
+services:
+  gaia-mcp:
+    build:
+      context: .github/mcp
+      dockerfile: Dockerfile
+    ports:
+      - "${GAIA_MCP_PORT:-5059}:8080"
+    environment:
+      - ASPNETCORE_URLS=http://+:8080
+      - GAIA_DATA_DIR=/data
+    volumes:
+      - gaia-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "dotnet --list-runtimes > /dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  gaia-data:
