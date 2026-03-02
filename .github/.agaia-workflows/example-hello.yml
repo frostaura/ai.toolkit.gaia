@@ -1,0 +1,18 @@
+name: example-hello
+description: "A simple example workflow that greets the user. Use this as a template for new workflows."
+params:
+  - name: name
+    description: "The name to greet (default: World)"
+  - name: greeting
+    description: "Optional greeting prefix (default: Hello)"
+output: "A greeting message printed to stdout"
+
+steps:
+  - id: resolve-name
+    run: "echo \"${name:-World}\""
+  - id: resolve-greeting
+    run: "echo \"${greeting:-Hello}\""
+  - id: greet
+    run: "echo \"${{ steps.resolve-greeting.output }}, ${{ steps.resolve-name.output }}!\""
+  - id: done
+    run: "echo \"Workflow completed successfully.\""

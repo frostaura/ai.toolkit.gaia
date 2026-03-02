@@ -1,94 +1,51 @@
 using Gaia.Workflows.Server.Models;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace Gaia.Workflows.Server.Parsing;
 
 public static class WorkflowParser
 {
+    private static readonly IDeserializer Deserializer = new DeserializerBuilder()
+        .WithNamingConvention(CamelCaseNamingConvention.Instance)
+        .IgnoreUnmatchedProperties()
+        .Build();
+
     /// <summary>
-    /// Parses the comment header of a bash script to extract workflow metadata.
-    /// Expected format:
-    ///   #!/bin/bash
-    ///   # @name: workflow-name
-    ///   # @description: What this workflow does
-    ///   # @param arg_name: Description of the argument
-    ///   # @output: What the workflow outputs
+    /// Parses a YAML workflow definition file.
     /// </summary>
     public static WorkflowDescriptor? Parse(string filePath)
     {
         if (!File.Exists(filePath)) return null;
 
-        var lines = File.ReadAllLines(filePath);
-        string? name = null;
-        string? description = null;
-        string? output = null;
-        var parameters = new List<WorkflowParam>();
-
-        foreach (var line in lines)
+        try
         {
-            var stripped = line.Trim();
+            var yaml = File.ReadAllText(filePath);
+            var descriptor = Deserializer.Deserialize<WorkflowDescriptor>(yaml);
 
-            // Skip shebang
-            if (stripped.StartsWith("#!")) continue;
+            if (descriptor is null || string.IsNullOrWhiteSpace(descriptor.Description))
+                return null;
 
-            // Stop at the first non-comment, non-empty line
-            if (!stripped.StartsWith("#") && stripped.Length > 0) break;
+            if (string.IsNullOrWhiteSpace(descriptor.Name))
+                descriptor.Name = Path.GetFileNameWithoutExtension(filePath);
 
-            // Skip empty lines and bare comments
-            if (stripped is "#" or "") continue;
-
-            var content = stripped.TrimStart('#').Trim();
-
-            if (content.StartsWith("@name:", StringComparison.OrdinalIgnoreCase))
-            {
-                name = content["@name:".Length..].Trim();
-            }
-            else if (content.StartsWith("@description:", StringComparison.OrdinalIgnoreCase))
-            {
-                description = content["@description:".Length..].Trim();
-            }
-            else if (content.StartsWith("@param ", StringComparison.OrdinalIgnoreCase))
-            {
-                var paramPart = content["@param ".Length..].Trim();
-                var colonIndex = paramPart.IndexOf(':');
-                if (colonIndex > 0)
-                {
-                    parameters.Add(new WorkflowParam
-                    {
-                        Name = paramPart[..colonIndex].Trim(),
-                        Description = paramPart[(colonIndex + 1)..].Trim()
-                    });
-                }
-            }
-            else if (content.StartsWith("@output:", StringComparison.OrdinalIgnoreCase))
-            {
-                output = content["@output:".Length..].Trim();
-            }
+            descriptor.FilePath = filePath;
+            return descriptor;
         }
-
-        // Default name from filename if not specified
-        name ??= Path.GetFileNameWithoutExtension(filePath);
-
-        // Require at least a description
-        if (description is null) return null;
-
-        return new WorkflowDescriptor
+        catch
         {
-            Name = name,
-            Description = description,
-            FilePath = filePath,
-            Params = parameters,
-            Output = output
-        };
+            return null;
+        }
     }
 
     /// <summary>
-    /// Scans a directory for .sh files and parses each one.
+    /// Scans a directory for .yml workflow files and parses each one.
     /// </summary>
     public static List<WorkflowDescriptor> ScanDirectory(string directory)
     {
         if (!Directory.Exists(directory)) return new();
 
-        return Directory.GetFiles(directory, "*.sh")
+        return Directory.GetFiles(directory, "*.yml")
             .Select(Parse)
             .Where(w => w is not null)
             .Cast<WorkflowDescriptor>()
