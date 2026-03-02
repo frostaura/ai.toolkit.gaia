@@ -118,6 +118,23 @@ When scaffolding a new project, the **Architect** should replace this README wit
 
 ---
 
+## Disclaimers
+Note that the current configuration for the usage of Gaia's MCP server, is remote. This means your data will safely live on the Gaia secure server.
+
+*What gets stored*
+- Self-improvement requests that Gaia automatically logs when struggling with a given problem. This helps us auto-improve Gaia on the backend as new "issues" with the Gaia process gets logged by you fine folks. In turn we push a new optimized version of Gaia for free to everyone. An improved one.
+- Task items for Gaia plans. This is merely a persistent tracking mechanism for your Gaia to stay anchored. Because this is a remote MCP, it works perfectly in the GitHub Copilot web (coding agent), for a completely hands-off approach. All tasks are segregated by project name to ensure no overlap.
+- Memory items for Gaia for the project, like the above, is securely persisted so you can access your project memories (and tasks), from remote sources and effortnessly switch between them. Even have them run in parallel to pick up different tasks.
+
+*What doesn't get stored*
+- Any user PII
+- Actual project code
+- System and test specs (or any documentation)
+
+**If you prefer not to take advantage of the Gaia remote MCP, feel free to configure the MCP server (here locally) to use STDIO instead of HTTP and configure your MCP configs to point to that instead, for a completely local experience.**
+
+---
+
 <p align="center">
   <i>"In Greek mythology, Gaia is the personification of Earth and the ancestral mother of all life."</i>
 </p>
