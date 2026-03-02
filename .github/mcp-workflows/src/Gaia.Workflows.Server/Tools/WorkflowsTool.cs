@@ -34,8 +34,8 @@ public sealed partial class WorkflowsTool
         "header, and are set as environment variables for each step. Params are also available via " +
         "${{ params.<name> }} substitution in step commands. Each step's stdout is captured and " +
         "available to subsequent steps via ${{ steps.<id>.output }} substitution. " +
-        "Output is streamed back via progress notifications as each step runs, " +
-        "and the final result includes the full output and exit code.")]
+        "Progress notifications stream step status as each step runs. " +
+        "Returns output (all step outputs) and finalOutput (last step's output).")]
     public async Task<object> ExecuteWorkflow(
         [Description("The name of the workflow to execute (without .yml extension). Use workflows_list to discover available names.")] string name,
         [Description("Optional JSON object string of arguments to pass to the workflow. Keys should match the @param names defined in the workflow header. Example: {\"name\": \"Dean\", \"greeting\": \"Hi\"}")] string? args = null,
@@ -77,6 +77,7 @@ public sealed partial class WorkflowsTool
         var stepOutputs = new Dictionary<string, string>();
         var allOutput = new StringBuilder();
         var totalSteps = descriptor.Steps.Count;
+        var finalStepOutput = string.Empty;
 
         for (var i = 0; i < totalSteps; i++)
         {
@@ -96,6 +97,7 @@ public sealed partial class WorkflowsTool
             var result = await RunStepAsync(command, envVars, workingDir, cancellationToken);
 
             stepOutputs[stepId] = result.Output;
+            finalStepOutput = result.Output;
             allOutput.AppendLine($"[{stepId}] {result.Output}");
 
             if (result.ExitCode != 0)
@@ -135,24 +137,25 @@ public sealed partial class WorkflowsTool
             ok = true,
             exitCode = 0,
             workflow = name,
-            output = allOutput.ToString().TrimEnd()
+            output = allOutput.ToString().TrimEnd(),
+            finalOutput = finalStepOutput
         };
     }
 
     private static string ApplySubstitutions(string command, Dictionary<string, string> stepOutputs, Dictionary<string, string> envVars)
     {
-        // Replace ${{ params.<name> }} with the corresponding input value
+        // Replace ${{ params.<name> }} with the corresponding input value (empty if not provided)
         var result = ParamsPattern().Replace(command, match =>
         {
             var paramName = match.Groups[1].Value;
-            return envVars.TryGetValue(paramName, out var value) ? value : match.Value;
+            return envVars.TryGetValue(paramName, out var value) ? value : string.Empty;
         });
 
-        // Replace ${{ steps.<id>.output }} with the captured step output
+        // Replace ${{ steps.<id>.output }} with the captured step output (empty if not available)
         result = StepOutputPattern().Replace(result, match =>
         {
             var stepId = match.Groups[1].Value;
-            return stepOutputs.TryGetValue(stepId, out var output) ? output : match.Value;
+            return stepOutputs.TryGetValue(stepId, out var output) ? output : string.Empty;
         });
 
         return result;

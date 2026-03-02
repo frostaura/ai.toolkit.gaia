@@ -1,0 +1,32 @@
+name: ensure-full-spec-implemented
+description: "A workflow that ensures the full specification is implemented by deep analyzing the repository and checking for the presence of all required files and configurations. It will also validate the structure and content of these files to ensure compliance with the defined standards. This flow then implements all missing components and ensures the highest quality of the codebase by enforcing best practices and coding standards. Finally, it will run a series of tests to verify that all implemented features are working as expected and that the repository is in a healthy state."
+params:
+  - name: foundational-large-language-model-name
+    description: "\"gpt-5.3-codex\" | \"claude-opus-4.6\" | \"gemini-3-pro-preview\" - depending on the task at hand and what you know about which model may work best, choose the most appropriate one. If you are unsure, default to \"gpt-5.3-codex\"."
+  - name: justification
+    description: "Provide a justification for the choice of the foundational large language model. This should include considerations such as the model's strengths, weaknesses, and suitability for the specific tasks involved in this workflow. If no justification is provided, it will default to 'No justification provided'."
+output: "The final output of the workflow which is a report of the findings and implementation changes."
+
+steps:
+  - id: print-details
+    run: "echo \"Choosing model '${foundational-large-language-model-name:-gpt-5.3-codex}', Reasoning: ${justification:-No justification provided}\""
+  - id: deep-repository-analysis
+    run: |
+      copilot --yolo --model "${foundational-large-language-model-name:-gpt-5.3-codex}" -p "You are an elite, dispassionate system auditor. Read docs/specs/system_spec.md and docs/specs/test_spec.md. Deeply scan and analyze the entire repo/codebase. Produce a merciless, exhaustive checklist of every missing feature, incomplete implementation, outstanding TODO, missing automated test, linting error, test coverage gap, and CI/CD pipeline issues, including but not limited to long-running pipelines like stuck e2e tests and so on. Be aggressive with your assessment of performance. Ensure config is abstracted. Ensure components, classes, styles and so on are abstracted. Output this precise gap analysis. Grade nothing on a curve."
+  - id: implement-missing-components
+    run: |
+      copilot --yolo --model "${foundational-large-language-model-name:-gpt-5.3-codex}" -p "Given the below features completion report, You are a master software architect. Read the completion report. Implement 100 percent of the missing features systematically. Write robust unit and integration tests for every single feature based on the test_spec.md. Ensure the application is running via the existing docker-compose stack. Leave zero technical debt. Do not tailor the tests to the code; tailor the code to pass the objective tests. The report: ${{ steps.deep-repository-analysis.output }}"
+  - id: devops-quality-engineering
+    run: |
+      copilot --yolo --model "${foundational-large-language-model-name:-gpt-5.3-codex}" -p "You are a ruthless DevOps and Code Quality Engineer. Run the codebase through all linters, test coverage tools, and local CI/CD pipelines. Resolve 100 percent of all linting issues, outstanding code-level warnings, and test coverage gaps. Investigate and fix any build or CI/CD pipeline failures. You must guarantee that our build pipeline is perfectly green and deploys successfully. Do not proceed until the build and deployment are flawless. You must also ensure the performance of all processes and builds. Never is a build allow to run over 10min. Ensure you test locally with timeouts to not wait forever and check the build in GitHub Actions too. We have made the following updates prior so check out for those but also don't restrict yourself to just fixing those if you find other issues. The report: ${{ steps.implement-missing-components.output }}"
+  - id: visual-quality-assessment
+    run: |
+      copilot --yolo --model "${foundational-large-language-model-name:-gpt-5.3-codex}" -p "You are a ruthless Visual QA Expert. Boot up the local docker-compose stack if it is not already running. You MUST configure your Playwright MCP tools to run strictly in HEADED MODE (headless: false) against this Docker Compose environment for consistency. Do not parse the DOM; rely exclusively on the rendered screenshots. Navigate every flow, modal, and state on Desktop and Mobile viewports manually. Document every single visual mismatch, clunky UX flaw, and functional bug against the specs. Output a detailed listing the location, the visual crime, expected vs reality, and screenshot references. We have made the following updates prior so check out for those but also don't restrict yourself to just fixing those if you find other issues. The report: ${{ steps.implement-missing-components.output }}"
+  - id: visual-quality-implementation
+    run: |
+      copilot --yolo --model "${foundational-large-language-model-name:-gpt-5.3-codex}" -p "You are a perfectionist UI Engineer. Based on this report '${{ steps.visual-quality-assessment.output }}', implement 100 percent of the requested visual and functional fixes against the running docker-compose stack. Modify components, stylesheets, and logic to achieve pixel-perfect alignment and flawless responsiveness. Take the harsh QA feedback as absolute law. Do not stop until every issue is completely eradicated from the codebase."
+  - id: final-regression-testing
+    run: |
+      copilot --yolo --model "${foundational-large-language-model-name:-gpt-5.3-codex}" -p "You are the Final Gatekeeper. Run a final manual regression test using your Playwright MCP tools in HEADED MODE (headless: false) against the Docker Compose stack. Verify that every single issue listed in the previous visual quality assessment has been flawlessly fixed and that no new regressions were introduced. Ensure the CI/CD pipeline still deploys successfully. If any visual or functional defects remain, output them. If the app is 100 percent perfect, output a final response. CRITICAL: When your testing is complete, intentionally LEAVE THE PLAYWRIGHT BROWSER OPEN so the human user can seamlessly take over for manual testing."
+  - id: done
+    run: "echo \"Workflow completed successfully\""
