@@ -69,6 +69,29 @@ copilot -p "Create a REST API for a blog with posts and comments"  --yolo
 
 ---
 
+### Advanced Mode
+The below may be used to simulate a workflow execution bu running copilot cli in headless mode.
+
+*Basic chaining for workflows*
+```bash
+copilot -p "prompt 1" --yolo && copilot -p "prompt 2" --yolo && copilot -p "prompt 3" --yolo
+```
+
+*Recursive chaining for continuous workflows*
+```bash
+while true; do copilot -p "prompt 1" --yolo && copilot -p "prompt 2" --yolo && copilot -p "prompt 3" --yolo; done
+```
+
+The above commands are exceptional in getting Gaia to recursively reflect on the code state vs the system spec, and iterate until your desired completion rate before starting the human polishing phase.
+
+*Simple recursive process for ensuring feature parity with the system spec and comprehensively test the system using the test spec / plan.*
+*Recursive chaining for continuous workflows. In the below example, we use multiple models. Claude Opus to do the assessments and Codex 5.3 to implement the deltas, recursively*
+```bash
+while true; do copilot --yolo --model "claude-opus-4.6" -p "Assess the docs/specs/system_spec.md and the state of the code repository. Assess the docs/specs/test_spec.md for a comprehensive test plan for the system. Determine the the completion rate for all features, items, outstanding todos, ourstanding static, sample or mock data, that data and config is well-abstracted and live in the config or appsettings files and not statically coded anywhere. Integration tests implementation completion rates, based on the test spec and the state of the repo. This should be a dispassionate report. Dont take the role of a developer or tester. Instead you are a dispassionate auditor. A feature parity, quality and visual excellence police. Detective Gaia, if you will. create a detailed report for the overall system completion and save it to COMPLETION_REPORT.md (overwrite)" && copilot --yolo --model "gpt-5.3-codex" -p "[COMPLETION_REPORT.md] - Now implement all the non 100% completed or perfect items systematically. Always leave any code you encounter in a better state where appropriate. Never leave things like pre-existing gaps, errors, todos and so on, undone. You are a responsible software architect and elite software engineer. Always implement 100% of all missing things. No less is exceptable. And only after the 100% completion mark, continue to the tests. As tests are written, ensure the code that it tests is bug-free. After all thats the point of tests. Don't just blindly taylor tests to the state of the code. The code should be taylored to delivering on features which the tests should objectively assert. Remove the report after."; done
+```
+
+---
+
 ## Repository Layout
 
 Gaia’s configuration lives in `.github/`:
