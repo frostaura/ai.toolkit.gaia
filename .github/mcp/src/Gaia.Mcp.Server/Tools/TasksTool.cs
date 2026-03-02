@@ -8,6 +8,11 @@ namespace Gaia.Mcp.Server.Tools;
 
 public sealed class TasksTool
 {
+    private static readonly HashSet<string> s_validStatuses = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "todo", "doing", "done"
+    };
+
     private readonly JsonTaskStore _store;
 
     public TasksTool(JsonTaskStore store)
@@ -58,7 +63,7 @@ public sealed class TasksTool
         "record gate satisfaction as verification steps pass, or manage blockers. " +
         "Example: Developer starts implementing, Orchestrator calls tasks_update(project='my-api', " +
         "id='abc123', status='doing'). Later, after CI passes: tasks_update(..., gatesSatisfied=['ci-green']).")]
-    public async Task<TaskItem> Update(
+    public async Task<object> Update(
         [Description("Project identifier the task belongs to.")] string project,
         [Description("The unique task ID (32-char hex string) returned by tasks_create. Must match exactly.")] string id,
         [Description("New title for the task. Pass null/omit to keep the current title unchanged.")] string? title = null,
@@ -68,10 +73,37 @@ public sealed class TasksTool
         [Description("List of gate labels now satisfied (e.g. ['ci-green', 'docs-updated']). Replaces the entire gatesSatisfied list. Must be a subset of the task's requiredGates. Pass null/omit to keep current gates unchanged.")] string[]? gatesSatisfied = null,
         [Description("List of blocker strings. Replaces the entire blockers list. Use to add or clear blockers. To clear all blockers, pass an empty array []. Unresolved blockers prevent tasks_mark_done from succeeding. Pass null/omit to keep current blockers unchanged.")] string[]? blockers = null)
     {
-        TaskItem result = null!;
+        if (status is not null && !s_validStatuses.Contains(status))
+        {
+            return new
+            {
+                ok = false,
+                error = new
+                {
+                    code = ErrorCodes.InvalidStatus,
+                    message = $"Invalid status '{status}'. Allowed values: 'todo', 'doing', 'done'."
+                }
+            };
+        }
+
+        object result = null!;
         await _store.MutateAsync(project, tasks =>
         {
-            var task = tasks.Single(t => t.Id == id);
+            var task = tasks.FirstOrDefault(t => t.Id == id);
+            if (task is null)
+            {
+                result = new
+                {
+                    ok = false,
+                    error = new
+                    {
+                        code = ErrorCodes.TaskNotFound,
+                        message = $"Task '{id}' not found in project '{project}'."
+                    }
+                };
+                return;
+            }
+
             if (title is not null) task.Title = title;
             if (description is not null) task.Description = description;
             if (status is not null) task.Status = status;
@@ -100,7 +132,20 @@ public sealed class TasksTool
         object response = null!;
         await _store.MutateAsync(project, tasks =>
         {
-            var task = tasks.Single(t => t.Id == id);
+            var task = tasks.FirstOrDefault(t => t.Id == id);
+            if (task is null)
+            {
+                response = new
+                {
+                    ok = false,
+                    error = new
+                    {
+                        code = ErrorCodes.TaskNotFound,
+                        message = $"Task '{id}' not found in project '{project}'."
+                    }
+                };
+                return;
+            }
 
             // Validate with candidate proof before mutating the task.
             var candidateProof = new ProofArgs
@@ -133,15 +178,29 @@ public sealed class TasksTool
         "Example: Analyst is unsure whether a use-case change is breaking: " +
         "tasks_flag_needs_input(project='my-api', id='abc123', questions=['Is removing the /v1 " +
         "endpoint a breaking change? Should we keep a redirect?']).")]
-    public async Task<TaskItem> FlagNeedsInput(
+    public async Task<object> FlagNeedsInput(
         [Description("Project identifier the task belongs to.")] string project,
         [Description("The unique task ID (32-char hex string) of the task to flag.")] string id,
         [Description("Array of one or more question strings that need human answers before work can proceed. Each question becomes a 'NEEDS_INPUT: ...' blocker on the task. These blockers must be cleared (via tasks_update with blockers=[]) before tasks_mark_done will succeed. Example: ['Is removing /v1 a breaking change?', 'Should we add a deprecation notice?'].")] string[] questions)
     {
-        TaskItem result = null!;
+        object result = null!;
         await _store.MutateAsync(project, tasks =>
         {
-            var task = tasks.Single(t => t.Id == id);
+            var task = tasks.FirstOrDefault(t => t.Id == id);
+            if (task is null)
+            {
+                result = new
+                {
+                    ok = false,
+                    error = new
+                    {
+                        code = ErrorCodes.TaskNotFound,
+                        message = $"Task '{id}' not found in project '{project}'."
+                    }
+                };
+                return;
+            }
+
             foreach (var q in questions)
             {
                 task.Blockers.Add($"NEEDS_INPUT: {q}");

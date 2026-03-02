@@ -91,10 +91,30 @@ public sealed partial class WorkflowsTool
                 Message = $"[step {i + 1}/{totalSteps}] Starting: {stepId}"
             });
 
+            // Add previous step outputs as environment variables for safe shell expansion
+            var stepEnv = new Dictionary<string, string>(envVars);
+            foreach (var (prevStepId, prevOutput) in stepOutputs)
+            {
+                // Normalize step ID to valid env var name (replace - with _)
+                var envName = $"STEP_OUTPUT_{prevStepId.Replace("-", "_")}";
+                stepEnv[envName] = prevOutput;
+            }
+
             // Apply ${{ params.<name> }} and ${{ steps.<id>.output }} substitutions
             var command = ApplySubstitutions(step.Run, stepOutputs, envVars);
 
-            var result = await RunStepAsync(command, envVars, workingDir, cancellationToken);
+            // Progress callback for real-time output streaming
+            void OnOutputLine(string line)
+            {
+                progress?.Report(new ProgressNotificationValue
+                {
+                    Progress = i,
+                    Total = totalSteps,
+                    Message = $"[{stepId}] {line}"
+                });
+            }
+
+            var result = await RunStepAsync(command, stepEnv, workingDir, OnOutputLine, cancellationToken);
 
             stepOutputs[stepId] = result.Output;
             finalStepOutput = result.Output;
@@ -120,6 +140,9 @@ public sealed partial class WorkflowsTool
                     exitCode = result.ExitCode,
                     workflow = name,
                     failedStep = stepId,
+                    command = command,
+                    stdout = result.Output,
+                    stderr = result.Stderr,
                     output = allOutput.ToString().TrimEnd()
                 };
             }
@@ -144,18 +167,25 @@ public sealed partial class WorkflowsTool
 
     private static string ApplySubstitutions(string command, Dictionary<string, string> stepOutputs, Dictionary<string, string> envVars)
     {
-        // Replace ${{ params.<name> }} with the corresponding input value (empty if not provided)
+        // Replace ${{ params.<name> }} with env var reference for safe shell expansion
+        // The actual value is already passed via environment variable with the param name
         var result = ParamsPattern().Replace(command, match =>
         {
             var paramName = match.Groups[1].Value;
-            return envVars.TryGetValue(paramName, out var value) ? value : string.Empty;
+            if (!envVars.ContainsKey(paramName)) return string.Empty;
+            // Return env var reference - bash will safely expand it without re-interpreting
+            return $"${paramName}";
         });
 
-        // Replace ${{ steps.<id>.output }} with the captured step output (empty if not available)
+        // Replace ${{ steps.<id>.output }} with env var reference for safe shell expansion
+        // The actual value is passed via STEP_OUTPUT_<stepId> environment variable
         result = StepOutputPattern().Replace(result, match =>
         {
             var stepId = match.Groups[1].Value;
-            return stepOutputs.TryGetValue(stepId, out var output) ? output : string.Empty;
+            if (!stepOutputs.ContainsKey(stepId)) return string.Empty;
+            // Return env var reference - bash will safely expand it
+            var envName = $"STEP_OUTPUT_{stepId.Replace("-", "_")}";
+            return $"${envName}";
         });
 
         return result;
@@ -171,6 +201,7 @@ public sealed partial class WorkflowsTool
         string command,
         Dictionary<string, string> envVars,
         string workingDir,
+        Action<string>? onOutputLine,
         CancellationToken ct)
     {
         var psi = new ProcessStartInfo
@@ -192,20 +223,44 @@ public sealed partial class WorkflowsTool
 
         using var process = new Process { StartInfo = psi };
 
+        var stdoutBuilder = new StringBuilder();
+        var stderrBuilder = new StringBuilder();
+
         try
         {
             process.Start();
 
-            var stdoutTask = process.StandardOutput.ReadToEndAsync(ct);
-            var stderrTask = process.StandardError.ReadToEndAsync(ct);
+            // Stream stdout line by line for real-time progress updates
+            var stdoutTask = Task.Run(async () =>
+            {
+                while (!ct.IsCancellationRequested)
+                {
+                    var line = await process.StandardOutput.ReadLineAsync(ct);
+                    if (line is null) break;
+                    stdoutBuilder.AppendLine(line);
+                    onOutputLine?.Invoke(line);
+                }
+            }, ct);
+
+            // Capture stderr separately
+            var stderrTask = Task.Run(async () =>
+            {
+                while (!ct.IsCancellationRequested)
+                {
+                    var line = await process.StandardError.ReadLineAsync(ct);
+                    if (line is null) break;
+                    stderrBuilder.AppendLine(line);
+                    onOutputLine?.Invoke($"[stderr] {line}");
+                }
+            }, ct);
 
             await Task.WhenAll(stdoutTask, stderrTask);
             await process.WaitForExitAsync(ct);
 
             return new StepResult
             {
-                Output = (await stdoutTask).TrimEnd(),
-                Stderr = (await stderrTask).TrimEnd(),
+                Output = stdoutBuilder.ToString().TrimEnd(),
+                Stderr = stderrBuilder.ToString().TrimEnd(),
                 ExitCode = process.ExitCode
             };
         }
@@ -213,8 +268,8 @@ public sealed partial class WorkflowsTool
         {
             return new StepResult
             {
-                Output = string.Empty,
-                Stderr = ex.Message,
+                Output = stdoutBuilder.ToString().TrimEnd(),
+                Stderr = $"{stderrBuilder}\n[exception] {ex.Message}".Trim(),
                 ExitCode = -1
             };
         }

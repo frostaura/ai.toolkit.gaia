@@ -9,8 +9,11 @@ This directory contains a custom **.NET-based MCP server** that provides tools f
 `tasks.mark_done` must refuse with a **clear, code+message** error unless:
 - task has no `blockers[]`
 - proof args are provided (paths/labels only)
-- referenced file paths exist
 - required gates are satisfied (as declared by the orchestrator)
+
+`tasks.update` validates:
+- status must be one of `todo`, `doing`, `done`
+- task ID must exist (returns `TASK_NOT_FOUND` error)
 
 ## Proof args (required)
 - `changed_files[]`: file paths

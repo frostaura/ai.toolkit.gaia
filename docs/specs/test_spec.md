@@ -1,4 +1,4 @@
-# TEST-001 — Gaia MCP Server Test Specification
+# Test Specification — Gaia AI Toolkit
 
 ## Scope
 

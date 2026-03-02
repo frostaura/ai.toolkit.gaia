@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Gaia.Mcp.Server.IntegrationTests" />
+    <InternalsVisibleTo Include="Gaia.Mcp.Server.Tests" />
   </ItemGroup>
 
   <ItemGroup>

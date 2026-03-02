@@ -16,6 +16,7 @@ jobs:
   test:
     name: Lint, Build, and Test
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -26,22 +27,23 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Restore
-        run: dotnet restore
+        run: dotnet restore Gaia.slnx
 
       - name: Format check
-        run: dotnet format --verify-no-changes
+        run: dotnet format Gaia.slnx --verify-no-changes
 
       - name: Build
-        run: dotnet build --no-restore
+        run: dotnet build Gaia.slnx --no-restore
 
       - name: Test
-        run: dotnet test --no-build --verbosity normal
+        run: dotnet test Gaia.slnx --no-build --verbosity normal
 
   build-and-push:
     name: Build and Push Gaia MCP
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: test
-    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

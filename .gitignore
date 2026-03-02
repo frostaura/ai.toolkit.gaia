@@ -1,6 +1,6 @@
-## Comprehensive .gitignore for AI Insights Dashboard
-## Full-stack application with .NET backend and React TypeScript frontend
-## Based on .NET, Node.js, and React best practices
+## Comprehensive .gitignore for Gaia AI Toolkit
+## .NET MCP server and workflows
+## Based on .NET best practices
 
 # Build results
 [Dd]ebug/

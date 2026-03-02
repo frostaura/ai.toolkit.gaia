@@ -24,7 +24,27 @@ public sealed class ThreadSafeJsonStore<T>
         Directory.CreateDirectory(_root);
     }
 
-    private string PathFor(string key) => Path.Combine(_root, $"{key}{_suffix}");
+    /// <summary>
+    /// Sanitize key to prevent path traversal. Only alphanumeric, dash, underscore, and dot are allowed.
+    /// </summary>
+    internal static string SanitizeKey(string key)
+    {
+        if (string.IsNullOrWhiteSpace(key))
+            throw new ArgumentException("Key must not be null or empty.", nameof(key));
+
+        // Replace any character that isn't alphanumeric, dash, underscore, or dot with underscore.
+        var sanitized = new string(key.Select(c => char.IsLetterOrDigit(c) || c == '-' || c == '_' || c == '.' ? c : '_').ToArray());
+
+        // Prevent directory traversal patterns like ".." even after sanitization.
+        sanitized = sanitized.Replace("..", "_");
+
+        if (string.IsNullOrWhiteSpace(sanitized))
+            throw new ArgumentException("Key resolves to empty after sanitization.", nameof(key));
+
+        return sanitized;
+    }
+
+    private string PathFor(string key) => Path.Combine(_root, $"{SanitizeKey(key)}{_suffix}");
 
     private SemaphoreSlim LockFor(string key) =>
         _locks.GetOrAdd(key, _ => new SemaphoreSlim(1, 1));

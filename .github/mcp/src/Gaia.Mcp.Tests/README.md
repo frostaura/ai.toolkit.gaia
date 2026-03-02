@@ -1,7 +1,5 @@
 # Gaia.Mcp.Tests
 
-Add unit tests for:
-- `tasks.mark_done` refusing with clear error codes/messages
-- path existence validation
-- blockers enforcement
-- required gate enforcement
+Placeholder project. Actual tests live in:
+- `tests/Gaia.Mcp.Server.Tests/` — unit tests
+- `tests/Gaia.Mcp.Server.IntegrationTests/` — integration tests

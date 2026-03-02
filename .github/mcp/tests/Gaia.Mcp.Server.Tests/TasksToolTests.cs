@@ -93,45 +93,52 @@ public class TasksToolTests : IDisposable
     public async Task Update_ChangesTitle()
     {
         var task = await _tool.Create("proj", "Original");
-        var updated = await _tool.Update("proj", task.Id, title: "Updated");
+        var result = await _tool.Update("proj", task.Id, title: "Updated");
 
-        Assert.Equal("Updated", updated.Title);
+        var json = TestHelpers.ToJson(result);
+        Assert.Equal("Updated", json.GetProperty("Title").GetString());
     }
 
     [Fact]
     public async Task Update_ChangesDescription()
     {
         var task = await _tool.Create("proj", "Task", "Old desc");
-        var updated = await _tool.Update("proj", task.Id, description: "New desc");
+        var result = await _tool.Update("proj", task.Id, description: "New desc");
 
-        Assert.Equal("New desc", updated.Description);
+        var json = TestHelpers.ToJson(result);
+        Assert.Equal("New desc", json.GetProperty("Description").GetString());
     }
 
     [Fact]
     public async Task Update_ChangesStatus()
     {
         var task = await _tool.Create("proj", "Task");
-        var updated = await _tool.Update("proj", task.Id, status: "doing");
+        var result = await _tool.Update("proj", task.Id, status: "doing");
 
-        Assert.Equal("doing", updated.Status);
+        var json = TestHelpers.ToJson(result);
+        Assert.Equal("doing", json.GetProperty("Status").GetString());
     }
 
     [Fact]
     public async Task Update_ReplacesRequiredGates()
     {
         var task = await _tool.Create("proj", "Task", requiredGates: new[] { "lint" });
-        var updated = await _tool.Update("proj", task.Id, requiredGates: new[] { "lint", "build", "ci" });
+        var result = await _tool.Update("proj", task.Id, requiredGates: new[] { "lint", "build", "ci" });
 
-        Assert.Equal(new[] { "lint", "build", "ci" }, updated.RequiredGates);
+        var json = TestHelpers.ToJson(result);
+        var gates = json.GetProperty("RequiredGates").EnumerateArray().Select(e => e.GetString()).ToList();
+        Assert.Equal(new[] { "lint", "build", "ci" }, gates);
     }
 
     [Fact]
     public async Task Update_ReplacesGatesSatisfied()
     {
         var task = await _tool.Create("proj", "Task", requiredGates: new[] { "lint", "build" });
-        var updated = await _tool.Update("proj", task.Id, gatesSatisfied: new[] { "lint" });
+        var result = await _tool.Update("proj", task.Id, gatesSatisfied: new[] { "lint" });
 
-        Assert.Equal(new[] { "lint" }, updated.GatesSatisfied);
+        var json = TestHelpers.ToJson(result);
+        var gates = json.GetProperty("GatesSatisfied").EnumerateArray().Select(e => e.GetString()).ToList();
+        Assert.Equal(new[] { "lint" }, gates);
     }
 
     [Fact]
@@ -139,9 +146,10 @@ public class TasksToolTests : IDisposable
     {
         var task = await _tool.Create("proj", "Task");
         await _tool.FlagNeedsInput("proj", task.Id, new[] { "Question?" });
-        var updated = await _tool.Update("proj", task.Id, blockers: Array.Empty<string>());
+        var result = await _tool.Update("proj", task.Id, blockers: Array.Empty<string>());
 
-        Assert.Empty(updated.Blockers);
+        var json = TestHelpers.ToJson(result);
+        Assert.Equal(0, json.GetProperty("Blockers").GetArrayLength());
     }
 
     [Fact]
@@ -150,12 +158,12 @@ public class TasksToolTests : IDisposable
         var task = await _tool.Create("proj", "Original Title", "Original Desc",
             new[] { "lint" });
 
-        var updated = await _tool.Update("proj", task.Id);
+        var result = await _tool.Update("proj", task.Id);
 
-        Assert.Equal("Original Title", updated.Title);
-        Assert.Equal("Original Desc", updated.Description);
-        Assert.Equal("todo", updated.Status);
-        Assert.Equal(new[] { "lint" }, updated.RequiredGates);
+        var json = TestHelpers.ToJson(result);
+        Assert.Equal("Original Title", json.GetProperty("Title").GetString());
+        Assert.Equal("Original Desc", json.GetProperty("Description").GetString());
+        Assert.Equal("todo", json.GetProperty("Status").GetString());
     }
 
     [Fact]
@@ -206,23 +214,27 @@ public class TasksToolTests : IDisposable
     public async Task FlagNeedsInput_AppendsBlockers()
     {
         var task = await _tool.Create("proj", "Task");
-        var updated = await _tool.FlagNeedsInput("proj", task.Id,
+        var result = await _tool.FlagNeedsInput("proj", task.Id,
             new[] { "Is this breaking?" });
 
-        Assert.Single(updated.Blockers);
-        Assert.Equal("NEEDS_INPUT: Is this breaking?", updated.Blockers[0]);
+        var json = TestHelpers.ToJson(result);
+        var blockers = json.GetProperty("Blockers").EnumerateArray().Select(e => e.GetString()).ToList();
+        Assert.Single(blockers);
+        Assert.Equal("NEEDS_INPUT: Is this breaking?", blockers[0]);
     }
 
     [Fact]
     public async Task FlagNeedsInput_SupportsMultipleQuestions()
     {
         var task = await _tool.Create("proj", "Task");
-        var updated = await _tool.FlagNeedsInput("proj", task.Id,
+        var result = await _tool.FlagNeedsInput("proj", task.Id,
             new[] { "Q1?", "Q2?" });
 
-        Assert.Equal(2, updated.Blockers.Count);
-        Assert.Equal("NEEDS_INPUT: Q1?", updated.Blockers[0]);
-        Assert.Equal("NEEDS_INPUT: Q2?", updated.Blockers[1]);
+        var json = TestHelpers.ToJson(result);
+        var blockers = json.GetProperty("Blockers").EnumerateArray().Select(e => e.GetString()).ToList();
+        Assert.Equal(2, blockers.Count);
+        Assert.Equal("NEEDS_INPUT: Q1?", blockers[0]);
+        Assert.Equal("NEEDS_INPUT: Q2?", blockers[1]);
     }
 
     [Fact]
@@ -301,5 +313,64 @@ public class TasksToolTests : IDisposable
 
         var json = TestHelpers.ToJson(result);
         Assert.False(json.GetProperty("ok").GetBoolean());
+    }
+
+    [Fact]
+    public async Task Update_InvalidStatus_ReturnsError()
+    {
+        var task = await _tool.Create("proj", "Task");
+        var result = await _tool.Update("proj", task.Id, status: "banana");
+
+        var json = TestHelpers.ToJson(result);
+        Assert.False(json.GetProperty("ok").GetBoolean());
+        Assert.Equal(ErrorCodes.InvalidStatus,
+            json.GetProperty("error").GetProperty("code").GetString());
+    }
+
+    [Fact]
+    public async Task Update_NonExistentId_ReturnsError()
+    {
+        var result = await _tool.Update("proj", "nonexistent", title: "New");
+
+        var json = TestHelpers.ToJson(result);
+        Assert.False(json.GetProperty("ok").GetBoolean());
+        Assert.Equal(ErrorCodes.TaskNotFound,
+            json.GetProperty("error").GetProperty("code").GetString());
+    }
+
+    [Fact]
+    public async Task MarkDone_NonExistentId_ReturnsError()
+    {
+        var result = await _tool.MarkDone("proj", "nonexistent",
+            new[] { "src/File.cs" },
+            new[] { "tests/FileTests.cs" },
+            new[] { "curl" });
+
+        var json = TestHelpers.ToJson(result);
+        Assert.False(json.GetProperty("ok").GetBoolean());
+        Assert.Equal(ErrorCodes.TaskNotFound,
+            json.GetProperty("error").GetProperty("code").GetString());
+    }
+
+    [Fact]
+    public async Task FlagNeedsInput_NonExistentId_ReturnsError()
+    {
+        var result = await _tool.FlagNeedsInput("proj", "nonexistent",
+            new[] { "Question?" });
+
+        var json = TestHelpers.ToJson(result);
+        Assert.False(json.GetProperty("ok").GetBoolean());
+        Assert.Equal(ErrorCodes.TaskNotFound,
+            json.GetProperty("error").GetProperty("code").GetString());
+    }
+
+    [Fact]
+    public async Task Update_StatusIsCaseInsensitive()
+    {
+        var task = await _tool.Create("proj", "Task");
+        var result = await _tool.Update("proj", task.Id, status: "DOING");
+
+        var json = TestHelpers.ToJson(result);
+        Assert.Equal("DOING", json.GetProperty("Status").GetString());
     }
 }

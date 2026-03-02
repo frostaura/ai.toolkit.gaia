@@ -2,21 +2,22 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Gaia TaskItem",
   "type": "object",
-  "required": ["id", "project", "title", "status"],
+  "required": ["Id", "Project", "Title", "Status"],
   "properties": {
-    "id": {"type": "string"},
-    "project": {"type": "string"},
-    "title": {"type": "string"},
-    "status": {"type": "string", "enum": ["todo", "doing", "done"]},
-    "required_gates": {"type": "array", "items": {"type": "string"}},
-    "gates_satisfied": {"type": "array", "items": {"type": "string"}},
-    "blockers": {"type": "array", "items": {"type": "string"}},
-    "proof": {
+    "Id": {"type": "string"},
+    "Project": {"type": "string"},
+    "Title": {"type": "string"},
+    "Description": {"type": ["string", "null"]},
+    "Status": {"type": "string", "enum": ["todo", "doing", "done"]},
+    "RequiredGates": {"type": "array", "items": {"type": "string"}},
+    "GatesSatisfied": {"type": "array", "items": {"type": "string"}},
+    "Blockers": {"type": "array", "items": {"type": "string"}},
+    "Proof": {
       "type": "object",
       "properties": {
-        "changed_files": {"type": "array", "items": {"type": "string"}},
-        "tests_added": {"type": "array", "items": {"type": "string"}},
-        "manual_regression": {"type": "array", "items": {"type": "string"}}
+        "ChangedFiles": {"type": "array", "items": {"type": "string"}},
+        "TestsAdded": {"type": "array", "items": {"type": "string"}},
+        "ManualRegression": {"type": "array", "items": {"type": "string"}}
       }
     }
   }

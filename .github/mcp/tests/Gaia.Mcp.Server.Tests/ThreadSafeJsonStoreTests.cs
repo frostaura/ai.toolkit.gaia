@@ -145,4 +145,47 @@ public class ThreadSafeJsonStoreTests : IDisposable
         Assert.Single(loaded);
         Assert.Equal("new", loaded[0].Key);
     }
+
+    [Fact]
+    public void SanitizeKey_RemovesPathTraversalCharacters()
+    {
+        var sanitized = ThreadSafeJsonStore<MemoryItem>.SanitizeKey("../../etc/passwd");
+        Assert.DoesNotContain("..", sanitized);
+        Assert.DoesNotContain("/", sanitized);
+    }
+
+    [Fact]
+    public void SanitizeKey_AllowsValidCharacters()
+    {
+        var sanitized = ThreadSafeJsonStore<MemoryItem>.SanitizeKey("my-project_v2.0");
+        Assert.Equal("my-project_v2.0", sanitized);
+    }
+
+    [Fact]
+    public void SanitizeKey_ThrowsOnEmpty()
+    {
+        Assert.Throws<ArgumentException>(() => ThreadSafeJsonStore<MemoryItem>.SanitizeKey(""));
+    }
+
+    [Fact]
+    public void SanitizeKey_ThrowsOnNull()
+    {
+        Assert.Throws<ArgumentException>(() => ThreadSafeJsonStore<MemoryItem>.SanitizeKey(null!));
+    }
+
+    [Fact]
+    public async Task PathTraversal_IsPrevented()
+    {
+        var store = new ThreadSafeJsonStore<MemoryItem>(_tempDir, ".test.json");
+
+        await store.MutateAsync("../../attack", items =>
+        {
+            items.Add(new MemoryItem { Key = "k", Value = "v", Project = "attack" });
+        });
+
+        // File should be created in _tempDir, not outside it
+        var files = Directory.GetFiles(_tempDir, "*.test.json");
+        Assert.Single(files);
+        Assert.StartsWith(_tempDir, files[0]);
+    }
 }
