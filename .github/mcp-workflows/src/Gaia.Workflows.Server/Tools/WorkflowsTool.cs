@@ -31,7 +31,8 @@ public sealed partial class WorkflowsTool
     [McpServerTool(Name = "workflows_execute"), Description(
         "Execute a Gaia workflow by name. The workflow is a YAML definition in .github/.agaia-workflows/. " +
         "Arguments are passed as a JSON object string where keys match param names from the workflow " +
-        "header, and are set as environment variables for each step. Each step's stdout is captured and " +
+        "header, and are set as environment variables for each step. Params are also available via " +
+        "${{ params.<name> }} substitution in step commands. Each step's stdout is captured and " +
         "available to subsequent steps via ${{ steps.<id>.output }} substitution. " +
         "Output is streamed back via progress notifications as each step runs, " +
         "and the final result includes the full output and exit code.")]
@@ -89,8 +90,8 @@ public sealed partial class WorkflowsTool
                 Message = $"[step {i + 1}/{totalSteps}] Starting: {stepId}"
             });
 
-            // Apply ${{ steps.<id>.output }} substitutions
-            var command = ApplySubstitutions(step.Run, stepOutputs);
+            // Apply ${{ params.<name> }} and ${{ steps.<id>.output }} substitutions
+            var command = ApplySubstitutions(step.Run, stepOutputs, envVars);
 
             var result = await RunStepAsync(command, envVars, workingDir, cancellationToken);
 
@@ -138,14 +139,27 @@ public sealed partial class WorkflowsTool
         };
     }
 
-    private static string ApplySubstitutions(string command, Dictionary<string, string> stepOutputs)
+    private static string ApplySubstitutions(string command, Dictionary<string, string> stepOutputs, Dictionary<string, string> envVars)
     {
-        return StepOutputPattern().Replace(command, match =>
+        // Replace ${{ params.<name> }} with the corresponding input value
+        var result = ParamsPattern().Replace(command, match =>
+        {
+            var paramName = match.Groups[1].Value;
+            return envVars.TryGetValue(paramName, out var value) ? value : match.Value;
+        });
+
+        // Replace ${{ steps.<id>.output }} with the captured step output
+        result = StepOutputPattern().Replace(result, match =>
         {
             var stepId = match.Groups[1].Value;
             return stepOutputs.TryGetValue(stepId, out var output) ? output : match.Value;
         });
+
+        return result;
     }
+
+    [GeneratedRegex(@"\$\{\{\s*params\.([a-zA-Z0-9_-]+)\s*\}\}")]
+    private static partial Regex ParamsPattern();
 
     [GeneratedRegex(@"\$\{\{\s*steps\.([a-zA-Z0-9_-]+)\.output\s*\}\}")]
     private static partial Regex StepOutputPattern();

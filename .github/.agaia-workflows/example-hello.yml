@@ -14,5 +14,7 @@ steps:
     run: "echo \"${greeting:-Hello}\""
   - id: greet
     run: "echo \"${{ steps.resolve-greeting.output }}, ${{ steps.resolve-name.output }}!\""
+  - id: greet-params
+    run: "echo \"Params interpolation: ${{ params.greeting }} ${{ params.name }}\""
   - id: done
     run: "echo \"Workflow completed successfully.\""
