@@ -8,7 +8,7 @@
 
 ---
 
-[![Version 8](https://img.shields.io/badge/Version-7-purple.svg)]()
+[![Version 8](https://img.shields.io/badge/Version-9-purple.svg)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub Copilot](https://img.shields.io/badge/GitHub-Copilot-blue.svg)]()
 [![GitHub Copilot CLI](https://img.shields.io/badge/GitHub-Copilot%20CLI-blue.svg)]()
