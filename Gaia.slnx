@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/.github/" />
+  <Folder Name="/.github/mcp-workflows/" />
+  <Folder Name="/.github/mcp-workflows/src/">
+    <Project Path=".github/mcp-workflows/src/Gaia.Workflows.Server/Gaia.Workflows.Server.csproj" />
+  </Folder>
+  <Folder Name="/.github/mcp/" />
+  <Folder Name="/.github/mcp/src/">
+    <Project Path=".github/mcp/src/Gaia.Mcp.Server/Gaia.Mcp.Server.csproj" />
+  </Folder>
+</Solution>
