@@ -1,0 +1,40 @@
+{
+    "name": "gaia",
+    "description": "Gaia is a powerful automated, enterprise-grade software architecture, engineering, and development agent designed to streamline the software development lifecycle. It leverages advanced AI capabilities to assist developers in creating high-quality software efficiently and consistently.",
+    "version": "0.0.1",
+    "author": {
+        "name": "FrostAura Dynamics",
+        "email": "support-gaia@frostaura.net"
+    },
+    "homepage": "https://gaia.frostaura.net",
+    "repository": "https://github.com/frostaura/ai.toolkit.gaia",
+    "license": "MIT",
+    "keywords": [
+        "gaia",
+        "full-stack",
+        "backend",
+        "frontend",
+        "database",
+        "devops",
+        "testing",
+        "documentation",
+        "project management",
+        "code review",
+        "refactoring",
+        "bug fixing",
+        "performance optimization",
+        "security analysis",
+        "continuous integration",
+        "continuous deployment",
+        "enterprise"
+    ],
+    "category": "full-stack-software-development",
+    "tags": [],
+    "agents": "agents/",
+    "_agentsDocumentationLink": "https://docs.github.com/en/copilot/reference/custom-agents-configuration",
+    "skills": "skills/",
+    "_skillsDocumentationLink": "https://agentskills.io/specification",
+    "hooks": "hooks.json",
+    "_hooksDocumentationLink": "https://docs.github.com/en/copilot/reference/hooks-configuration",
+    "mcpServers": ".mcp.json"
+}

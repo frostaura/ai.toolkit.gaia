@@ -1,41 +1,70 @@
 <p align="center">
-  <img src="https://github.com/frostaura/fa.templates.vibe-coding/blob/main/README.icon.png?raw=true" alt="Gaia" width="300" />
+  <img src="https://github.com/frostaura/ai.toolkit.gaia/blob/main/README.icon.png?raw=true" alt="Gaia" width="300" />
 </p>
 
 <h1 align="center"><b>Gaia</b></h1>
-<p align="center"><i>research scientist edition</i></p>
 <h3 align="center">full-stack apps. enterprise-grade. maintainable. customizable.</h3>
+<p align="center"><i>Designed to be installed as a GitHub Copilot plugin</i></p>
 
 ---
 
-[![Version 7](https://img.shields.io/badge/Version-7-purple.svg)]()
+[![Version 8](https://img.shields.io/badge/Version-7-purple.svg)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub Copilot](https://img.shields.io/badge/GitHub-Copilot-blue.svg)]()
 [![GitHub Copilot CLI](https://img.shields.io/badge/GitHub-Copilot%20CLI-blue.svg)]()
+[![Claude Code](https://img.shields.io/badge/Claude-Code-orange.svg)]()
 
 ---
 
 ## What is Gaia?
 
 Gaia is a **team of AI agents** designed to build and evolve software using **spec-driven development**.
-You describe your goal; Gaia coordinates architecture, implementation, testing, and documentation.
+You describe your goal; Gaia coordinates architecture, implementation, testing, documentation and so on.
 
 ---
 
-## How Gaia Works (Spec-Driven)
+## Install the Gaia plugin locally
+> This can be done after any changes to this repo / system in order to continuously have the latest version of the Gaia system installed globally.
+
+`copilot plugin install ./` *note: the absolute path to the plugin should be used here.*
+
+---
+
+## How Gaia Works (Adaptive Spec-Driven SDLC)
 
 - `docs/` is the **source of truth** for requirements and architecture.
 - **No drift**:
   - If a spec describes a feature, it must exist in code.
   - If code changes behavior, the spec must be updated.
+- New work starts with **intake-led refinement** and **solutions architecture**, not direct coding.
+- Gaia adapts the SDLC to the **complexity of the task**, but always keeps architecture review, planning, QA, and release validation in the loop.
+- Gaia assembles a **virtual team on the fly**: intake orchestrator, solutions architect, implementation planner, software engineer, tester, and release engineer.
+- Each agent should get only the tools required for its role so read-only analysis stays read-only and delivery ownership stays clear.
+- Agents may call each other directly when prerequisites are satisfied, and the plan should expose safe parallel branches instead of forcing unnecessary serialization.
+- Planning happens **after architecture** so the execution tree reflects the target solution, estimates, dependencies, QA work, and CI or deployment gates.
+- QA is always present in the process and can veto weak completion claims.
 
-**Ownership:**
+```mermaid
+flowchart LR
+    Request[Request] --> Intake[Intake & Refine]
+    Intake --> Design[Architect]
+    Design --> Plan[Plan]
+    Plan --> Build[Engineer]
+    Build --> Test[Tester]
+    Test -->|rework| Plan
+    Test -->|approved| Release[Release]
+```
 
-- Architect owns `docs/` and architecture decisions.
-- Developer owns code/tests/migrations/infra.
-- Tester validates behavior and quality gates.
-- Analyst investigates bugs/perf and provides recommendations.
-- Orchestrator coordinates everything.
+**Virtual team:**
+
+- Intake orchestrator owns intake, refinement, complexity classification, and the initial graph.
+- Solutions architect owns `docs/` and architecture decisions.
+- Implementation planner creates the branch-aware execution tree in `gaia_plan.md`.
+- Software engineer owns implementation and stabilization.
+- Tester validates behavior, regression risk, and quality gates continuously.
+- Release engineer validates CI and delivery gates.
+
+Shared workflow policy lives in **`AGENTS.md`** so agent files can stay role-specific without repeating the entire contract.
 
 The workflow contract lives in **`AGENTS.md`**.
 
@@ -48,12 +77,6 @@ The workflow contract lives in **`AGENTS.md`**.
 1. Open your project folder in VS Code
 2. Enable GitHub Copilot
 3. Start a chat and describe what you want
-
-Example:
-
-```
-Build me a task management app with user login
-```
 
 ### In the Terminal (Copilot CLI)
 
@@ -70,7 +93,7 @@ copilot -p "Create a REST API for a blog with posts and comments"  --yolo
 ---
 
 ### Advanced Mode
-The below may be used to simulate a workflow execution bu running copilot cli in headless mode.
+The below may be used to simulate a workflow execution by running copilot cli in headless mode.
 
 *Basic chaining for workflows*
 ```bash
@@ -82,40 +105,6 @@ copilot -p "prompt 1" --yolo && copilot -p "prompt 2" --yolo && copilot -p "prom
 while true; do copilot -p "prompt 1" --yolo && copilot -p "prompt 2" --yolo && copilot -p "prompt 3" --yolo; done
 ```
 
-The above commands are exceptional in getting Gaia to recursively reflect on the code state vs the system spec, and iterate until your desired completion rate before starting the human polishing phase.
-
-*Simple recursive process for ensuring feature parity with the system spec and comprehensively test the system using the test spec / plan.*
-*Recursive chaining for continuous workflows. In the below example, we use multiple models. Claude Opus to do the assessments and Codex 5.3 to implement the deltas, recursively*
-```bash
-while true; do copilot --yolo --model "claude-opus-4.6" -p "Assess the docs/specs/system_spec.md and the state of the code repository. Assess the docs/specs/test_spec.md for a comprehensive test plan for the system. Determine the the completion rate for all features, items, outstanding todos, ourstanding static, sample or mock data, that data and config is well-abstracted and live in the config or appsettings files and not statically coded anywhere. Integration tests implementation completion rates, based on the test spec and the state of the repo. This should be a dispassionate report. Dont take the role of a developer or tester. Instead you are a dispassionate auditor. A feature parity, quality and visual excellence police. Detective Gaia, if you will. create a detailed report for the overall system completion and save it to COMPLETION_REPORT.md (overwrite)" && copilot --yolo --model "gpt-5.3-codex" -p "[COMPLETION_REPORT.md] - Now implement all the non 100% completed or perfect items systematically. Always leave any code you encounter in a better state where appropriate. Never leave things like pre-existing gaps, errors, todos and so on, undone. You are a responsible software architect and elite software engineer. Always implement 100% of all missing things. No less is exceptable. And only after the 100% completion mark, continue to the tests. As tests are written, ensure the code that it tests is bug-free. After all thats the point of tests. Don't just blindly taylor tests to the state of the code. The code should be taylored to delivering on features which the tests should objectively assert. Remove the report after."; done
-```
-
----
-
-## Repository Layout
-
-Gaia’s configuration lives in `.github/`:
-
-- `.github/copilot-instructions.md` — repo-wide Copilot context
-- `AGENTS.md` — agent workflow contract (permissions, delegation, tools)
-- `.github/agents/` — individual agent personas
-- `.github/skills/` — playbooks and best practices
-- `.github/mcp-config.json` — MCP servers (e.g. `gaia`, `playwright`)
-
-Application projects typically include:
-
-```
-docs/           ← Specifications and design docs (Architect-owned)
-src/            ← Application code (Developer-owned)
-tests/          ← Automated tests (Developer-owned)
-```
-
----
-
-## Notes for Gaia Maintainers
-
-When scaffolding a new project, the **Architect** should replace this README with a project-specific README describing the actual application being built.
-
 ---
 
 ## Disclaimers
@@ -124,7 +113,7 @@ Note that the current configuration for the usage of Gaia's MCP server, is remot
 *What gets stored*
 - Self-improvement requests that Gaia automatically logs when struggling with a given problem. This helps us auto-improve Gaia on the backend as new "issues" with the Gaia process gets logged by you fine folks. In turn we push a new optimized version of Gaia for free to everyone. An improved one.
 - Task items for Gaia plans. This is merely a persistent tracking mechanism for your Gaia to stay anchored. Because this is a remote MCP, it works perfectly in the GitHub Copilot web (coding agent), for a completely hands-off approach. All tasks are segregated by project name to ensure no overlap.
-- Memory items for Gaia for the project, like the above, is securely persisted so you can access your project memories (and tasks), from remote sources and effortnessly switch between them. Even have them run in parallel to pick up different tasks.
+- Memory items for Gaia for the project, like the above, is securely persisted so you can access your project memories (and tasks), from remote sources and effortlessly switch between them. Even have them run in parallel to pick up different tasks.
 
 *What doesn't get stored*
 - Any user PII

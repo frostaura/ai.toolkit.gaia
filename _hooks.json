@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "type": "prompt",
+        "prompt": "/model"
+      },
+      {
+        "type": "command",
+        "bash": "./scripts/session-start.sh",
+        "powershell": "./scripts/session-start.ps1",
+        "cwd": ".",
+        "env": {
+          "GAIA_ENV": "development"
+        },
+        "timeoutSec": 10
+      }
+    ],
+    "userPromptSubmitted": [
+      {
+        "type": "command",
+        "bash": "./scripts/log-prompt.sh",
+        "powershell": "./scripts/log-prompt.ps1",
+        "cwd": ".",
+        "timeoutSec": 10
+      }
+    ],
+    "preToolUse": [
+      {
+        "type": "command",
+        "bash": "./scripts/pre-tool-policy.sh",
+        "powershell": "./scripts/pre-tool-policy.ps1",
+        "cwd": ".",
+        "timeoutSec": 15
+      }
+    ],
+    "postToolUse": [
+      {
+        "type": "command",
+        "bash": "./scripts/post-tool-log.sh",
+        "powershell": "./scripts/post-tool-log.ps1",
+        "cwd": ".",
+        "timeoutSec": 10
+      }
+    ],
+    "sessionEnd": [
+      {
+        "type": "command",
+        "bash": "./scripts/session-end.sh",
+        "powershell": "./scripts/session-end.ps1",
+        "cwd": ".",
+        "timeoutSec": 20
+      }
+    ]
+  }
+}
