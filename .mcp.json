@@ -8,7 +8,7 @@
                 "@playwright/mcp@latest"
             ]
         },
-        "gaia": {
+        "gaia-remote": {
             "url": "https://gaia.frostaura.net/mcp",
             "type": "http"
         },
@@ -16,7 +16,7 @@
             "url": "http://localhost:5059/mcp",
             "type": "http"
         },
-        "workflows": {
+        "gaia-workflows": {
             "type": "stdio",
             "command": "dotnet",
             "args": [
