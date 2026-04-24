@@ -40,6 +40,8 @@ Do not use this skill when:
 ## Decision tree
 
 - If the request is ambiguous, keep it in intake and clarify first.
+- If the user specified stack preferences, honor them and treat Gaia defaults as non-applicable unless the user asks for comparison or migration.
+- If the request leaves stack choice open and the repo has no approved override, resolve Gaia's default stack baseline before planning.
 - If architecture drift exists, route to architecture before planning or delivery.
 - If the target solution is current but execution order is missing, route to planning.
 - If a planned branch is ready, route to engineering or testing as appropriate.
@@ -49,16 +51,18 @@ Do not use this skill when:
 ## Core workflow
 
 1. Inspect the repo, docs, skills, and CI or deployment signals for blocking drift.
-2. Decide whether the request is trivial, standard, or complex, and say why.
-3. Route the work through architecture first when the target solution changes.
-4. Require planning after architecture so the execution tree is explicit.
-5. Keep QA active throughout delivery, not only at the end.
-6. Re-plan when new branches, blockers, or gate conditions appear.
-7. Treat proof recording as part of delivery, not optional cleanup.
+2. Resolve whether the user or repo already chose the stack, and use Gaia defaults only when neither did.
+3. Decide whether the request is trivial, standard, or complex, and say why.
+4. Route the work through architecture first when the target solution changes.
+5. Require planning after architecture so the execution tree is explicit.
+6. Keep QA active throughout delivery, not only at the end.
+7. Re-plan when new branches, blockers, or gate conditions appear.
+8. Treat proof recording as part of delivery, not optional cleanup.
 
 ## Workflow checkpoints
 
 - confirm the current source of truth before delegating downstream work
+- confirm the active stack baseline or explicit user override before delegating planning or implementation
 - name the current owner and the next owner explicitly at each phase boundary
 - expose QA checkpoints before implementation begins, not after it ends
 - verify that release gates and proof expectations exist before calling work complete
@@ -75,6 +79,8 @@ Do not use this skill when:
 ## Anti-patterns
 
 - do not use process language to avoid real ownership
+- do not substitute Gaia defaults for an explicit user stack choice
+- do not let planning start while stack selection is still implicit
 - do not skip architecture because the change "seems small"
 - do not let QA or proof become implied final steps
 - do not leave the workflow linear when safe parallel branches exist

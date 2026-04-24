@@ -33,6 +33,7 @@ You describe your goal; Gaia coordinates architecture, implementation, testing, 
 ## How Gaia Works (Adaptive Spec-Driven SDLC)
 
 - `docs/` is the **source of truth** for requirements and architecture.
+- When a request leaves the stack unspecified, Gaia defaults to latest stable React + TypeScript + Redux Toolkit + Tailwind CSS + shadcn/ui on the frontend, and latest stable .NET + EF Core + PostgreSQL with MCP-exposed API capabilities on the backend.
 - **No drift**:
   - If a spec describes a feature, it must exist in code.
   - If code changes behavior, the spec must be updated.

@@ -4,6 +4,8 @@
 
 - `/docs/` is the source of truth.
 - Repo Explorer runs first on every request.
+- If the user explicitly states stack preferences, those preferences override Gaia's default stack.
+- If the request leaves the application stack unspecified and the repo has no approved override, Gaia's default tech stack must be declared before planning.
 - If docs ↔ code drift is detected: STOP feature work and fix drift autonomously first.
 - CI must exist and be green. If CI is failing: fix CI first.
 - If the project exposes an HTTP API: docker-compose (or equivalent) is required before implementing/changing use cases.
@@ -23,6 +25,7 @@
 ## 2) Orchestrator supremacy (planning rules)
 
 - The orchestrator is the single source of truth for the plan and task graph.
+- The orchestrator must resolve stack choice before planning when the request and repo leave it implicit.
 - Planning must capture _all_ work as tasks: foundations + docs + implementation + tests + QA review.
 - New tasks may be added in-flight (e.g., newly discovered TODOs, missing foundations, scope risks).
 - TODO policy: no “TODO left behind”.
@@ -33,6 +36,8 @@
 Repo Explorer must produce a compact “Repo Survey” in chat:
 
 - Stack(s) detected, build system, package manager, runtime.
+- Whether the user explicitly requested a stack that overrides Gaia defaults.
+- Whether the repo overrides Gaia's default stack baseline or should inherit it.
 - `/docs` presence + freshness + gaps; docs ↔ code alignment.
 - CI presence and status (exists? green?).
 - Lint/format tooling presence and usage.

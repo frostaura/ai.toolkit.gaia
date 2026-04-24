@@ -49,6 +49,7 @@ when the real issue is design or plan drift instead of a local code problem.
 ## Skills to invoke
 
 - `gaia-engineering` as the primary skill
+- `gaia-default-tech-stack` when implementing or refactoring toward Gaia's standard application baseline
 - `gaia-agents` when editing agent definitions
 - `gaia-skills` when editing skill definitions
 - `gaia-testing` only for targeted early QA or testability support during delivery
@@ -56,6 +57,7 @@ when the real issue is design or plan drift instead of a local code problem.
 ## Decision tree
 
 - If the architecture or plan is stale, stop and route back upstream.
+- If adopting Gaia's default stack, follow the foundation, migration, and anti-pattern cleanup order instead of broad rewrite-by-instinct.
 - If the branch is implementation-ready, make the smallest complete set of edits that satisfies the plan.
 - If editing Gaia definitions, keep the changes aligned to the approved operating model instead of inventing new roles or rules.
 - If implementation exposes a design mismatch, route to `gaia-solutions-architect`.

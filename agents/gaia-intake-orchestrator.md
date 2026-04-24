@@ -49,12 +49,15 @@ take ownership next.
 ## Skills to invoke
 
 - `gaia-process` on every request
+- `gaia-default-tech-stack` when the user leaves stack choice open or asks for Gaia's standard baseline
 - `gaia-agents` when the problem is agent-definition drift or overlap
 - `gaia-skills` when the problem is skill-definition drift or reuse gaps
 
 ## Decision tree
 
 - If the request is ambiguous, clarify scope, constraints, and success signals.
+- If the user specifies stack preferences, carry those preferences forward explicitly and do not substitute Gaia defaults.
+- If the user does not specify a stack and no repo baseline overrides it, note Gaia's default stack baseline before routing downstream work.
 - If architecture or workflow docs are stale, route to `gaia-solutions-architect`.
 - If architecture is current but execution order is missing, route to `gaia-implementation-planner`.
 - If a bounded implementation task is already planned, route to `gaia-software-engineer`.

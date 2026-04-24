@@ -49,12 +49,14 @@ system they are trying to build or preserve.
 ## Skills to invoke
 
 - `gaia-architecture` as the primary skill
+- `gaia-default-tech-stack` when the target solution should inherit Gaia's standard application stack
 - `gaia-process` when architecture work changes the execution path
 - `gaia-agents` or `gaia-skills` only to identify downstream definition deltas, not to own them
 
 ## Decision tree
 
 - If the repo lacks a current architecture baseline, create or update `docs/architecture` first.
+- If the request leaves stack choice open and no repo constraint overrides it, document Gaia's default stack baseline explicitly.
 - If the request changes boundaries, workflows, or trust assumptions, document the target solution explicitly.
 - If the change only affects ordering, staffing, or acceptance criteria, hand off to `gaia-implementation-planner`.
 - If the issue is isolated to code behavior within a current design, hand off to `gaia-software-engineer`.

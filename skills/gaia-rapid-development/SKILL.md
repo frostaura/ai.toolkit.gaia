@@ -1,8 +1,8 @@
 ---
 name: gaia-rapid-development
-description: Use this skill for bounded, low-risk work that benefits from a fast local edit-run-observe loop instead of Gaia's full SDLC pass-through. It keeps shared dependencies available through docker compose, runs the backend directly with `dotnet run`, runs the frontend with the repo's HMR dev command (`npm run dev`), and verifies live browser behavior through screenshot review plus console and network inspection. Use it when rapid iteration is the main need; stop using it and re-route to the full Gaia process as soon as scope, risk, or gate requirements grow.
+description: Use this skill for bounded, low-risk work that benefits from a fast local edit-run-observe loop instead of Gaia's full SDLC pass-through. When neither the user nor the repo overrides Gaia's stack baseline, this loop inherits the gaia-default-tech-stack frontend of latest stable React + TypeScript + Redux Toolkit + Tailwind CSS + shadcn/ui on Vite and the backend of latest stable .NET API + EF Core + PostgreSQL with MCP exposure. It keeps shared dependencies available through docker compose, runs the backend directly with `dotnet run`, runs the frontend with the repo's HMR dev command (`npm run dev`), and verifies live browser behavior through screenshot review plus console and network inspection. Use it when rapid iteration is the main need; stop using it and re-route to the full Gaia process as soon as scope, risk, or gate requirements grow.
 license: MIT
-compatibility: Requires docker compose, .NET 8, Node/npm, and browser tooling for screenshot-based verification.
+compatibility: Requires docker compose, latest stable .NET, Node/npm, and browser tooling for screenshot-based verification.
 ---
 
 # Gaia Rapid Development
@@ -29,6 +29,7 @@ pretending the work needs Gaia's full intake-to-release path every time.
 ## Required inputs
 
 - the bounded objective, constraints, and obvious adjacent risk areas
+- whether the user or repo overrides `gaia-default-tech-stack`
 - the repo's local runtime commands and required environment variables
 - the browser routes or user flows that prove the change worked
 - the escalation point that sends the work back to the full Gaia path
@@ -36,6 +37,7 @@ pretending the work needs Gaia's full intake-to-release path every time.
 ## Owned outputs
 
 - a converged local implementation loop with realistic runtime dependencies
+- a local loop that either follows Gaia's default stack baseline or names the repo-specific override explicitly
 - browser-review evidence based on screenshots, console output, and network behavior
 - explicit escalation when the work grows past the shortcut's safe boundary
 - a clean handoff into engineering, testing, or the full Gaia process when needed
@@ -44,6 +46,8 @@ pretending the work needs Gaia's full intake-to-release path every time.
 
 - If the task is not clearly bounded, route back to `gaia-process`.
 - If architecture or contract behavior might change, route to `gaia-process`.
+- If the user specified another stack, use that stack instead of inheriting Gaia defaults.
+- If neither the user nor the repo has a stack override, inherit `gaia-default-tech-stack` before starting the local loop.
 - If the work mainly needs fast feedback, start the local runtime loop.
 - If the browser still shows defects, keep iterating while the work remains local.
 - If the loop stabilizes, either finish the small task or hand off to `gaia-engineering` or `gaia-testing`.
@@ -51,18 +55,21 @@ pretending the work needs Gaia's full intake-to-release path every time.
 
 ## Core workflow
 
-1. Start only the shared dependencies you need from `docker compose`.
-2. Run the backend directly with `dotnet run` against the local dependency stack.
-3. Run the frontend directly with the repo's HMR command so UI edits apply immediately.
-4. Reproduce the target behavior in the live browser and capture screenshots of the real result.
-5. Inspect browser console messages and network behavior instead of trusting the DOM alone.
-6. Iterate on code, refresh the live page, and compare the next screenshot to the intended outcome.
-7. Once the local loop converges, decide whether the work is truly done or now needs formal engineering/testing handoff.
+1. Confirm whether the user or repo overrides `gaia-default-tech-stack`.
+2. Start only the shared dependencies you need from `docker compose`.
+3. Run the backend directly with `dotnet run` against the local dependency stack.
+4. Run the frontend directly with the repo's HMR command so UI edits apply immediately.
+5. For default-stack UI work, land semantic tokens and global styles before page-by-page primitive replacement.
+6. Reproduce the target behavior in the live browser and capture screenshots of the real result.
+7. Inspect browser console messages and network behavior instead of trusting the DOM alone.
+8. Iterate on code, refresh the live page, and compare the next screenshot to the intended outcome.
+9. Once the local loop converges, decide whether the work is truly done or now needs formal engineering/testing handoff.
 
 ## Local runtime model
 
 - keep Docker focused on shared services such as Postgres and MailHog, not the active app-edit loop
 - prefer repo-native dev commands over containerized backend/frontend runs so edits apply immediately
+- when the repo does not say otherwise, assume the frontend is Vite + React + TypeScript + Redux Toolkit + Tailwind + shadcn/ui and the backend is .NET + EF Core + PostgreSQL with MCP exposure
 - keep backend and frontend origins explicit when bypassing the frontend proxy
 - stop and document environment blockers instead of silently switching to a different runtime model
 
@@ -86,6 +93,7 @@ pretending the work needs Gaia's full intake-to-release path every time.
 
 - do not use this skill to avoid architecture or planning work that is actually needed
 - do not spin up full Dockerized frontend/backend containers when the goal is fast HMR-backed iteration
+- do not skip the foundation-first UI order when standardizing onto Gaia's default frontend stack
 - do not trust DOM structure alone when screenshots, console output, or network requests disagree
 - do not keep the shortcut running once the work clearly needs broader QA or release gates
 
@@ -97,6 +105,7 @@ pretending the work needs Gaia's full intake-to-release path every time.
 
 ## References
 
+- [Gaia default stack baseline](../gaia-default-tech-stack/references/default-stack-baseline.md)
 - [Rapid local runtime loop](references/rapid-local-runtime-loop.md)
 - [Gaia delivery policy](../references/gaia-delivery-policy.md)
 - [Gaia ownership and conventions](../references/gaia-ownership-and-conventions.md)

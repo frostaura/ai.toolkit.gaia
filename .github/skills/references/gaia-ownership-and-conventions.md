@@ -11,6 +11,7 @@ Use this reference when deciding which skill should own a change, which reposito
 | `gaia-planning` | The repository's `gaia_plan.md`, branching plan structure, dependencies, QA checkpoints, release gates, and proof expectations |
 | `gaia-engineering` | Planned implementation work, rapid iteration, implementation stabilization, and engineering standards during delivery |
 | `gaia-testing` | Formal test strategy, test artifacts, regression coverage, and testing evidence |
+| `gaia-default-tech-stack` | Default frontend and backend stack selection, design-system standardization, and MCP-ready API baseline when the request or repo does not specify another stack |
 | `gaia-skills` | Skill naming, skill structure, `SKILL.md` maintenance, and repository skill conventions |
 | `gaia-agents` | Agent naming, agent definitions, and repository custom agent conventions |
 
@@ -21,8 +22,8 @@ Use this reference when deciding which skill should own a change, which reposito
 - `gaia_plan.md` -> `gaia-planning`
 - Repository code and implementation changes -> `gaia-engineering`
 - Formal test files and testing evidence -> `gaia-testing`
-- `.github/skills/**` or `.claude/skills/**` -> `gaia-skills`
-- `.github/agents/**` or `.claude/agents/**` -> `gaia-agents`
+- `skills/**`, `.github/skills/**`, or `.claude/skills/**` -> `gaia-skills`
+- `agents/**`, `.github/agents/**`, or `.claude/agents/**` -> `gaia-agents`
 
 ## Naming conventions
 

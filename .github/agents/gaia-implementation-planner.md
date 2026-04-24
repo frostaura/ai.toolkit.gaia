@@ -49,12 +49,14 @@ what can run in parallel, and what evidence will prove the work is complete.
 ## Skills to invoke
 
 - `gaia-planning` as the primary skill
+- `gaia-default-tech-stack` when the plan must adopt or migrate toward Gaia's standard frontend and backend baseline
 - `gaia-process` when the execution path itself must be updated
 - `gaia-testing` when early QA shape must be embedded into the plan
 
 ## Decision tree
 
 - If architecture is missing or stale, stop and send the work back to `gaia-solutions-architect`.
+- If the work includes default-stack adoption, plan it in phases: foundation first, component migration second, anti-pattern cleanup third.
 - If the work is trivial, publish the smallest plan that still names QA, gates, and proof.
 - If branches are independent, expose them as parallel-safe work streams.
 - If a branch depends on another artifact becoming current, make the dependency explicit instead of implying it.
