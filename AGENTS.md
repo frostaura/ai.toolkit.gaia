@@ -89,8 +89,8 @@ Task tools (`tasks_*`):
 - `tasks_create(project, title, requiredGates[])` — create a new task.
 - `tasks_list(project)` — list all tasks and their state.
 - `tasks_update(project, id, ...)` — update status/gates/blockers.
-- `tasks_mark_done(project, id, changedFiles[], testsAdded[], manualRegressionLabels[])` — complete with proof.
-- `tasks_flag_needs_input(project, id, questions[])` — block on human input.
+- `tasks_complete(project, id, changedFiles[], testsAdded[], manualRegressionLabels[])` — complete with proof.
+- `tasks_request_input(project, id, questions[])` — block on human input.
 - `tasks_delete(project, id)` / `tasks_clear(project)` — cleanup.
 
 Memory tools (`memory_*`):
@@ -103,7 +103,7 @@ Evolution tools (`evolve_*`) — agents call these to continuously upgrade thems
 
 - `evolve_log(project, suggestion, category?)` — log a lesson learned.
 - `evolve_list(project?, category?)` — review lessons (call at session start).
-- `evolve_mark_applied(id)` / `evolve_clear(project?)` — manage backlog.
+- `evolve_apply(id)` / `evolve_clear(project?)` — manage backlog.
 
 Task fields:
 
@@ -113,7 +113,7 @@ Task fields:
 - `gates_satisfied[]`: updated as gates pass
 - `proof`: `changed_files[]`, `tests_added[]`, `manual_regression[]`
 
-`tasks_mark_done` refuses with error codes when:
+`tasks_complete` refuses with error codes when:
 
 - `GAIA_TASKS_ERR_BLOCKERS_UNRESOLVED` — blockers exist
 - `GAIA_TASKS_ERR_NEEDS_INPUT_UNRESOLVED` — human input pending
@@ -122,7 +122,7 @@ Task fields:
 
 "Needs human input" mode:
 
-- Call `tasks_flag_needs_input(project, id, questions[])` to block on human input.
+- Call `tasks_request_input(project, id, questions[])` to block on human input.
 - Continue parallelizable work while waiting.
 
 ## 8) Skills policy (keep current)
@@ -165,7 +165,7 @@ A task is DONE only when:
 - Required docs/spec are updated (when behavior changes),
 - CI exists and is green (or will be green once merged, per current branch checks),
 - Required gates pass for the task (as declared in `required_gates[]`),
-- Proof args are recorded via `tasks_mark_done`,
+- Proof args are recorded via `tasks_complete`,
 - Quality Gatekeeper approves (orchestrator must comply with veto).
 
 ## 12) Memory and evolution (use aggressively)
@@ -173,4 +173,4 @@ A task is DONE only when:
 - **Every session start**: call `memory_recall(project)` and `evolve_list()` to load context.
 - **Repo Explorer**: `memory_remember` discovered conventions (build commands, env vars, stack details).
 - **After mistakes/inefficiencies**: call `evolve_log` to record lessons for future sessions.
-- **After applying a lesson**: call `evolve_mark_applied` to close the loop.
+- **After applying a lesson**: call `evolve_apply` to close the loop.

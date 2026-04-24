@@ -1,5 +1,5 @@
 name: gaia-planning
-description: Provides execution planning guidance that turns approved architecture into a branch-aware plan with dependencies, QA checkpoints, release gates, and proof expectations. Use it after architecture is current, when work needs explicit sequencing instead of informal next steps, or when new branches, blockers, or gate definitions require re-planning.
+description: Provides execution planning guidance that turns approved architecture into a branch-aware plan with dependencies, QA checkpoints, release gates, and proof expectations. Use it by translating the current architecture into MCP tasks (tasks_create) sequenced by branch, with explicit required_gates and blockers, then keeping the plan current as new work is discovered. Use it after architecture is current, when work needs explicit sequencing instead of informal next steps, or when new branches, blockers, or gate definitions require re-planning.
 license: MIT
 ---
 

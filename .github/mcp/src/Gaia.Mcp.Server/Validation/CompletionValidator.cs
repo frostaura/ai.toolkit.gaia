@@ -4,7 +4,7 @@ namespace Gaia.Mcp.Server.Validation;
 
 public static class CompletionValidator
 {
-    public static ToolError? ValidateMarkDone(TaskItem task)
+    public static ToolError? ValidateComplete(TaskItem task)
     {
         // Check NEEDS_INPUT blockers first for a more specific error message
         if (task.Blockers.Any(b => b.StartsWith("NEEDS_INPUT:", StringComparison.OrdinalIgnoreCase)))
@@ -13,7 +13,7 @@ public static class CompletionValidator
             return new ToolError(
                 ErrorCodes.NeedsInputUnresolved,
                 $"Task '{task.Id}' has unresolved human input requests: {string.Join(" | ", needsInput)}. " +
-                "Resolve these via tasks_update(blockers=[]) before calling tasks_mark_done."
+                "Resolve these via tasks_update(blockers=[]) before calling tasks_complete."
             );
         }
 
@@ -23,7 +23,7 @@ public static class CompletionValidator
             return new ToolError(
                 ErrorCodes.BlockersUnresolved,
                 $"Task '{task.Id}' has unresolved blockers: {string.Join(" | ", task.Blockers)}. " +
-                "Clear blockers via tasks_update(blockers=[]) before calling tasks_mark_done."
+                "Clear blockers via tasks_update(blockers=[]) before calling tasks_complete."
             );
         }
 
@@ -36,7 +36,7 @@ public static class CompletionValidator
             if (task.Proof.ManualRegression.Count == 0) missing.Add("manualRegressionLabels");
             return new ToolError(
                 ErrorCodes.MissingProofArgs,
-                $"mark_done requires all three proof arrays to be non-empty. Missing: {string.Join(", ", missing)}. " +
+                $"tasks_complete requires all three proof arrays to be non-empty. Missing: {string.Join(", ", missing)}. " +
                 "Each array must contain at least one entry (file path or label)."
             );
         }
@@ -48,7 +48,7 @@ public static class CompletionValidator
             return new ToolError(
                 ErrorCodes.GatesUnsatisfied,
                 $"Required gates not satisfied: {string.Join(", ", missingGates)}. " +
-                "Call tasks_update(gatesSatisfied=[...]) before tasks_mark_done."
+                "Call tasks_update(gatesSatisfied=[...]) before tasks_complete."
             );
         }
 

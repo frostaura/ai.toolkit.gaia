@@ -20,23 +20,20 @@ public sealed partial class WorkflowsTool
     }
 
     [McpServerTool(Name = "workflows_list"), Description(
-        "List all available Gaia workflows defined in .github/.agaia-workflows/. " +
-        "Returns each workflow's name, description, parameters, and expected output. " +
-        "Use this to discover what workflows are available before executing one.")]
-    public List<WorkflowDescriptor> ListWorkflows()
+        "Provides the catalogue of Gaia workflows defined in .github/.agaia-workflows/, including each workflow's name, description, parameters, and expected output. " +
+        "How to use: call with no arguments; returns a list of WorkflowDescriptor entries you can introspect to build a workflows_run call. " +
+        "Use before executing any workflow to discover what is available, what params it expects, and what it produces \u2014 never guess a workflow name.")]
+    public List<WorkflowDescriptor> List()
     {
         return WorkflowParser.ScanDirectory(_workflowsDir);
     }
 
-    [McpServerTool(Name = "workflows_execute"), Description(
-        "Execute a Gaia workflow by name. The workflow is a YAML definition in .github/.agaia-workflows/. " +
-        "Arguments are passed as a JSON object string where keys match param names from the workflow " +
-        "header, and are set as environment variables for each step. Params are also available via " +
-        "${{ params.<name> }} substitution in step commands. Each step's stdout is captured and " +
-        "available to subsequent steps via ${{ steps.<id>.output }} substitution. " +
-        "Progress notifications stream step status as each step runs. " +
-        "Returns output (all step outputs) and finalOutput (last step's output).")]
-    public async Task<object> ExecuteWorkflow(
+    [McpServerTool(Name = "workflows_run"), Description(
+        "Provides end-to-end execution of a named Gaia workflow (a YAML definition under .github/.agaia-workflows/), running each step in order, streaming step status as progress notifications, and returning the captured stdout. " +
+        "How to use: pass the workflow name (no .yml extension, discovered via workflows_list) and an optional JSON-object string of args whose keys match the workflow's @param names; args are exposed to steps as environment variables and via ${{ params.<name> }} substitution, and earlier step outputs are available via ${{ steps.<id>.output }}. Returns {ok, output (all step outputs), finalOutput (last step's output)}, or {ok:false, exitCode, failedStep, stdout, stderr} on failure. " +
+        "Use to invoke a vetted automation rather than scripting it ad-hoc \u2014 anything from a simple smoke test to a multi-step delivery routine \u2014 and prefer it over inline shell when a workflow already exists. " +
+        "Example: workflows_run(name='example-hello', args='{\"name\":\"Dean\",\"greeting\":\"Hi\"}').")]
+    public async Task<object> Run(
         [Description("The name of the workflow to execute (without .yml extension). Use workflows_list to discover available names.")] string name,
         [Description("Optional JSON object string of arguments to pass to the workflow. Keys should match the @param names defined in the workflow header. Example: {\"name\": \"Dean\", \"greeting\": \"Hi\"}")] string? args = null,
         IProgress<ProgressNotificationValue>? progress = null,

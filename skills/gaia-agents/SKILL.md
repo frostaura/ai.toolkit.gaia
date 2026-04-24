@@ -1,5 +1,5 @@
 name: gaia-agents
-description: Provides Gaia custom-agent definition guidance with clear role boundaries, strong descriptions, valid tool scopes, delegation rules, and overlap control. Use it when adding, revising, auditing, or rationalizing agent files, role ownership, naming, or contract alignment.
+description: Provides Gaia custom-agent definition guidance with clear role boundaries, strong descriptions, valid tool scopes, delegation rules, and overlap control. Use it by following the agents-specification reference (frontmatter, role contract, tool allow-list, delegation rules) when adding or revising an agent file, and by mirroring changes across both /agents/ and /.github/agents/ trees. Use it when adding, revising, auditing, or rationalizing agent files, role ownership, naming, or contract alignment.
 license: MIT
 ---
 

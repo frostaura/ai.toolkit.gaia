@@ -1,6 +1,6 @@
 ---
 name: gaia-ui-engineering
-description: Provides React UI implementation guidance that enforces the design system, shadcn/ui composition, semantic Tailwind tokens, and responsive layout discipline. Use it when building or refactoring user-facing React components, screens, forms, dialogs, or styling where UI consistency and token cleanup matter.
+description: Provides React UI implementation guidance that enforces the design system, shadcn/ui composition, semantic Tailwind tokens, and responsive layout discipline. Use it by composing shadcn/ui primitives with semantic Tailwind tokens (no raw color/spacing literals), respecting the responsive layout rules, and removing dead tokens as you go. Use it when building or refactoring user-facing React components, screens, forms, dialogs, or styling where UI consistency and token cleanup matter.
 license: MIT
 ---
 
