@@ -1,6 +1,5 @@
----
 name: gaia-rapid-development
-description: Use this skill for bounded, low-risk work that benefits from a fast local edit-run-observe loop instead of Gaia's full SDLC pass-through. When neither the user nor the repo overrides Gaia's stack baseline, this loop inherits the gaia-default-tech-stack frontend of latest stable React + TypeScript + Redux Toolkit + Tailwind CSS + shadcn/ui on Vite and the backend of latest stable .NET API + EF Core + PostgreSQL with MCP exposure. It keeps shared dependencies available through docker compose, runs the backend directly with `dotnet run`, runs the frontend with the repo's HMR dev command (`npm run dev`), and verifies live browser behavior through screenshot review plus console and network inspection. Use it when rapid iteration is the main need; stop using it and re-route to the full Gaia process as soon as scope, risk, or gate requirements grow.
+description: Provides a fast local edit-run-observe loop for bounded, low-risk work using Gaia's default stack baseline, docker-backed shared dependencies, and browser-based verification. Use it when rapid iteration matters more than a full SDLC pass-through, and stop using it as soon as scope, risk, or gate requirements grow.
 license: MIT
 compatibility: Requires docker compose, latest stable .NET, Node/npm, and browser tooling for screenshot-based verification.
 ---

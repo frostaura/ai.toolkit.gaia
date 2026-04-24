@@ -1,6 +1,5 @@
----
 name: gaia-skills
-description: Use this skill to create, revise, audit, and rationalize Gaia skills when procedural guidance, naming, descriptions, references, or ownership boundaries need maintenance. Use it when a repeated pattern deserves a reusable skill, when an existing skill has drifted from the workflow contract, when frontmatter descriptions need better invocation quality, or when the skill set should be simplified instead of expanded. Do not use it to solve a missing architecture decision or to move global workflow policy out of AGENTS.md into scattered skill files. Its output is a coherent skill set with clear procedural ownership, valid metadata, strong descriptions, and minimal duplication.
+description: Provides Gaia skill-definition maintenance guidance with clear naming, descriptions, ownership boundaries, references, and reuse decisions. Use it when adding, revising, auditing, or rationalizing skills, improving invocation quality, or consolidating drifting procedural guidance.
 license: MIT
 ---
 

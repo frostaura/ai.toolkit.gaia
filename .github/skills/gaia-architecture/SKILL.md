@@ -1,6 +1,5 @@
----
 name: gaia-architecture
-description: Use this skill to create, update, reconcile, or explain Gaia architecture documentation when the target operating model changes, drift is detected, a repo baseline is missing, or README messaging must stay aligned with design. Use it when system structure, trust boundaries, interfaces, workflows, ownership, or architectural assumptions change; when planning or validation cannot proceed because design is unclear; or when Gaia's own plugin and workflow architecture must be documented before broader definition work continues. Do not use it for implementation delivery or release gating. Its output is current architecture documentation, explicit design decisions, and a clean handoff to planning or definition maintenance.
+description: Provides Gaia architecture documentation guidance that keeps docs, README messaging, and design decisions aligned to the current operating model. Use it when system structure, trust boundaries, interfaces, workflows, ownership, or architectural assumptions change, or when architecture drift blocks planning or delivery.
 license: MIT
 ---
 

@@ -1,6 +1,5 @@
----
 name: gaia-agents
-description: Use this skill to create, revise, audit, or rationalize Gaia custom-agent definitions when role boundaries, naming, descriptions, tool scopes, delegation rules, or overlap concerns need maintenance. Use it when adding a role, evaluating whether a new role is justified, expanding an existing role, rewriting agent instructions, or aligning agent files to the global contract. Do not use it to bypass architecture decisions or to create new roles just because one workflow feels inconvenient. Its output is a clear agent definition set with strong descriptions, explicit boundaries, valid tool scopes, and no unnecessary role duplication.
+description: Provides Gaia custom-agent definition guidance with clear role boundaries, strong descriptions, valid tool scopes, delegation rules, and overlap control. Use it when adding, revising, auditing, or rationalizing agent files, role ownership, naming, or contract alignment.
 license: MIT
 ---
 

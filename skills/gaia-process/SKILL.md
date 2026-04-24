@@ -1,6 +1,5 @@
----
 name: gaia-process
-description: Use this skill to run Gaia's end-to-end workflow from intake through closure. It applies when a request needs complexity classification, routing, agent selection, QA checkpoints, release gates, proof expectations, or a workflow reset after drift or repeated blockers. Use it for every meaningful request, for re-planning after major discoveries, and for maintenance efforts that change Gaia's own operating model. Do not use it as a replacement for architecture, planning, engineering, testing, or release work; use it to orchestrate those roles and verify the right artifacts are current before downstream work proceeds.
+description: Provides Gaia's end-to-end workflow orchestration guidance for intake, routing, QA checkpoints, release gates, and proof expectations. Use it for meaningful requests, workflow resets after drift or blockers, and maintenance work that changes Gaia's operating model.
 ---
 
 # Gaia Process

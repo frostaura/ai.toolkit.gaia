@@ -1,6 +1,5 @@
----
 name: gaia-planning
-description: Use this skill to turn approved architecture into an explicit execution plan with branch boundaries, dependencies, parallel-safe work, QA checkpoints, release gates, and proof expectations. Use it after architecture is current, whenever the work needs sequencing instead of informal next steps, or when execution reveals new branches, blockers, or gate definitions that require re-planning. Do not use it to invent a target solution or to hide QA and proof work inside vague future tasks. Its output is a current plan that downstream engineering, testing, and release roles can execute directly and audit easily.
+description: Provides execution planning guidance that turns approved architecture into a branch-aware plan with dependencies, QA checkpoints, release gates, and proof expectations. Use it after architecture is current, when work needs explicit sequencing instead of informal next steps, or when new branches, blockers, or gate definitions require re-planning.
 license: MIT
 ---
 

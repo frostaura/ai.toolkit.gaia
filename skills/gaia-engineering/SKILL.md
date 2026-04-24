@@ -1,6 +1,5 @@
----
 name: gaia-engineering
-description: Use this skill to execute planned implementation work, keep a branch coherent while it changes, and stabilize behavior before formal hardening and release evaluation. Use it when a current plan branch is ready for code or definition-file edits, when implementation-side cleanup is needed to preserve the branch, or when targeted early QA support is useful during delivery. Do not use it to redefine architecture, replace planning, or make broad release decisions. Its output is implemented work that respects the approved target solution, leaves a clean testing handoff, and calls out any upstream design or planning mismatch instead of masking it locally.
+description: Provides planned implementation delivery guidance that keeps a branch coherent, stabilized, and ready for testing without redefining the target solution. Use it when a current plan branch is ready for code or definition-file edits, when implementation-side cleanup is needed, or when targeted early QA support is useful during delivery.
 license: MIT
 ---
 

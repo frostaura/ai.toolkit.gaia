@@ -1,6 +1,5 @@
----
 name: gaia-testing
-description: Use this skill to define and execute Gaia's formal validation approach across unit, integration, manual regression, automated regression, and evidence review. Use it when a branch is stable enough for hardening, when high-risk behavior needs targeted early validation, when browser-based or user-visible behavior must be checked directly, or when release readiness depends on a clear QA signal. Do not use it to replace implementation ownership, invent acceptance criteria from scratch when planning is missing, or treat weak evidence as proof. Its output is explicit pass-fail-blocked routing, updated validation artifacts, and evidence that matches the risk and surface area of the change.
+description: Provides Gaia's formal validation guidance across unit, integration, manual regression, automated regression, and evidence review. Use it when a branch is stable enough for hardening, when high-risk behavior needs targeted early validation, or when release readiness depends on a clear QA signal.
 license: MIT
 ---
 
