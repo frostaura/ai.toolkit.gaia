@@ -22,7 +22,7 @@
             "args": [
                 "run",
                 "--project",
-                "mcps/mcp-workflows/src/Gaia.Workflows.Server"
+                ".github/mcp-workflows/src/Gaia.Workflows.Server"
             ]
         }
     }

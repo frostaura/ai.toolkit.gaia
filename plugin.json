@@ -1,7 +1,7 @@
 {
     "name": "gaia",
     "description": "Gaia is a powerful automated, enterprise-grade software architecture, engineering, and development agent designed to streamline the software development lifecycle. It leverages advanced AI capabilities to assist developers in creating high-quality software efficiently and consistently.",
-    "version": "8.0.0",
+    "version": "8.1.0",
     "author": {
         "name": "FrostAura Dynamics",
         "email": "support-gaia@frostaura.net"

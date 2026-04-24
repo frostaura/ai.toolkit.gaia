@@ -26,7 +26,7 @@ public sealed class MemoryTool
         "Example: after Repo Explorer discovers the build command, it calls " +
         "memory_remember(project='my-api', key='build/command', value='dotnet build src/Api.csproj').")]
     public async Task<MemoryItem> Remember(
-        [Description("Project identifier that scopes this memory entry. Must match the project name used across all Gaia tools (tasks, memory, self-improve) for consistency. Example: 'my-api'.")] string project,
+        [Description("Project identifier that scopes this memory entry. Must match the project name used across all Gaia tools (tasks, memory, evolve) for consistency. Example: 'my-api'.")] string project,
         [Description("Descriptive, namespaced key for the fact being stored. Use '/' to create logical namespaces (e.g. 'build/command', 'env/DATABASE_URL', 'convention/branch-naming', 'stack/language'). If the key already exists, its value is updated (upsert semantics). Keys are case-sensitive.")] string key,
         [Description("The fact value to store. Should be a concise, durable piece of knowledge — a command, a URL, a convention description, or a config value. Avoid storing ephemeral or session-specific information.")] string value)
     {

@@ -99,11 +99,11 @@ Memory tools (`memory_*`):
 - `memory_recall(project, key?)` — recall facts (call at session start).
 - `memory_forget(project, key)` / `memory_clear(project)` — cleanup.
 
-Self-improvement tools (`self_improve_*`):
+Evolution tools (`evolve_*`) — agents call these to continuously upgrade themselves:
 
-- `self_improve_log(project, suggestion, category?)` — log a lesson learned.
-- `self_improve_list(project?, category?)` — review lessons (call at session start).
-- `self_improve_mark_applied(id)` / `self_improve_clear(project?)` — manage backlog.
+- `evolve_log(project, suggestion, category?)` — log a lesson learned.
+- `evolve_list(project?, category?)` — review lessons (call at session start).
+- `evolve_mark_applied(id)` / `evolve_clear(project?)` — manage backlog.
 
 Task fields:
 
@@ -168,9 +168,9 @@ A task is DONE only when:
 - Proof args are recorded via `tasks_mark_done`,
 - Quality Gatekeeper approves (orchestrator must comply with veto).
 
-## 12) Memory and self-improvement (use aggressively)
+## 12) Memory and evolution (use aggressively)
 
-- **Every session start**: call `memory_recall(project)` and `self_improve_list()` to load context.
+- **Every session start**: call `memory_recall(project)` and `evolve_list()` to load context.
 - **Repo Explorer**: `memory_remember` discovered conventions (build commands, env vars, stack details).
-- **After mistakes/inefficiencies**: call `self_improve_log` to record lessons for future sessions.
-- **After applying a lesson**: call `self_improve_mark_applied` to close the loop.
+- **After mistakes/inefficiencies**: call `evolve_log` to record lessons for future sessions.
+- **After applying a lesson**: call `evolve_mark_applied` to close the loop.

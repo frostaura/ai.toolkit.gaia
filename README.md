@@ -112,7 +112,7 @@ while true; do copilot -p "prompt 1" --yolo && copilot -p "prompt 2" --yolo && c
 Note that the current configuration for the usage of Gaia's MCP server, is remote. This means your data will safely live on the Gaia secure server.
 
 *What gets stored*
-- Self-improvement requests that Gaia automatically logs when struggling with a given problem. This helps us auto-improve Gaia on the backend as new "issues" with the Gaia process gets logged by you fine folks. In turn we push a new optimized version of Gaia for free to everyone. An improved one.
+- Evolution requests that Gaia automatically logs when struggling with a given problem. This helps agents continuously evolve themselves: as new "issues" with the Gaia process get logged by you fine folks, we push a new optimized version of Gaia for free to everyone. An evolved one.
 - Task items for Gaia plans. This is merely a persistent tracking mechanism for your Gaia to stay anchored. Because this is a remote MCP, it works perfectly in the GitHub Copilot web (coding agent), for a completely hands-off approach. All tasks are segregated by project name to ensure no overlap.
 - Memory items for Gaia for the project, like the above, is securely persisted so you can access your project memories (and tasks), from remote sources and effortlessly switch between them. Even have them run in parallel to pick up different tasks.
 

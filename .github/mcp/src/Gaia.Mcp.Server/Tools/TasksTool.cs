@@ -27,7 +27,7 @@ public sealed class TasksTool
         "mark_done succeeds. Example: after Repo Explorer survey, Orchestrator calls tasks_create with " +
         "project='my-api', title='Add Playwright specs for login flow', requiredGates=['ci-green','docs-updated'].")]
     public async Task<TaskItem> Create(
-        [Description("Project identifier that scopes this task. Must match the project name used across all Gaia tools (tasks, memory, self-improve) for consistency. Example: 'my-api'.")] string project,
+        [Description("Project identifier that scopes this task. Must match the project name used across all Gaia tools (tasks, memory, evolve) for consistency. Example: 'my-api'.")] string project,
         [Description("Short, action-oriented title summarizing what this task accomplishes. Should be specific enough to be actionable without reading the description. Example: 'Add Playwright specs for login flow'.")] string title,
         [Description("Optional longer description providing context, acceptance criteria, or implementation notes for the task. Omit if the title is self-explanatory.")] string? description = null,
         [Description("Optional list of gate labels that must ALL be satisfied before tasks_mark_done will accept this task as complete. Each gate is a string label (e.g. 'ci-green', 'docs-updated', 'lint-clean'). Gates are satisfied by calling tasks_update with gatesSatisfied. If omitted, no gates are enforced.")] string[]? requiredGates = null)

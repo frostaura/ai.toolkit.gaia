@@ -6,13 +6,13 @@
     },
     "metadata": {
         "description": "Curated plugins from the FrostAura team.",
-        "version": "1.0.0"
+        "version": "0.1.0"
     },
     "plugins": [
         {
             "name": "gaia",
             "description": "Spec-driven AI agents for software architecture, planning, engineering, testing, and release workflows.",
-            "version": "8.0.0",
+            "version": "8.1.0",
             "source": "."
         }
     ]

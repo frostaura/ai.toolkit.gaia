@@ -1,6 +1,6 @@
 namespace Gaia.Mcp.Server.Models;
 
-public sealed class ImprovementItem
+public sealed class EvolutionItem
 {
     public required string Id { get; init; }
     public required string Project { get; init; }
