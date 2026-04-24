@@ -20,10 +20,10 @@ Run the API directly from the repo so code edits apply immediately:
 
 ```bash
 cd src/backend
-dotnet run --project LifeOS.Api
+dotnet run --project Example.Api
 ```
 
-- Prefer ASP.NET user-secrets on `src/backend/LifeOS.Api` for local secrets.
+- Prefer ASP.NET user-secrets on `src/backend/Example.Api` for local secrets.
 - If you bypass the frontend proxy, keep the backend origin explicit so browser
   requests still target the direct API process.
 

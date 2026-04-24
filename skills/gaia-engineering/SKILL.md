@@ -40,6 +40,7 @@ Do not use this skill when:
 ## Decision tree
 
 - If the branch is ready, implement the smallest complete set of changes that satisfies the plan.
+- If the branch changes React UI, invoke `gaia-ui-engineering` before editing components, classes, or layout behavior.
 - If the work reveals a design contradiction, stop and route to architecture.
 - If the work reveals a missing dependency or acceptance model, route to planning.
 - If the branch is stable enough for targeted early QA, involve testing deliberately rather than waiting blindly.
@@ -56,6 +57,7 @@ Do not use this skill when:
 ## Implementation guardrails
 
 - keep edits aligned with the approved architecture and current plan branch
+- route user-facing React UI work through `gaia-ui-engineering` so design-system rules stay explicit during delivery
 - fix tightly coupled breakage caused by the change, but do not expand scope casually
 - preserve explicit configuration and toolchain conventions already used in the repo
 - stop and escalate when the branch cannot be completed without redesign or re-planning
