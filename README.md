@@ -4,7 +4,7 @@
 
 <h1 align="center"><b>Gaia</b></h1>
 <h3 align="center">full-stack apps. enterprise-grade. maintainable. customizable.</h3>
-<p align="center"><i>A Claude Code plugin for spec-driven software delivery.</i></p>
+<p align="center"><i>A Claude Code plugin (and Claude CoWork starter pack) for spec-driven software delivery.</i></p>
 
 ---
 
@@ -40,6 +40,20 @@ claude plugin install gaia@frostaura-gaia
 The plugin manifest lives at `.claude-plugin/plugin.json`. Agents, skills, slash
 commands, hooks, and MCP servers are auto-discovered from `agents/`, `skills/`,
 `commands/`, `hooks/hooks.json`, and `.mcp.json`.
+
+### Claude CoWork
+
+Claude CoWork is a separate product and does not load Claude Code plugins,
+but it speaks MCP. Gaia ships a CoWork starter pack at `cowork/`:
+
+1. Add `https://gaia.frostaura.net/mcp` as a custom HTTP MCP connector in
+   your CoWork project (or paste `cowork/connector.json`).
+2. Copy the contents of `cowork/instructions.md` into your CoWork project's
+   Instructions / System Prompt field.
+3. Whenever the agents or skills change here, regenerate the instructions
+   with `./cowork/build.sh` and re-paste.
+
+Full walkthrough at [`cowork/README.md`](cowork/README.md).
 
 ---
 
