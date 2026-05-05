@@ -1,3 +1,4 @@
+---
 name: gaia-process
 description: Provides Gaia's end-to-end workflow orchestration guidance for intake, routing, QA checkpoints, release gates, and proof expectations. Use it by routing every meaningful request through the intake → architecture → planning → engineering → testing → release sequence and only completing tasks once the corresponding gates and proof are recorded. Use it for meaningful requests, workflow resets after drift or blockers, and maintenance work that changes Gaia's operating model.
 ---

@@ -4,7 +4,7 @@
 
 <h1 align="center"><b>Gaia</b></h1>
 <h3 align="center">full-stack apps. enterprise-grade. maintainable. customizable.</h3>
-<p align="center"><i>Designed to be installed as a GitHub Copilot plugin</i></p>
+<p align="center"><i>Installable in GitHub Copilot and Claude Code as a single plugin.</i></p>
 
 ---
 
@@ -26,7 +26,29 @@ You describe your goal; Gaia coordinates architecture, implementation, testing, 
 ## Install the Gaia plugin locally
 > This can be done after any changes to this repo / system in order to continuously have the latest version of the Gaia system installed globally.
 
+### GitHub Copilot
+
 `copilot plugin install ./` *note: the absolute path to the plugin should be used here.*
+
+### Claude Code
+
+```bash
+# Add this repo as a Claude Code plugin marketplace, then install Gaia.
+claude plugin marketplace add frostaura/ai.toolkit.gaia
+claude plugin install gaia@frostaura-gaia
+```
+
+Or, for local development of Gaia itself, point Claude Code at the working tree:
+
+```bash
+claude plugin marketplace add ./
+claude plugin install gaia@frostaura-gaia
+```
+
+The same `agents/`, `skills/`, `commands/`, `.mcp.json`, and `scripts/` are
+served to both platforms — Claude Code reads its manifest from
+`.claude-plugin/plugin.json` and its hooks from `hooks/hooks.json`; Copilot
+reads `plugin.json` and `hooks.json` at the repo root.
 
 ---
 
@@ -90,6 +112,20 @@ Example:
 ```bash
 copilot -p "Create a REST API for a blog with posts and comments"  --yolo
 ```
+
+### In Claude Code
+
+After installing (see above), use the bundled slash commands:
+
+- `/gaia-init` — kick off the Repo Explorer and produce a Repo Survey.
+- `/gaia-intake <request>` — frame a new request and route it to the right Gaia role.
+- `/gaia-plan` — turn the current architecture into a branch-aware plan.
+- `/gaia-review` — run the Quality Gatekeeper checklist on the current branch.
+- `/gaia-evolve` — review and apply Gaia evolution lessons.
+
+Or invoke any role agent directly via `@gaia-intake-orchestrator`,
+`@gaia-solutions-architect`, `@gaia-implementation-planner`,
+`@gaia-software-engineer`, `@gaia-tester`, `@gaia-release-engineer`.
 
 ---
 

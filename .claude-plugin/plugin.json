@@ -1,0 +1,22 @@
+{
+    "$schema": "https://code.claude.com/schemas/plugin.json",
+    "name": "gaia",
+    "description": "Gaia: a team of AI agents that build and evolve software using spec-driven development. Coordinates intake, architecture, planning, engineering, testing, and release across one repo.",
+    "version": "8.1.0",
+    "author": {
+        "name": "FrostAura Dynamics",
+        "email": "support-gaia@frostaura.net",
+        "url": "https://gaia.frostaura.net"
+    },
+    "homepage": "https://gaia.frostaura.net",
+    "repository": "https://github.com/frostaura/ai.toolkit.gaia",
+    "license": "MIT",
+    "keywords": [
+        "gaia",
+        "spec-driven",
+        "full-stack",
+        "agents",
+        "skills",
+        "mcp"
+    ]
+}

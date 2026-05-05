@@ -7,6 +7,22 @@ This reference article provides detailed configuration information for custom ag
 > \[!NOTE]
 > Custom agents are in public preview for JetBrains IDEs, Eclipse, and Xcode, and subject to change.
 
+## Dual-platform note (Gaia)
+
+Gaia agents are authored to be loadable by **both** GitHub Copilot and Claude Code from a single file. The two platforms agree on most fields but diverge on a few:
+
+| Field                       | Copilot                              | Claude Code                                | Gaia convention                                                                                                                            |
+| --------------------------- | ------------------------------------ | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `name`, `description`       | Required                             | Required                                   | Always set.                                                                                                                                |
+| `tools`                     | Aliases (`read`, `edit`, `agent`, …) | Exact tool names (`Read`, `Edit`, `Task`, `mcp__server__tool`) | **Use a superset.** Both forms are listed; each platform ignores tokens it does not recognize.                                              |
+| `model`                     | Inherits if unset                    | Recognized: `opus`, `sonnet`, `haiku`      | Set per agent; both platforms accept it.                                                                                                   |
+| `user-invocable`            | Recognized (boolean)                 | Skill-level field; ignored on agents       | Keep on Gaia agents — helps Copilot, harmless on Claude.                                                                                   |
+| `disable-model-invocation`  | Recognized (boolean)                 | Skill-level field; ignored on agents       | Keep on Gaia agents — helps Copilot, harmless on Claude.                                                                                   |
+| `target`                    | `vscode` \| `github-copilot`         | Not recognized                             | Omit unless an agent is explicitly Copilot-only.                                                                                           |
+| `mcp-servers`               | Recognized (per-agent overrides)     | Not recognized; use repo `.mcp.json`       | Prefer the shared `.mcp.json` at repo root so both platforms see the same servers.                                                          |
+
+For Claude Code's full agent frontmatter spec see [Claude Code plugin reference](https://code.claude.com/docs/en/plugins-reference). For Claude tool naming see the agents tool list in that doc; relevant exact names include `Read`, `Edit`, `Write`, `Bash`, `Grep`, `Glob`, `Task`, plus MCP tools as `mcp__<server>__<tool>` (with wildcards: `mcp__gaia-remote__tasks_*`).
+
 ## YAML frontmatter properties
 
 The following table outlines the properties that you can configure for agent profiles in GitHub.com, the Copilot CLI, and supported IDEs (unless otherwise noted). Any environment-specific behavior is noted in the property description. The configuration file's name (minus `.md` or `.agent.md`) is used for deduplication between levels so that the lowest level configuration takes precedence.

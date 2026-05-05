@@ -1,0 +1,35 @@
+name: agents-skills-mirror
+
+# Gaia ships /agents/ and /skills/ at the repo root (read by Claude Code and
+# Copilot) AND mirrors of both under /.github/agents/ and /.github/skills/
+# (read by Copilot's GitHub-side discovery). This workflow fails when the
+# two trees drift, so a future change has to land in both places.
+
+on:
+    push:
+        branches: [main]
+        paths:
+            - "agents/**"
+            - "skills/**"
+            - ".github/agents/**"
+            - ".github/skills/**"
+    pull_request:
+        paths:
+            - "agents/**"
+            - "skills/**"
+            - ".github/agents/**"
+            - ".github/skills/**"
+
+jobs:
+    verify-mirror:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Verify /agents/ mirrors /.github/agents/
+              run: |
+                  diff -rq agents/ .github/agents/
+
+            - name: Verify /skills/ mirrors /.github/skills/
+              run: |
+                  diff -rq skills/ .github/skills/

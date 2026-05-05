@@ -1,0 +1,25 @@
+{
+    "$schema": "https://code.claude.com/schemas/marketplace.json",
+    "name": "frostaura-gaia",
+    "owner": {
+        "name": "FrostAura Dynamics",
+        "email": "support-gaia@frostaura.net",
+        "url": "https://gaia.frostaura.net"
+    },
+    "metadata": {
+        "description": "Curated plugins from the FrostAura team for Claude Code.",
+        "version": "0.1.0"
+    },
+    "plugins": [
+        {
+            "name": "gaia",
+            "description": "Spec-driven AI agents for software architecture, planning, engineering, testing, and release workflows.",
+            "version": "8.1.0",
+            "source": {
+                "source": "github",
+                "repo": "frostaura/ai.toolkit.gaia"
+            },
+            "category": "full-stack-software-development"
+        }
+    ]
+}

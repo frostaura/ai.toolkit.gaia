@@ -1,0 +1,68 @@
+{
+    "_documentation": "https://code.claude.com/docs/en/hooks",
+    "_notes": "Claude Code shape: PascalCase event names, each hook entry uses { type, command, shell } with optional matcher.",
+    "hooks": {
+        "SessionStart": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "${CLAUDE_PLUGIN_ROOT}/scripts/session-start.sh",
+                        "shell": "bash",
+                        "timeout": 15
+                    }
+                ]
+            }
+        ],
+        "UserPromptSubmit": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "${CLAUDE_PLUGIN_ROOT}/scripts/log-prompt.sh",
+                        "shell": "bash",
+                        "timeout": 10
+                    }
+                ]
+            }
+        ],
+        "PreToolUse": [
+            {
+                "matcher": "Bash|Edit|Write|MultiEdit",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "${CLAUDE_PLUGIN_ROOT}/scripts/pre-tool-policy.sh",
+                        "shell": "bash",
+                        "timeout": 15
+                    }
+                ]
+            }
+        ],
+        "PostToolUse": [
+            {
+                "matcher": "Edit|Write|MultiEdit",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "${CLAUDE_PLUGIN_ROOT}/scripts/post-tool-log.sh",
+                        "shell": "bash",
+                        "timeout": 10
+                    }
+                ]
+            }
+        ],
+        "Stop": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "${CLAUDE_PLUGIN_ROOT}/scripts/session-end.sh",
+                        "shell": "bash",
+                        "timeout": 20
+                    }
+                ]
+            }
+        ]
+    }
+}

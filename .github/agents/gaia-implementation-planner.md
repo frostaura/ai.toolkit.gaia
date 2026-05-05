@@ -13,7 +13,8 @@ description: >-
   approve release readiness. Its output should be an actionable plan that
   exposes both serial dependencies and safe parallel branches without hiding QA
   or proof requirements behind vague follow-up work.
-tools: ["gaia/*", "read", "search", "edit", "agent"]
+tools: ["gaia/*", "read", "search", "edit", "agent", "Read", "Edit", "Write", "Grep", "Glob", "Task", "mcp__gaia-remote__tasks_*", "mcp__gaia-remote__memory_*", "mcp__gaia-remote__evolve_*"]
+model: opus
 disable-model-invocation: true
 user-invocable: true
 ---
