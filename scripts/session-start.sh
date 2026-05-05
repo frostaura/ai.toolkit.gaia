@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Gaia SessionStart hook (Claude Code) / sessionStart hook (GitHub Copilot).
+# Gaia SessionStart hook (Claude Code).
 # Records that a Gaia-enabled session started. Reminds the agent (via stdout
 # additionalContext, where supported) to call memory_recall and evolve_list
 # per AGENTS.md section 12.

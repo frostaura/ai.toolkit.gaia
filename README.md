@@ -4,15 +4,13 @@
 
 <h1 align="center"><b>Gaia</b></h1>
 <h3 align="center">full-stack apps. enterprise-grade. maintainable. customizable.</h3>
-<p align="center"><i>Installable in GitHub Copilot and Claude Code as a single plugin.</i></p>
+<p align="center"><i>A Claude Code plugin for spec-driven software delivery.</i></p>
 
 ---
 
-[![Version 8](https://img.shields.io/badge/Version-9-purple.svg)]()
+[![Version 9](https://img.shields.io/badge/Version-9-purple.svg)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![GitHub Copilot](https://img.shields.io/badge/GitHub-Copilot-blue.svg)]()
-[![GitHub Copilot CLI](https://img.shields.io/badge/GitHub-Copilot%20CLI-blue.svg)]()
-[![Claude Code](https://img.shields.io/badge/Claude-Code-orange.svg)]()
+[![Claude Code](https://img.shields.io/badge/Claude-Code-orange.svg)](https://code.claude.com)
 
 ---
 
@@ -23,32 +21,25 @@ You describe your goal; Gaia coordinates architecture, implementation, testing, 
 
 ---
 
-## Install the Gaia plugin locally
-> This can be done after any changes to this repo / system in order to continuously have the latest version of the Gaia system installed globally.
+## Install
 
-### GitHub Copilot
-
-`copilot plugin install ./` *note: the absolute path to the plugin should be used here.*
-
-### Claude Code
+Gaia ships as a Claude Code plugin. Install from this repo's marketplace:
 
 ```bash
-# Add this repo as a Claude Code plugin marketplace, then install Gaia.
 claude plugin marketplace add frostaura/ai.toolkit.gaia
 claude plugin install gaia@frostaura-gaia
 ```
 
-Or, for local development of Gaia itself, point Claude Code at the working tree:
+For local development of Gaia itself, point Claude Code at the working tree:
 
 ```bash
 claude plugin marketplace add ./
 claude plugin install gaia@frostaura-gaia
 ```
 
-The same `agents/`, `skills/`, `commands/`, `.mcp.json`, and `scripts/` are
-served to both platforms — Claude Code reads its manifest from
-`.claude-plugin/plugin.json` and its hooks from `hooks/hooks.json`; Copilot
-reads `plugin.json` and `hooks.json` at the repo root.
+The plugin manifest lives at `.claude-plugin/plugin.json`. Agents, skills, slash
+commands, hooks, and MCP servers are auto-discovered from `agents/`, `skills/`,
+`commands/`, `hooks/hooks.json`, and `.mcp.json`.
 
 ---
 
@@ -95,27 +86,7 @@ The workflow contract lives in **`AGENTS.md`**.
 
 ## Using Gaia
 
-### In VS Code (recommended)
-
-1. Open your project folder in VS Code
-2. Enable GitHub Copilot
-3. Start a chat and describe what you want
-
-### In the Terminal (Copilot CLI)
-
-```bash
-npm i -g @github/copilot && copilot -p "<your project request>" --yolo
-```
-
-Example:
-
-```bash
-copilot -p "Create a REST API for a blog with posts and comments"  --yolo
-```
-
-### In Claude Code
-
-After installing (see above), use the bundled slash commands:
+After installing, use the bundled slash commands inside any Claude Code session:
 
 - `/gaia-init` — kick off the Repo Explorer and produce a Repo Survey.
 - `/gaia-intake <request>` — frame a new request and route it to the right Gaia role.
@@ -127,19 +98,18 @@ Or invoke any role agent directly via `@gaia-intake-orchestrator`,
 `@gaia-solutions-architect`, `@gaia-implementation-planner`,
 `@gaia-software-engineer`, `@gaia-tester`, `@gaia-release-engineer`.
 
----
+### Headless / non-interactive runs
 
-### Advanced Mode
-The below may be used to simulate a workflow execution by running copilot cli in headless mode.
+For scripted workflows, use Claude Code's `-p` flag:
 
-*Basic chaining for workflows*
 ```bash
-copilot -p "prompt 1" --yolo && copilot -p "prompt 2" --yolo && copilot -p "prompt 3" --yolo
+claude -p "Create a REST API for a blog with posts and comments"
 ```
 
-*Recursive chaining for continuous workflows*
+Chain prompts to simulate a workflow:
+
 ```bash
-while true; do copilot -p "prompt 1" --yolo && copilot -p "prompt 2" --yolo && copilot -p "prompt 3" --yolo; done
+claude -p "/gaia-init" && claude -p "/gaia-intake build a blog API" && claude -p "/gaia-plan"
 ```
 
 ---
@@ -149,7 +119,7 @@ Note that the current configuration for the usage of Gaia's MCP server, is remot
 
 *What gets stored*
 - Evolution requests that Gaia automatically logs when struggling with a given problem. This helps agents continuously evolve themselves: as new "issues" with the Gaia process get logged by you fine folks, we push a new optimized version of Gaia for free to everyone. An evolved one.
-- Task items for Gaia plans. This is merely a persistent tracking mechanism for your Gaia to stay anchored. Because this is a remote MCP, it works perfectly in the GitHub Copilot web (coding agent), for a completely hands-off approach. All tasks are segregated by project name to ensure no overlap.
+- Task items for Gaia plans. This is merely a persistent tracking mechanism for your Gaia to stay anchored. All tasks are segregated by project name to ensure no overlap.
 - Memory items for Gaia for the project, like the above, is securely persisted so you can access your project memories (and tasks), from remote sources and effortlessly switch between them. Even have them run in parallel to pick up different tasks.
 
 *What doesn't get stored*

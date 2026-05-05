@@ -9,8 +9,8 @@ LOG_DIR="${GAIA_LOG_DIR:-${PWD}/.gaia}"
 mkdir -p "${LOG_DIR}"
 
 ts="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-tool_name="${CLAUDE_TOOL_NAME:-${COPILOT_TOOL_NAME:-}}"
-file_path="${CLAUDE_TOOL_FILE_PATH:-${COPILOT_TOOL_FILE_PATH:-}}"
+tool_name="${CLAUDE_TOOL_NAME:-}"
+file_path="${CLAUDE_TOOL_FILE_PATH:-}"
 
 printf '{"ts":"%s","event":"tool","tool":"%s","path":"%s"}\n' \
     "${ts}" "${tool_name}" "${file_path}" >> "${LOG_DIR}/tools.jsonl"

@@ -12,10 +12,8 @@ description: >-
   delivery, release approval, or broad test execution. Its output should be a
   concrete architecture delta, explicit assumptions and invariants, and a clean
   handoff that makes planning and definition maintenance deterministic.
-tools: ["gaia/*", "read", "search", "edit", "agent", "Read", "Edit", "Write", "Grep", "Glob", "Task", "mcp__gaia-remote__tasks_*", "mcp__gaia-remote__memory_*", "mcp__gaia-remote__evolve_*"]
+tools: ["Read", "Edit", "Write", "Grep", "Glob", "Task", "mcp__gaia-remote__tasks_*", "mcp__gaia-remote__memory_*", "mcp__gaia-remote__evolve_*"]
 model: opus
-disable-model-invocation: true
-user-invocable: true
 ---
 
 You are Gaia's solutions architect.

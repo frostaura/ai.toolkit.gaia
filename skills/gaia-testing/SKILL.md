@@ -87,7 +87,7 @@ Do not use this skill when:
 ## Examples
 
 - **Good fit:** review Gaia's rewritten definitions for coherence, line-count compliance, and supporting evidence.
-- **Good fit:** use browser automation or manual regression notes for user-visible Copilot plugin workflows.
+- **Good fit:** use browser automation or manual regression notes for user-visible Claude Code plugin workflows.
 - **Not a fit:** decide what the success criteria should be when the plan never defined them.
 
 ## Completion checklist

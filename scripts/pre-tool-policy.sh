@@ -7,8 +7,8 @@
 
 set -u
 
-tool_name="${CLAUDE_TOOL_NAME:-${COPILOT_TOOL_NAME:-}}"
-tool_input="${CLAUDE_TOOL_INPUT:-${COPILOT_TOOL_INPUT:-}}"
+tool_name="${CLAUDE_TOOL_NAME:-}"
+tool_input="${CLAUDE_TOOL_INPUT:-}"
 
 if [ "${tool_name}" = "Bash" ]; then
     if printf '%s' "${tool_input}" | grep -Eq 'git[[:space:]]+push[[:space:]]+(.*--force|.*-f([[:space:]]|$))'; then

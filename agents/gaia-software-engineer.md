@@ -13,10 +13,8 @@ description: >-
   the final release-ready decision. Its output should be implemented changes,
   concise stabilization notes, and a branch that testers and release reviewers
   can evaluate directly.
-tools: ["gaia/*", "read", "search", "edit", "execute", "agent", "Read", "Edit", "Write", "Bash", "Grep", "Glob", "Task", "mcp__gaia-remote__tasks_*", "mcp__gaia-remote__memory_*", "mcp__gaia-remote__evolve_*"]
+tools: ["Read", "Edit", "Write", "Bash", "Grep", "Glob", "Task", "mcp__gaia-remote__tasks_*", "mcp__gaia-remote__memory_*", "mcp__gaia-remote__evolve_*"]
 model: sonnet
-disable-model-invocation: true
-user-invocable: true
 ---
 
 You are Gaia's software engineer.
