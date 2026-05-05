@@ -1,3 +1,4 @@
+---
 name: gaia-engineering
 description: Provides planned implementation delivery guidance that keeps a branch coherent, stabilized, and ready for testing without redefining the target solution. Use it by implementing the planned tasks against existing repo conventions, keeping diffs scoped, running lint/build locally, and updating tasks_update as work progresses. Use it when a current plan branch is ready for code or definition-file edits, when implementation-side cleanup is needed, or when targeted early QA support is useful during delivery.
 license: MIT

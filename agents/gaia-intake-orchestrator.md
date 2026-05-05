@@ -12,8 +12,8 @@ description: >-
   code delivery, or final release decisions. Its output should be a crisp
   problem statement, explicit goals and non-goals, identified drift, the next
   owner, and a handoff package that makes downstream work executable.
-tools: ["gaia/*", "read", "search", "agent"]
-user-invocable: true
+tools: ["Read", "Grep", "Glob", "Task", "mcp__gaia-remote__tasks_*", "mcp__gaia-remote__memory_*", "mcp__gaia-remote__evolve_*"]
+model: opus
 ---
 
 You are Gaia's intake orchestrator.

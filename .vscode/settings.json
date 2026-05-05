@@ -62,7 +62,6 @@
     "chat.editor.wordWrap": "on",
     "chat.mcp.assisted.nuget.enabled": true,
     "chat.agent.thinkingStyle": "collapsedPreview",
-    "github.copilot.chat.agent.autoFix": true,
     "chat.tools.edits.autoApprove": {
         "**/*": true
     },

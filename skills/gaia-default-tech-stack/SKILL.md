@@ -1,3 +1,4 @@
+---
 name: gaia-default-tech-stack
 description: Provides Gaia's default full-stack baseline with React, TypeScript, Redux Toolkit, Tailwind CSS, and shadcn/ui on the frontend plus .NET, EF Core, PostgreSQL, and MCP exposure on the backend. Use it by adopting the documented baseline (versions, scaffolds, references) for any new app or unspecified-stack request, and by declaring the stack explicitly before planning when the request leaves it implicit. Use it when the request or repo leaves stack choice open, when bootstrapping a new application, or when standardizing an existing codebase onto Gaia's preferred platform.
 license: MIT

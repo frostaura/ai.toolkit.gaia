@@ -1,3 +1,4 @@
+---
 name: gaia-skills
 description: Provides Gaia skill-definition maintenance guidance with clear naming, descriptions, ownership boundaries, references, and reuse decisions. Use it by following the skills-specification reference (naming, frontmatter shape, scope sections, references) when adding or revising a SKILL.md, and by mirroring changes across both /skills/ and /.github/skills/ trees. Use it when adding, revising, auditing, or rationalizing skills, improving invocation quality, or consolidating drifting procedural guidance.
 license: MIT

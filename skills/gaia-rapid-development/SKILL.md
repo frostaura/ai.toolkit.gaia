@@ -1,3 +1,4 @@
+---
 name: gaia-rapid-development
 description: Provides a fast local edit-run-observe loop for bounded, low-risk work using Gaia's default stack baseline, docker-backed shared dependencies, and browser-based verification. Use it by spinning up the docker-backed dependencies once, then iterating in the local edit-run-observe loop with browser/MCP-based verification instead of full SDLC gates. Use it when rapid iteration matters more than a full SDLC pass-through, and stop using it as soon as scope, risk, or gate requirements grow.
 license: MIT

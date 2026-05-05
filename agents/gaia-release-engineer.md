@@ -13,9 +13,8 @@ description: >-
   unresolved blockers behind a "mostly ready" summary. Its output should be a
   precise ready or not-ready decision, the owning blocker when readiness fails,
   and the evidence that supports closure when readiness passes.
-tools: ["gaia/*", "read", "search", "execute", "agent"]
-disable-model-invocation: true
-user-invocable: true
+tools: ["Read", "Grep", "Glob", "Bash", "Task", "mcp__gaia-remote__tasks_*", "mcp__gaia-remote__memory_*", "mcp__gaia-remote__evolve_*"]
+model: sonnet
 ---
 
 You are Gaia's release engineer.

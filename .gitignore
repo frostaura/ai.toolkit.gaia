@@ -147,3 +147,7 @@ nunit-*.xml
 /playwright/.cache/
 
 **/*.db*
+
+# Claude Code per-user state and Gaia hook logs
+.claude/
+.gaia/

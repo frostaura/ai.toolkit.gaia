@@ -1,0 +1,14 @@
+{
+    "_documentation": "https://claude.com/product/cowork",
+    "_notes": "Gaia exposes its task / memory / evolution surface as a remote MCP server. Add this to Claude CoWork as a custom MCP connector. The gaia-local entry is optional and only needed if you run the Gaia MCP server on your own machine.",
+    "mcpServers": {
+        "gaia-remote": {
+            "url": "https://gaia.frostaura.net/mcp",
+            "type": "http"
+        },
+        "gaia-local": {
+            "url": "http://localhost:5059/mcp",
+            "type": "http"
+        }
+    }
+}
