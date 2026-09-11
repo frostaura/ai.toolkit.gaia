@@ -1,62 +1,48 @@
 ---
 name: ai-toolkit-gaia-questions
-description: "Woolworths reverse-engineering is now PUBLISHED (founder-authorised 2026-08-21) and the terms/agreement question is live rather than hypothetical; one repo ships two unrelated products; placement reads as Technologies; main→tags"
+description: "Founder-owned and unresolved: one repo ships two unrelated products; placement reads as Technologies, not Labs; floating ref:main installs vs tags; and nothing in the repo can say whether the hosted service was ever redeployed."
 type: question
-last_verified: 2026-08-21
+last_verified: 2026-09-11
 ---
 
 # Open questions
 
-## Published, 2026-08-21 — the exposure is now live, not hypothetical
+Every item here is **founder-owned**. Placement, brand and public-distribution calls are
+parent-controlled under `decision-rights.md`; an agent recommends and escalates, it does not
+decide. The Woolworths exposure has its own home and is not restated here:
+[`questions-woolworths.md`](questions-woolworths.md).
 
-**Decided:** the founder authorised the push with this stated, so v13.0.0 is on
-`origin/main`. `fa.integrations` was **private**; this repo is **public**; the Woolworths
-work is now published. What that means, kept here because it stopped being a question about
-whether and became a question about what to do next:
+1. **Is the hosted service running a v13 image?** Owner: founder — he holds the Docker Hub
+   and Portainer access, and nothing in this repository can answer it. CI builds and pushes
+   the image on every merge to `main` but **contains no deploy step**, so redeploy is a manual
+   act outside the repo. Until someone checks the running `tools/list`, the correct posture is
+   that the version is *unknown*, not that it is stale. The evidence trail is in
+   [`state.md`](state.md); the consequence if it was never redeployed is in
+   [`watch.md`](watch.md).
 
-- **`WoolworthsSearchClient` carries a Constructor.io key lifted from the Woolworths
-  storefront bundle.** Not a secret leak — the key is served to every browser. What changes
-  is attribution and convenience: a public repo under FrostAura's name hands anyone a
-  working, documented proxy for a search contract **Woolworths pays for and we do not**.
-  Abuse lands on their bill, which makes it worse rather than better.
-- **`docs/integrations/woolworths.md` is a 300-line reverse-engineered contract** for
-  undocumented endpoints. As a private note it is engineering documentation; published under
-  a company name it reads as an invitation.
-- **No agreement, no terms, no notice channel with Woolworths**, and there never was.
-  Tolerable for a private tool a founder ran against his own account; a different
-  proposition attached to a public MIT-licensed repository.
+2. **This repository ships two unrelated products.** A developer-delivery plugin suite and a
+   grocery integration gateway share a repo, a CHANGELOG, a version line and a hostname — and
+   since `foundation` stopped wiring the server, nothing else. Three honest exits: leave it
+   and say so in the README; split the server into its own repository; or reframe Gaia
+   deliberately as both. **The unpushed re-wiring commit quietly picks a fourth option** —
+   coupling them again without deciding ([`state.md`](state.md)). Owner: founder.
 
-**Still open, and now time-sensitive rather than preventable:** the README says nothing
-about the integration's stance. Worth adding deliberately — personal-use tool, no
-affiliation with or endorsement by Woolworths, no warranty — and worth deciding whether to
-approach them. Unpublishing is not a remedy once something is on a public repo; the
-remaining levers are framing, a vendor conversation, and being ready to remove the
-integration if asked.
+3. **Placement still reads as `Technologies/`, not Labs.** This is a versioned, publicly
+   distributed, multi-ecosystem developer product with a live hosted service, CI/CD, a support
+   address and no research character left. A credential-handling gateway is an operations
+   concern. It is also the only Labs program with a granted stealth exception — the signature
+   of something that already graduated. Owner: founder; parent-controlled, so this program
+   recommends and does not move itself.
 
-## Inherited from `fa.integrations` — these did not die with the repo
+4. **`ref: main` or tags for plugin refs?** Floating installs are dangerous for a public user
+   base: a breaking change reaches every fetching install at push time, with no version a user
+   can pin to and no tag to roll back to. Nothing past `v8.0.0` has ever been tagged. Owner:
+   founder. Decided either way, the README should say which.
 
-- **Does a headless-filled cart appear in the Woolworths mobile app?** Account-bound and it
-  survived sign-out in testing, so it should, but never confirmed on a phone. The Siri
-  Shortcut flow ends with "open the cart".
-- **Should the write path require explicit confirmation?**
-  `woolworths_add_shopping_list_to_cart` adds ~15 items in one call with no confirmation.
-  It stops short of checkout, but an agent calling it silently mutates a real cart — more
-  pressing now the tools are reachable from a hosted server.
-- **Will Woolworths tolerate this traffic pattern?** Unknowable without asking. Treat the
-  integration as something that can break without warning.
+5. **Should the integration be wired into any plugin at all?** If yes, it wants its own opt-in
+   plugin rather than the context layer — that was the v13.0.0 reasoning, and the unpushed
+   commit contradicts it without arguing with it. Owner: founder.
 
-## Standing
-
-- **This repo now ships two unrelated products** — a developer-delivery plugin suite and a
-  grocery integration gateway — sharing a repo, a CHANGELOG and a hostname, and since
-  `foundation` stopped wiring the server, nothing else. Leave it and say so; split the
-  server out; or reframe Gaia deliberately.
-- **Placement** still reads as `Technologies/`, and a live credential-handling gateway is an
-  operations concern, not a Labs one. Parent-controlled.
-- **`main` vs tags for plugin refs.** Floating installs are dangerous for a public user base,
-  and 13.0.0 is exactly the breaking change that lands the moment it is pushed.
-- **Should the integration be wired into any plugin at all?** If so it wants its own opt-in
-  plugin, not the context layer.
-
-_(Resolved 2026-08-21: the `b9d2ee3` deletion incident — restored, committed, pushed. The
-vacuous test gate — `src/Gaia.Mcp.Tests` is real, 12 assertions, gated in CI.)_
+_(Closed 2026-08-21 and deliberately not carried: the `b9d2ee3` deletion incident — restored,
+committed, pushed; the vacuous CI test gate — `src/Gaia.Mcp.Tests` is real and in the
+solution.)_
