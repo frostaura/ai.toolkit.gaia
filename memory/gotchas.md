@@ -37,6 +37,13 @@ last_verified: 2026-09-11
   marketplace manifests agree. The `personal` plugin's pair had silently drifted before that
   plugin was removed. The three surviving pairs were `cmp`-verified identical on 2026-09-11;
   without a check they will drift again. The by-hand loop is in `../docs/development.md`.
+- **The shipped audit reports this repo's own `CLAUDE.md` when run at this repo's root, and
+  it is right to.** `MEMORY-TOPIC-NAME` on all seven topics and `UPKEEP-UNSCOPED` on `CLAUDE.md`
+  both fall out of the documented `--root` caveat: the expected topic slug and the expected
+  `--scope` argument are derived from the scope's path *relative to the root given*, and this
+  repo's context layer is authored for the FrostAura tree root, where the slug is
+  `ai-toolkit-gaia-` and the scope is `Labs/projects/ai.toolkit.gaia`. Audit it from the tree
+  root, not from here; never "fix" the frontmatter to satisfy a narrower run.
 - **Probing a health endpoint: `ping` was removed in MCP spec 2026-07-28** and SDK 2.2.0
   rejects it with a 400. Probe with a legacy `initialize` POST instead — which is what the
   Dockerfile's HEALTHCHECK does.
