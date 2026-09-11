@@ -1,6 +1,6 @@
 ---
 name: ai-toolkit-gaia-state
-description: "origin/main still serves v13; the whole v14.0.0 breaking release sits unpushed, ahead-only with no deletions, and carries the still-unexplained MCP re-wiring with it. Lockstep intact at 14.0.0 everywhere. Never tagged past v8."
+description: "origin/main still serves v13; the entire v14 line sits unpushed — breaking, ahead-only, no deletions — and carries the still-unexplained MCP re-wiring with it. Lockstep intact at 14.1.0 across every version site. Never tagged past v8."
 type: state
 last_verified: 2026-09-11
 ---
@@ -16,11 +16,13 @@ one step the moment someone pushes. What "installed" means here at all: [`watch.
 **Local `main` is ahead-only against `origin/main`, no deletions in the range** — the safe
 topology; a plain `git push` fast-forwards. Waiting in that range:
 
-- **`feat(foundation)!` — the v14.0.0 breaking release.** `MEMORY.md` becomes a *derived*
-  index regenerated from its `memory/` topic files, with new `MEMORY-*` findings and
-  `--fix-index` in `context-audit.py`, and every skill, reference and agent that said "re-cut
-  the index hook" rewritten to say edit the topics and regenerate. Breaking because a
-  consuming repo's hand-authored index now reports stale until it is regenerated.
+- **The whole v14 line.** `14.0.0` is breaking: `MEMORY.md` becomes a *derived* index
+  regenerated from its `memory/` topic files, with new `MEMORY-*` findings and `--fix-index`
+  in `context-audit.py`, and every skill and reference that said "re-cut the index hook"
+  rewritten to say edit the topics and regenerate — a consuming repo's hand-authored index
+  reports stale until it is regenerated once. `14.1.0` hardens that regenerator: `--scope`
+  narrows it, and it now refuses an empty store and a CRLF topic instead of destroying an
+  index. Both reach every floating install in the single push that ships either.
 - **The `foundation` MCP re-wiring**, from 2026-08-24 and still carrying **no recorded
   rationale**: an `mcpServers` block wiring `fa-gaia-remote` to
   `https://gaia.frostaura.net/mcp`, reversing the v13.0.0 decision that no plugin declares
@@ -28,17 +30,15 @@ topology; a plain `git push` fast-forwards. Waiting in that range:
   an unpushed breaking release — **whoever authorises the v14 push authorises the re-wiring
   with it**, and makes the README's "the plugins send nothing anywhere" disclosure untrue for
   `foundation` in the same instant.
-- The memory-store rewrite that accompanied the release.
+Pushing is the founder's call — and now one call over all of it, not three.
 
-Pushing is the founder's call — and now one call over both things, not two.
-
-**Version lockstep is intact at 14.0.0.** Verified 2026-09-11: all six `plugin.json` files,
+**Version lockstep is intact at 14.1.0.** Verified 2026-09-11: all six `plugin.json` files,
 the plugin rows in both marketplace manifests and the README badge agree. `metadata.version`
 in the manifests tracks the catalog's shape and deliberately does not move with a plugin
 ([`decisions-distribution.md`](decisions-distribution.md)).
 
-**Nothing past v8 was ever tagged.** The newest tag here is `v8.0.0`; v9 through v14 ship by
-moving `main` alone, and no step in the release path creates a tag.
+**Nothing past v8 was ever tagged.** The newest tag is `v8.0.0`; v9 onward ship by moving
+`main` alone, and no step in the release path creates a tag.
 
 ## Verified on disk, 2026-09-11
 
