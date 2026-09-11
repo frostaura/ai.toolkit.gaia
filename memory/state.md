@@ -1,6 +1,6 @@
 ---
 name: ai-toolkit-gaia-state
-description: "origin/main still serves v13; the entire v14 line sits unpushed — breaking, ahead-only, no deletions — and carries the still-unexplained MCP re-wiring with it. Lockstep intact at 14.3.0 across every version site. Never tagged past v8."
+description: "origin/main still serves v13; the entire v14 line sits unpushed — breaking, ahead-only, no deletions — and carries the still-unexplained MCP re-wiring with it. A release bump touches 13 sites by hand and nothing in CI checks they agree."
 type: state
 last_verified: 2026-09-11
 ---
@@ -20,14 +20,12 @@ topology; a plain `git push` fast-forwards. Waiting in that range:
   regenerated from its `memory/` topic files, with new `MEMORY-*` findings and `--fix-index`
   in `context-audit.py`, and every skill and reference that said "re-cut the index hook"
   rewritten to say edit the topics and regenerate — a consuming repo's hand-authored index
-  reports stale until it is regenerated once. `14.1.0` through `14.3.0` harden the regenerator
-  and widen the audit — `--scope`, a created-not-ignored missing index, blocked regeneration on
-  bad frontmatter, the instruction-layer scan reaching skills and agent definitions, a remote
-  proved by `ls-remote` rather than trusted, and then the round that made those checks actually
-  fire: topics validated before an index is created, a future stamp blocking creation as well as
-  regeneration, `SCOPE-EMPTY` per scope, the size cap measured over the body, a state word no
-  longer exempted for sharing a line with `MEMORY.md`, and `UPKEEP-UNSCOPED`. One push ships all
-  of it at once.
+  reports stale until it is regenerated once. `14.1.0` through `14.3.1` then harden the
+  regenerator and widen the audit (`--scope`, blocked regeneration on bad frontmatter, the
+  instruction scan reaching skills and agents, a remote proved by `ls-remote`), make those
+  checks actually fire, and finally stop two of them reading the wrong text — the instruction
+  scan had been skipping every table row and blockquote, and `UPKEEP-UNSCOPED` accepted only
+  one spelling of its own command. One push ships all of it at once.
 - **The `foundation` MCP re-wiring**, from 2026-08-24 and still carrying **no recorded
   rationale**: an `mcpServers` block wiring `fa-gaia-remote` to
   `https://gaia.frostaura.net/mcp`, reversing the v13.0.0 decision that no plugin declares
@@ -38,9 +36,11 @@ topology; a plain `git push` fast-forwards. Waiting in that range:
 
 Pushing is the founder's call — and now one call over all of it, not three.
 
-**Version lockstep is intact at 14.3.0.** Verified 2026-09-11 across all six `plugin.json`
-files, all three plugin rows in both manifests and the README badge. `metadata.version` tracks
-the catalog's shape and deliberately does not move ([`decisions-distribution.md`](decisions-distribution.md)).
+**Lockstep is an invariant nothing enforces.** A release moves twelve JSON version sites plus the
+README badge by hand, and no CI job compares them — the topology of the hazard, not its current
+value ([`gotchas.md`](gotchas.md), [`decisions-distribution.md`](decisions-distribution.md)).
+`metadata.version` in the two manifests tracks the catalog's shape and deliberately does not move.
+*Dated reading: all thirteen sites agreed at `14.3.1` on 2026-09-11 — re-measure, never quote.*
 
 **Nothing past v8 was ever tagged.** The newest tag is `v8.0.0`; v9 onward ship by moving
 `main` alone, and no step in the release path creates a tag.
