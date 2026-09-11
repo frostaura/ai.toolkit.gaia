@@ -1,7 +1,7 @@
 {
     "name": "product",
     "description": "A money-gated lifecycle for taking consumer one-off / in-app-purchase products from idea to validated bet through launch and live-ops. Provides 10 stage playbooks (discovery, ideation, monetization design, validation, vertical-slice/MVP, production hardening, compliance, soft-launch, GTM launch, live-ops, and portfolio retrospective) plus a shared money-gate and unit-economics discipline, orchestrated by a coordinator and specialist, reviewer, and synthesizer agents that fan out, adversarially review, and synthesize each stage against net-of-fee economics.",
-    "version": "14.0.0",
+    "version": "14.1.0",
     "author": {
         "name": "FrostAura Technologies",
         "email": "support-plugins-product@frostaura.net"

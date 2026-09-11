@@ -61,8 +61,10 @@ Do not use this skill when:
 `MEMORY.md` is a **pure index, and it is derived — never authored.** Content lives in a `memory/` directory beside it, one topic file per concern, so a reader lists the index, skims frontmatter, and deep-reads only what the task needs. Every line of the index is computed from those topic files: the heading from the scope's path, each title from the topic's `# H1`, each hook from its `description:`, the order from its `type:`. You write topic files and then run the generator; you do not write `MEMORY.md`.
 
 ```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/context-audit.py --fix-index
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/context-audit.py --fix-index [--scope <your directory>]
 ```
+
+It refuses to regenerate a store whose topics have malformed frontmatter, and refuses when `memory/` holds no topic at all rather than truncating the index to a bare heading. Only `*.md` topics live in `memory/` — anything else there is `MEMORY-STORE-DEBRIS`.
 
 ```markdown
 # MEMORY — packages/ingest
@@ -73,7 +75,7 @@ python3 ${CLAUDE_PLUGIN_ROOT}/scripts/context-audit.py --fix-index
 
 The heading is the scope's path relative to the repository root; the root's own index uses the repository directory's name. Order is by type — `alert`, `state`, `decision`, `gotcha`, `question`, `watch`, `kill-record`, `evidence`, `log`, `reference` — canonical file before its split siblings, then alphabetical. Any byte of difference between the file on disk and that derivation is `MEMORY-INDEX-STALE`, and the fix is always to regenerate, never to edit the index.
 
-Every topic file opens with exactly this block — four keys, in this order, no extras — so `head -7` returns the complete relevance signal plus the heading:
+Every topic file opens with exactly this block — four keys, in this order, no extras, then a blank line and the heading — so `head -8` returns the complete relevance signal plus that heading:
 
 ```markdown
 ---

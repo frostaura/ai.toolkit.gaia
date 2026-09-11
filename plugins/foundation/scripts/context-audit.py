@@ -21,6 +21,14 @@ pass `--group-dir` once per name in use; the default is `projects`. Pass
 `--instruction-file AGENTS.md` where that, rather than `CLAUDE.md`, is the
 tree's real instruction file and the other name is only an interop pointer.
 
+`--registry PATH` reconciles a central project registry against what is on
+disk, in both directions; omit it and the check is skipped, because a
+repository with no registry is not in violation of anything.
+
+Naming `--scope` also narrows the memory-store checks and `--fix-index` to
+those directories, so parallel agents can each regenerate their own indexes
+without rewriting a sibling's mid-flight.
+
 Exit code 0 = clean, 1 = findings. Findings are advisory, not policy.
 Spec: ../references/context-cascade.md
 Finding codes: ../references/context-audit-findings.md
@@ -54,7 +62,14 @@ def set_instruction_file(name):
 # used to print CLEAN over every directory a `packages/`-shaped tree holds.
 GROUP_DIRS = ("projects",)
 SKIP_DIRS = {".git", "node_modules", "worktrees", "bin", "obj", "dist",
-             "build", ".venv", "venv", "__pycache__", ".tmp"}
+             "build", ".venv", "venv", "__pycache__", ".tmp", ".pio",
+             "libdeps"}
+# A directory carrying one of these is a vendored third-party library — the
+# Arduino and PlatformIO manifests. Its README's link debt is upstream's, and a
+# `libdeps/` tree of forty vendored libraries drowns the real findings. The
+# directory-name skips above catch the usual locations; this catches a vendored
+# library dropped anywhere else.
+VENDORED_MANIFESTS = {"library.properties", "library.json"}
 # Imported/vendored trees. Their link debt is upstream engineering debt, not
 # context drift in the consuming repository, so they are excluded unless --all
 # is passed.
@@ -165,6 +180,11 @@ def walk(root, include_vendored=False):
                 return "skills" in os.listdir(os.path.join(dirpath, d))
             except OSError:
                 return False
+        try:
+            if VENDORED_MANIFESTS & set(os.listdir(os.path.join(dirpath, d))):
+                return False
+        except OSError:
+            return False
         return True
 
     for dirpath, dirnames, filenames in os.walk(root):
@@ -392,8 +412,10 @@ def check_links(root, out, include_vendored=False):
 
 
 # The four required frontmatter keys, in order, with no extras — six lines total,
-# so `head -7` of any topic file yields the complete relevance signal plus the
-# first body line. This is deliberately a line-by-line parse and not one regex:
+# then a blank, then the heading, so `head -8` of any topic file yields the
+# complete relevance signal plus that heading. Line 7 is the mandatory blank; a
+# `head -7` stops one line short of the title every index is built from.
+# This is deliberately a line-by-line parse and not one regex:
 # a single re.S regex lets `name: .+` match across newlines, so any number of
 # extra keys slips through a check the doctrine advertises as exact.
 MEM_FM_KEYS = ("name", "description", "type", "last_verified")
@@ -460,6 +482,10 @@ TOPIC_MAX_CHARS = 6000
 # The description is the index hook. It has to fit on one line of an index a
 # reader skims; past this it is a summary of the body, not a relevance signal.
 DESCRIPTION_MAX_CHARS = 240
+# Below this a description is a label, not a signal — the same defeat the line
+# rule suffered, from the other side. A heading repeated as the description is
+# the other shape of it: the index then says nothing the title did not.
+DESCRIPTION_MIN_CHARS = 40
 TOPIC_NAME = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 # Volatile git-shaped integers. The spec says record the topology, not the
 # count: these go stale inside the session that writes them. Advisory — a
@@ -499,17 +525,34 @@ def index_heading(root, scope):
 def read_topics(memdir):
     """Parse every topic file in a memory/ directory.
 
-    Returns (topics, problems): topics is a list of dicts for files whose
-    frontmatter parsed; problems is a list of (file, reason) for those that
-    did not. Order is by filename.
+    Returns (topics, problems, debris): topics is a list of dicts for files
+    whose frontmatter parsed; problems is a list of (file, reason) for those
+    that did not; debris is everything in `memory/` that is not a `*.md` topic
+    at all. Order is by filename.
+
+    Files are read as **bytes** first so line endings are visible. A CRLF topic
+    parses perfectly as text and then renders an index the regenerator can never
+    match, because every comparison is against LF output — the store sits
+    permanently MEMORY-INDEX-STALE while every individual file looks correct. It
+    is a `problems` entry, which also blocks regeneration until it is fixed.
     """
-    topics, problems = [], []
-    for p in sorted(memdir.glob("*.md")):
+    topics, problems, debris = [], [], []
+    for p in sorted(memdir.iterdir()):
+        if p.name.startswith("."):
+            continue
+        if p.is_dir() or p.suffix != ".md":
+            debris.append(p)
+            continue
         try:
-            body = p.read_text(encoding="utf-8", errors="replace")
+            raw = p.read_bytes()
         except OSError:
             problems.append((p, "unreadable"))
             continue
+        if b"\r\n" in raw:
+            problems.append((p, "CRLF line endings — the store is LF-only, and a "
+                                "CRLF topic can never match the regenerated index"))
+            continue
+        body = raw.decode("utf-8", errors="replace")
         parsed, reason = parse_topic_frontmatter(body)
         if not parsed:
             problems.append((p, reason))
@@ -526,7 +569,7 @@ def read_topics(memdir):
         topics.append({"path": p, "name": name, "description": desc,
                        "type": ttype, "verified": verified, "title": title,
                        "body": "\n".join(lines[6:]), "text": body})
-    return topics, problems
+    return topics, problems, debris
 
 
 def render_index(root, scope, topics):
@@ -543,22 +586,40 @@ def render_index(root, scope, topics):
                                             t["path"].name))
     lines = [index_heading(root, scope), ""]
     for t in ordered:
-        title = (t["title"] or t["path"].stem).replace("[", "").replace("]", "")
+        # Escape, never strip: a heading like `Red — [gaia] do not push` is
+        # about a thing actually called `[gaia]`, and silently deleting the
+        # brackets makes the index title disagree with the topic's own H1.
+        title = (t["title"] or t["path"].stem).replace("[", "\\[").replace("]", "\\]")
         lines.append(f"- [{title}](memory/{t['path'].name}) — {t['description']}")
     return "\n".join(lines) + "\n"
 
 
+def in_scope(root, dirpath, scopes):
+    """True when dirpath is inside one of the named scopes (or none were named).
+
+    Only *explicitly named* `--scope` arguments narrow the memory checks. A
+    fan-out passes its own scope so `--fix-index` regenerates its own indexes
+    and never a sibling's mid-flight; with no `--scope` the whole tree is in
+    scope, which is what a single-agent run wants.
+    """
+    if not scopes:
+        return True
+    return any(dirpath == sc or sc in dirpath.parents for sc in scopes)
+
+
 def check_memory_freshness(root, max_age, out, fix_index=False,
-                           group_dirs=GROUP_DIRS):
+                           group_dirs=GROUP_DIRS, scopes=()):
     """Memory is a topic store: MEMORY.md is a pure index *derived* from the
     memory/*.md topic files, whose first 6 lines are frontmatter
-    (name / description / type / last_verified). head -7 of any topic file
+    (name / description / type / last_verified). head -8 of any topic file
     must be enough to judge relevance, and the index must equal exactly what
     render_index() produces from those files."""
     today = dt.date.today()
     seen_names = {}
     for dirpath, filenames in walk(root):
         if "MEMORY.md" not in filenames:
+            continue
+        if not in_scope(root, dirpath, scopes):
             continue
         f = dirpath / "MEMORY.md"
         r = rel(root, f)
@@ -580,7 +641,18 @@ def check_memory_freshness(root, max_age, out, fix_index=False,
                         "monolithic MEMORY.md — split into the memory/ topic store "
                         "(spec: ../references/context-cascade.md)"))
             continue
-        topics, problems = read_topics(memdir)
+        topics, problems, debris = read_topics(memdir)
+        for p in debris:
+            out.append(("MEMORY-STORE-DEBRIS", rel(root, p),
+                        "not a topic file — only `*.md` topics live in memory/; a "
+                        "`.bak`, a stray note or a subdirectory is a second source "
+                        "of truth nothing checks. Promote it or delete it"))
+        if not topics and not problems:
+            out.append(("MEMORY-STORE-EMPTY", r,
+                        "memory/ exists but holds no topic file — author state.md; "
+                        "the index cannot be derived from nothing, and --fix-index "
+                        "will not truncate the existing one to a bare heading"))
+            continue
         for p, reason in problems:
             out.append(("MEMORY-FRONTMATTER", rel(root, p),
                         f"{reason} — the block is exactly six lines: '---', "
@@ -615,6 +687,22 @@ def check_memory_freshness(root, max_age, out, fix_index=False,
                             f"description is {len(t['description'])} chars (max "
                             f"{DESCRIPTION_MAX_CHARS}) — it is the index hook, one "
                             f"line of signal, not a summary of the body"))
+            elif len(t["description"]) < DESCRIPTION_MIN_CHARS or \
+                    t["description"].strip().lower() == (t["title"] or "").strip().lower():
+                out.append(("MEMORY-DESCRIPTION-THIN", prel,
+                            f"description {t['description'][:40]!r} is a label, not a "
+                            f"signal — a reader who stops at the index must leave "
+                            f"knowing the state, the hazard or the open call"))
+            if "](" in t["description"]:
+                out.append(("MEMORY-DESCRIPTION-LINK", prel,
+                            "a markdown link in a description is copied verbatim into "
+                            "the index, where it resolves from the scope and not from "
+                            "memory/ — name the file in backticks instead"))
+            if re.search(r"^##+\s+Upkeep", t["body"], re.M):
+                out.append(("MEMORY-TOPIC-UPKEEP", prel,
+                            "topic files carry no `## Upkeep` section — the write "
+                            "protocol is their upkeep; a delete-when condition is the "
+                            "topic's last sentence"))
             n_lines = len(t["text"].rstrip("\n").split("\n"))
             if n_lines > TOPIC_MAX_LINES:
                 out.append(("MEMORY-TOPIC-LONG", prel,
@@ -632,24 +720,32 @@ def check_memory_freshness(root, max_age, out, fix_index=False,
             if t["verified"] > today:
                 out.append(("MEMORY-FRONTMATTER", prel,
                             f"last_verified {t['verified']} is in the future"))
-            for m in VOLATILE_COUNT.finditer(strip_code(t["body"])):
+            for m in VOLATILE_COUNT.finditer(
+                    strip_code(t["body"]) + "\n" + t["description"]):
                 out.append(("MEMORY-VOLATILE-COUNT", prel,
                             f"{m.group(0)!r} — record the topology, not the "
                             f"integer; the audit re-measures counts"))
         # 2. The index must be exactly what the topic files derive to.
         expected_index = render_index(root, dirpath, topics)
-        if text != expected_index:
+        # Compare CRLF-normalised: a `\r\n` index is a line-ending defect, not a
+        # content defect, and reporting it as MEMORY-INDEX-STALE sends the reader
+        # hunting for a hook that is in fact identical.
+        if text.replace("\r\n", "\n") != expected_index:
+            if fix_index and not problems and topics:
+                f.write_text(expected_index, encoding="utf-8")
+                out.append(("MEMORY-INDEX-REWRITTEN", r,
+                            "regenerated from the topic files' frontmatter"))
+                # Every orphan and broken link below describes the index as it
+                # was *before* this rewrite. Reporting them now sends an agent to
+                # fix an index that is already correct.
+                continue
             linked = set(re.findall(r"\((memory/[^)]+\.md)\)", text))
             on_disk = {f"memory/{p.name}" for p in memdir.glob("*.md")}
             for miss in sorted(linked - on_disk):
                 out.append(("MEMORY-LINK-BROKEN", r, f"index links {miss}, not on disk"))
             for orph in sorted(on_disk - linked):
                 out.append(("MEMORY-ORPHAN-TOPIC", r, f"{orph} exists but is not indexed"))
-            if fix_index and not problems:
-                f.write_text(expected_index, encoding="utf-8")
-                out.append(("MEMORY-INDEX-REWRITTEN", r,
-                            "regenerated from the topic files' frontmatter"))
-            else:
+            if True:
                 why = ("cannot regenerate while a topic has malformed frontmatter"
                        if problems else
                        "run with --fix-index to regenerate it")
@@ -1037,7 +1133,10 @@ def main():
     ap.add_argument("--scope", action="append", default=[], metavar="PATH",
                     help="a directory carrying its own context pair; repeat once "
                          "per scope. Omit to auto-discover every immediate "
-                         "subdirectory that already carries the pair")
+                         "subdirectory that already carries the pair. Naming "
+                         "scopes also narrows the memory-store checks and "
+                         "--fix-index to them, so a fan-out agent passes its own "
+                         "scope and never rewrites a sibling's MEMORY.md mid-flight")
     ap.add_argument("--group-dir", action="append", default=[], metavar="NAME",
                     help="name of a directory whose only job is holding scopes; "
                          "repeat once per name in use. Default: "
@@ -1060,7 +1159,9 @@ def main():
                     help="rewrite every MEMORY.md that differs from what its "
                          "memory/ topic files derive to (title = the topic's H1, "
                          "hook = its description, order = type rank). The index "
-                         "is generated, never hand-written")
+                         "is generated, never hand-written. Refuses to touch a "
+                         "store with malformed frontmatter or no topic files at "
+                         "all; honours --scope")
     args = ap.parse_args()
     root = Path(args.root).resolve() if args.root else Path.cwd().resolve()
     if not root.is_dir():
@@ -1075,7 +1176,12 @@ def main():
     if args.registry:
         check_registry(root, args.registry, scopes, out, group_dirs)
     check_links(root, out, args.all)
-    check_memory_freshness(root, args.max_age, out, args.fix_index, group_dirs)
+    # Only an explicit --scope narrows the memory checks. Discovered scopes are
+    # a convenience for the other checks; letting them narrow this one would
+    # silently exclude the root's own store from every default run.
+    memory_scopes = tuple(scopes) if args.scope else ()
+    check_memory_freshness(root, args.max_age, out, args.fix_index, group_dirs,
+                           memory_scopes)
     check_split(root, out)
     check_cloud_dupes(root, out)
     check_upkeep(root, out)

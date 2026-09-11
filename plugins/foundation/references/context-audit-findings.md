@@ -1,6 +1,8 @@
 # Context Audit — Finding Codes
 
-`python3 ${CLAUDE_PLUGIN_ROOT}/scripts/context-audit.py` mechanically checks the context layer described in [`context-cascade.md`](context-cascade.md). It sweeps the scopes it is given as `--scope` arguments (never a hard-coded list), takes `--max-age DAYS` for memory freshness, `--no-git` to skip the repository checks and `--fix-index` to regenerate every stale `MEMORY.md` from its topic files, and exits `0` clean / `1` with findings.
+`python3 ${CLAUDE_PLUGIN_ROOT}/scripts/context-audit.py` mechanically checks the context layer described in [`context-cascade.md`](context-cascade.md). It sweeps the scopes it is given as `--scope` arguments (never a hard-coded list), takes `--max-age DAYS` for memory freshness, `--registry PATH` to reconcile a central project registry against what is on disk, `--no-git` to skip the repository checks and `--fix-index` to regenerate every stale `MEMORY.md` from its topic files, and exits `0` clean / `1` with findings.
+
+**Naming `--scope` also narrows the memory-store checks and `--fix-index` to those directories.** In a fan-out, every agent passes its own scope, so no agent regenerates a sibling's `MEMORY.md` while that sibling is still editing its topic files. With no `--scope` the whole tree is in scope, which is what a single-agent run wants.
 
 **Two rules make it safe to use.**
 
@@ -46,12 +48,17 @@ Read `GIT-DIVERGED` and `GIT-DESTRUCTIVE-UNPUSHED` first in any run — they are
 | `MEMORY-INDEX-REWRITTEN` | `--fix-index` regenerated a stale index | Informational. Review the diff and commit it with the topic edits that caused it | No |
 | `MEMORY-LINK-BROKEN` | The index links a topic that is not on disk | A symptom of a stale index: restore the topic, or regenerate | No |
 | `MEMORY-ORPHAN-TOPIC` | A topic file exists that nothing indexes | A symptom of a stale index: regenerate to index it, or delete the topic if its concern is dead | Yes |
-| `MEMORY-FRONTMATTER` | The six-line block is malformed, or `last_verified` is in the future | Rewrite it: `---`, `name`, `description`, `type`, `last_verified`, `---` — four keys, in that order, no extras. `--fix-index` refuses to regenerate a store holding one of these | No |
+| `MEMORY-FRONTMATTER` | The six-line block is malformed, `last_verified` is in the future, or the file has CRLF line endings | Rewrite it: `---`, `name`, `description`, `type`, `last_verified`, `---` — four keys, in that order, no extras. A CRLF topic parses fine and then renders an index nothing can ever match, so the store sits permanently stale while every file looks correct; convert it to LF. `--fix-index` refuses to regenerate a store holding any of these | No |
+| `MEMORY-STORE-EMPTY` | A `memory/` directory exists but holds no topic file | Author `state.md`. An index cannot be derived from nothing, and `--fix-index` deliberately leaves the existing file alone rather than truncating it to a bare heading | No |
+| `MEMORY-STORE-DEBRIS` | Something in `memory/` that is not a `*.md` topic — a `.bak`, a stray note, a subdirectory | Only topic files live there. Anything else is a second source of truth nothing checks and no index points at: promote it into a topic, or delete it | Yes |
 | `MEMORY-TOPIC-TYPE` | `type:` is outside the ten-value vocabulary | Use the singular form from the closed list; plurals defeat every filter | No |
 | `MEMORY-TOPIC-NAME` | `name:` is not `<scope slug>-<file stem>`, or collides with another topic's | Rename it to match. The slug is the scope's directory name kebab-cased, a grouping directory prefixed by its parent, the root `root`. **The slug depends on where `--root` points:** a repository nested inside a larger tree is `my-repo-state` when the tree is audited and `root-state` when that repository is audited alone, so audit it at the root its store was authored for rather than renaming to satisfy the narrower run | No |
 | `MEMORY-TOPIC-NO-HEADING` | A topic's first body line is not a `# Heading` | Add one — the index title is derived from it, and without it the index falls back to the filename | No |
 | `MEMORY-ALERT-HEADING` | An `alert` topic's heading does not begin `Red — ` | Prefix it, so the hazard reads as a hazard in the index | No |
 | `MEMORY-DESCRIPTION-LONG` | A `description:` exceeds 240 characters | It **is** the index hook: cut it to the signal, or split the topic. A description that needs more room is narrating the body | Yes |
+| `MEMORY-DESCRIPTION-THIN` | A `description:` is under 40 characters, or simply repeats the heading | It carries no signal — a reader who stops at the index must leave knowing the state, the hazard or the open call, not just the topic's name. Write the signal | Yes |
+| `MEMORY-DESCRIPTION-LINK` | A markdown link inside a `description:` | The description is copied verbatim into the index, one directory up from `memory/`, so the link resolves from the wrong place. Name the file in backticks instead | No |
+| `MEMORY-TOPIC-UPKEEP` | A topic file carries an `## Upkeep` section | Delete it. The write protocol *is* a topic's upkeep, and a "delete this once X" condition belongs in the topic's last sentence | No |
 | `MEMORY-TOPIC-LONG` | A topic file has outgrown ~60 lines | Split it, or prune what stopped being true | Yes |
 | `MEMORY-TOPIC-HEAVY` | A topic's body exceeds 6,000 characters | The line cap is being met with paragraph-long lines. Split on the real seam, or prune | Yes |
 | `MEMORY-VOLATILE-COUNT` | A git-shaped integer in a topic's prose | Replace it with the topology. Advisory: a count that is *itself* the hazard ("deletes 21 tracked files") is legitimate and stays | Yes |

@@ -52,7 +52,7 @@ Do not use this skill when:
 
 ## Core workflow
 
-1. Run the mechanical pass first: `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/context-audit.py --scope <dir> --scope <dir> …`. It takes seconds and removes the entire class of findings that need no judgement. `MEMORY-INDEX-STALE` is the cheapest of them: every `MEMORY.md` is derived from its `memory/` topic files, so the fix is `--fix-index`, never an edit to the index.
+1. Run the mechanical pass first: `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/context-audit.py --scope <dir> --scope <dir> …`, adding `--registry <path>` where the tree carries a central registry file (the registry check is opt-in and silently does nothing without it) and `--instruction-file AGENTS.md` where that, not `CLAUDE.md`, carries the rules. It takes seconds and removes the entire class of findings that need no judgement. `MEMORY-INDEX-STALE` is the cheapest of them: every `MEMORY.md` is derived from its `memory/` topic files, so the fix is `--fix-index`, never an edit to the index.
 2. Read the previous pass's record and note its date. This sweep verifies those claims; it does not re-derive them from scratch.
 3. Partition the repository into disjoint scopes and fan out one agent per scope, all launched concurrently, under the rules below.
 4. While the branches run, resolve the judgement-required findings yourself, with whole files open.

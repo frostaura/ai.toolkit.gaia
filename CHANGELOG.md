@@ -4,6 +4,34 @@ All notable changes to the Gaia plugins are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions are lockstep across all plugins. Plugin sources track `ref: main`; the `version` field in each `plugin.json` is the update trigger, and changes reach users when pushed to GitHub.
 
+## [14.1.0] - 2026-09-11
+
+Hardening for the derived-index machinery shipped in 14.0.0, all of it additive: a regenerator that refuses the cases where it would destroy an index rather than repair one, and four new findings for the ways a store silently stops being derivable.
+
+### Added
+
+- **`--scope` now narrows the memory-store checks and `--fix-index`**, not just scope discovery. In a fan-out, every agent passes its own scope, so no agent regenerates a sibling's `MEMORY.md` while that sibling is still editing its topic files. With no `--scope` the whole tree is in scope, exactly as before.
+- **`MEMORY-STORE-EMPTY`** — a `memory/` directory holding no topic file. `--fix-index` refuses it rather than truncating the existing index to a bare heading, which is what it used to do: an empty store silently deleted the only copy of a hand-written index.
+- **`MEMORY-STORE-DEBRIS`** — anything in `memory/` that is not a `*.md` topic: a `.bak`, a stray note, a subdirectory. It is a second source of truth that nothing checks and no index points at.
+- **`MEMORY-DESCRIPTION-LINK`** — a markdown link inside a `description:`. The description is copied verbatim into the index, one directory above `memory/`, so the link resolves from the wrong place. Name the file in backticks instead.
+- **`MEMORY-DESCRIPTION-THIN`** — a `description:` under 40 characters, or one that simply repeats the topic's heading. The 240-character ceiling was being defeated from the other side: a one-word hook passes every check and tells a reader nothing.
+- **`MEMORY-TOPIC-UPKEEP`** — an `## Upkeep` section inside a topic file. The write protocol *is* a topic's upkeep; a "delete this once X" condition is the topic's last sentence.
+
+### Fixed
+
+- **CRLF topic files are now a `MEMORY-FRONTMATTER` finding and block regeneration.** Files are read as bytes before decoding. A CRLF topic parses perfectly as text and then renders an index nothing can ever match, so the store sat permanently `MEMORY-INDEX-STALE` while every individual file looked correct.
+- **The index is compared CRLF-normalised.** A `\r\n` index is a line-ending defect, not a content defect, and reporting it as `MEMORY-INDEX-STALE` sent the reader hunting for a hook that was in fact identical.
+- **A `--fix-index` run that rewrote an index no longer also reports `MEMORY-ORPHAN-TOPIC` and `MEMORY-LINK-BROKEN` for that store.** Those describe the index as it was *before* the rewrite, and they sent agents to fix an index that was already correct.
+- **The index title escapes `[` and `]` rather than stripping them.** A heading like `Red — [ingest] do not push` is about a thing actually called `[ingest]`; deleting the brackets made the index title disagree with the topic's own `# H1`.
+- **`MEMORY-VOLATILE-COUNT` now scans the `description:` as well as the body.** The hook is the most-read line in a store and was the one line exempt from the rule.
+- **Vendored third-party libraries are skipped again.** `.pio/` and `libdeps/` by name, and any directory carrying a `library.properties` or `library.json` manifest — an Arduino or PlatformIO library tree. Its README's link debt is upstream's, and forty vendored libraries drown every real finding.
+
+### Changed
+
+- **`--registry` is documented where the script is offered as a registry check.** `fa-foundation-registry-audit` told the reader to run the script and read `REGISTRY-*`; the check is opt-in, so without `--registry PATH` it printed a clean run over a registry it never opened. `fa-foundation-context-audit` now names `--registry` and `--instruction-file` at the same step.
+- **`head -7` is `head -8` everywhere.** Line 7 of a topic file is the mandatory blank; the `# H1` every index title is derived from is line 8, so the documented command stopped one line short of the heading it was meant to show. Corrected in `references/context-cascade.md`, `fa-foundation-context-authoring`, `fa-foundation-memory-maintenance` and the `fa-foundation-optimize-directory-tree` branch brief.
+- **The cascade reference now states the four rules the tooling enforces**: never hand-edit the index; a description may not contain a link; only `*.md` topics live in `memory/`; pass `--scope` in a fan-out.
+
 ## [14.0.0] - 2026-09-11
 
 ### Changed — BREAKING

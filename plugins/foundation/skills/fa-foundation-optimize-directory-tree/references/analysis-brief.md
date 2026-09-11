@@ -89,7 +89,7 @@ You write memory files in almost every mode, and **this brief is the only place 
 
 Entries are ordered by type — `alert`, `state`, `decision`, `gotcha`, `question`, `watch`, `kill-record`, `evidence`, `log`, `reference` — with a type's canonical file (`decisions.md`) before its split siblings (`decisions-sync.md`), then alphabetically. **The hook is the signal, not a label:** "deploy decided, unpushed range still local, kill clock void once live" is a hook; "notes about deployment" is a label. A reader who stops at the index must still leave informed — so that sentence belongs in the topic's `description:`, which is the only place it can be written.
 
-**Every topic file opens with exactly this six-line frontmatter block** — the four keys, in this order, with **no extras** — so that `head -7` of any topic returns the complete relevance signal plus the first body line:
+**Every topic file opens with exactly this six-line frontmatter block** — the four keys, in this order, with **no extras**, then a blank line and the `# H1` — so that `head -8` of any topic returns the complete relevance signal plus that heading:
 
 ```markdown
 ---
