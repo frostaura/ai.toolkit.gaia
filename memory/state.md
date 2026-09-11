@@ -1,54 +1,60 @@
 ---
 name: ai-toolkit-gaia-state
-description: "v13 is live on origin/main and floats into installs via ref:main. One unpushed commit re-wires the hosted MCP into foundation and bumps foundation alone to 13.1.0 — ahead-only, no deletions. Never tagged past v8."
+description: "origin/main still serves v13; the whole v14.0.0 breaking release sits unpushed, ahead-only with no deletions, and carries the still-unexplained MCP re-wiring with it. Lockstep intact at 14.0.0 everywhere. Never tagged past v8."
 type: state
 last_verified: 2026-09-11
 ---
 
 # Current state
 
-**Published.** `origin/main` carries v13.0.0 — the removal of the `tasks_*` / `memory_*` /
-`evolve_*` tools and the whole Woolworths capability migrated in from the retired
-`fa.integrations`. Because plugin sources float on `ref: main`, whatever sits on `origin/main`
-is what a fetching install resolves. What "installed" actually means on this machine is a
-separate matter — [`watch.md`](watch.md).
+**Published — and behind the working tree.** `origin/main` still carries v13.0.0: the removal
+of the `tasks_*` / `memory_*` / `evolve_*` tools and the whole Woolworths capability migrated
+in from the retired `fa.integrations`. Plugin sources float on `ref: main`, so `origin/main`
+is what a fetching install resolves — **no installed user has v14**, and they all get it in
+one step the moment someone pushes. What "installed" means here at all: [`watch.md`](watch.md).
 
-**Local `main` is ahead-only against `origin/main`, with zero deletions in the range** — the
-safe topology; a plain `git push` fast-forwards. The unpushed commit (2026-08-24,
-`chore(foundation): adding mcp server to foundation plugin set`) touches four files and does
-exactly two things:
+**Local `main` is ahead-only against `origin/main`, no deletions in the range** — the safe
+topology; a plain `git push` fast-forwards. Waiting in that range:
 
-- re-adds an `mcpServers` block to `foundation` wiring `fa-gaia-remote` to
-  `https://gaia.frostaura.net/mcp` — reversing the v13.0.0 decision that no plugin declares
-  the server, with no recorded rationale ([`decisions.md`](decisions.md));
-- bumps **`foundation` alone** to `13.1.0` across its four version sites, leaving
-  `engineering` and `product` at `13.0.0` — so lockstep versioning is broken in the working
-  tree ([`decisions-distribution.md`](decisions-distribution.md)).
+- **`feat(foundation)!` — the v14.0.0 breaking release.** `MEMORY.md` becomes a *derived*
+  index regenerated from its `memory/` topic files, with new `MEMORY-*` findings and
+  `--fix-index` in `context-audit.py`, and every skill, reference and agent that said "re-cut
+  the index hook" rewritten to say edit the topics and regenerate. Breaking because a
+  consuming repo's hand-authored index now reports stale until it is regenerated.
+- **The `foundation` MCP re-wiring**, from 2026-08-24 and still carrying **no recorded
+  rationale**: an `mcpServers` block wiring `fa-gaia-remote` to
+  `https://gaia.frostaura.net/mcp`, reversing the v13.0.0 decision that no plugin declares
+  the server ([`decisions.md`](decisions.md)). Once an isolated commit, it is now buried in
+  an unpushed breaking release — **whoever authorises the v14 push authorises the re-wiring
+  with it**, and makes the README's "the plugins send nothing anywhere" disclosure untrue for
+  `foundation` in the same instant.
+- The memory-store rewrite that accompanied the release.
 
-Pushing is the founder's call. It would also make the README's "the plugins send nothing
-anywhere" disclosure untrue for `foundation` the moment it lands.
+Pushing is the founder's call — and now one call over both things, not two.
 
-**Nothing past v8 was ever tagged.** The newest tag here is `v8.0.0`; v9 through v13 shipped
-by moving `main` alone, and no step in the release path creates a tag.
+**Version lockstep is intact at 14.0.0.** Verified 2026-09-11: all six `plugin.json` files,
+the plugin rows in both marketplace manifests and the README badge agree. `metadata.version`
+in the manifests tracks the catalog's shape and deliberately does not move with a plugin
+([`decisions-distribution.md`](decisions-distribution.md)).
+
+**Nothing past v8 was ever tagged.** The newest tag here is `v8.0.0`; v9 through v14 ship by
+moving `main` alone, and no step in the release path creates a tag.
 
 ## Verified on disk, 2026-09-11
 
-- Three plugins ship — `foundation`, `engineering`, `product`, each with its own `skills/` and
-  `agents/` trees. All three `plugin.json` pairs are byte-identical (`cmp`).
-- `foundation`'s authored skills include `fa-foundation-session-close`,
-  `fa-foundation-repo-durability`, `fa-foundation-context-audit`,
-  `fa-foundation-memory-maintenance`, `fa-foundation-context-authoring` and
-  `fa-foundation-registry-audit` — the capability names FrostAura context files reach for.
-  They exist here, authored. Whether they are *installed* anywhere is [`watch.md`](watch.md).
+- Three plugins ship — `foundation`, `engineering`, `product` — each with its own `skills/`
+  and `agents/` trees, and all three `plugin.json` pairs byte-identical (`cmp`).
+- `foundation` carries the capability names FrostAura context files reach for, each as an
+  `fa-foundation-*` skill: session-close, repo-durability, context-audit, memory-maintenance,
+  context-authoring, registry-audit. Authored here; *installed* anywhere is [`watch.md`](watch.md).
 - `src/` is the .NET 10 MCP server plus `src/Gaia.Mcp.Tests`, a real xUnit project listed in
-  `Gaia.slnx` — so CI's `dotnet test` gate asserts something. Before v13.0.0 it did not.
+  `Gaia.slnx`, so CI's `dotnet test` gate asserts something. Before v13.0.0 it did not.
 - The server's only integration is Woolworths (`Integrations/Woolworths`,
   `Tools/WoolworthsTools.cs`), exposed on both MCP and REST.
 
 ## What this repository cannot tell you
 
-**Whether `gaia.frostaura.net/mcp` is running a v13 image.** The repo holds one workflow,
-`build-gaia-mcp.yml`: it tests, then builds and pushes `gaia-mcp:latest` and `gaia-mcp:<sha>`
-to Docker Hub on every push to `main`. **There is no deploy step of any kind** — no Portainer
-webhook, no stack update. Redeploy is a manual act outside this repository, so the running
-tool set is unknowable from here. Owned and open: [`questions.md`](questions.md).
+**Which image `gaia.frostaura.net/mcp` is running.** The one workflow, `build-gaia-mcp.yml`,
+tests and then pushes `gaia-mcp:latest` and `gaia-mcp:<sha>` to Docker Hub on every push to `main`
+— and **contains no deploy step of any kind**. Redeploy is a manual act outside this repo, so
+the running tool set is unknowable from here: [`questions.md`](questions.md).

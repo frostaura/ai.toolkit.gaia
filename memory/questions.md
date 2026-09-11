@@ -24,8 +24,9 @@ decide. The Woolworths exposure has its own home and is not restated here:
    grocery integration gateway share a repo, a CHANGELOG, a version line and a hostname — and
    since `foundation` stopped wiring the server, nothing else. Three honest exits: leave it
    and say so in the README; split the server into its own repository; or reframe Gaia
-   deliberately as both. **The unpushed re-wiring commit quietly picks a fourth option** —
-   coupling them again without deciding ([`state.md`](state.md)). Owner: founder.
+   deliberately as both. **The unpushed re-wiring quietly picks a fourth option** — coupling
+   them again without deciding — and now rides inside the v14 release, so the push that ships
+   v14 also ships this ([`state.md`](state.md)). Owner: founder.
 
 3. **Placement still reads as `Technologies/`, not Labs.** This is a versioned, publicly
    distributed, multi-ecosystem developer product with a live hosted service, CI/CD, a support
@@ -42,7 +43,3 @@ decide. The Woolworths exposure has its own home and is not restated here:
 5. **Should the integration be wired into any plugin at all?** If yes, it wants its own opt-in
    plugin rather than the context layer — that was the v13.0.0 reasoning, and the unpushed
    commit contradicts it without arguing with it. Owner: founder.
-
-_(Closed 2026-08-21 and deliberately not carried: the `b9d2ee3` deletion incident — restored,
-committed, pushed; the vacuous CI test gate — `src/Gaia.Mcp.Tests` is real and in the
-solution.)_

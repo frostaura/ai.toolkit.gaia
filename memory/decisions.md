@@ -25,8 +25,9 @@ last_verified: 2026-09-11
 - **`foundation` declared no MCP server** (v13.0.0): wiring the remaining Woolworths tools
   into every `foundation` install would push a grocery integration onto people who installed
   a context-layer plugin. If the server is ever wired again it should be opt-in and its own
-  plugin. **An unpushed commit reverses this with no recorded why** — see
-  [`state.md`](state.md); treat the reversal as unratified until the founder says otherwise.
+  plugin. **An unpushed commit reverses this with no recorded why**, and it now sits inside
+  the unpushed v14 range ([`state.md`](state.md)) — treat the reversal as unratified until the
+  founder says otherwise, and do not let a v14 push ratify it by accident.
 - **`fa.integrations` was migrated in whole and killed, not kept alongside** — one hosted
   service, one deploy chain, one place to add the next integration. The `IIntegration` seam
   moved with it, so adding a provider is still a class plus three registration lines.
