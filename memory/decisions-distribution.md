@@ -19,8 +19,9 @@ last_verified: 2026-09-11
   the two marketplace manifests does **not** move for a plugin change — it tracks the
   catalog's shape, not the plugins'. Major when a contract breaks (tools removed, skill
   descriptions changed, the agent-schema rewrite); minor when purely additive. A bump touches
-  twelve sites — six `plugin.json` files and the plugin row in each manifest — plus the README
-  badge, and nothing in CI checks that they agree ([`gotchas.md`](gotchas.md)).
+  twelve sites — six `plugin.json` files plus all three plugin rows in each of the two
+  marketplace manifests — and the README badge on top of those, with nothing in CI checking
+  that they agree ([`gotchas.md`](gotchas.md)).
 - **`"dependencies": ["foundation"]` stays in the two `plugin.json` copies and is
   deliberately not mirrored into the marketplace manifests.** The manifests are a discovery
   catalog, not a resolver; adding a field neither ecosystem resolves creates a fourth place

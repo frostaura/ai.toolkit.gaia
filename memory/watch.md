@@ -9,14 +9,11 @@ last_verified: 2026-09-11
 
 **Dogfooding — the gap that matters most**
 
-- **Nothing FrostAura publishes is installed on the founder's Mac.** Verified 2026-09-11
-  against `~/.claude/plugins/`: the `frostaura` marketplace is absent and only
-  `claude-plugins-official` plugins are present. The marketplace was removed on 2026-08-21 at
-  the founder's request and has not come back, so every FrostAura instruction to reach for an
-  `fa-foundation-*` capability has been firing against nothing here. **Dogfooding is a stated
-  kill criterion for this program** (`../CLAUDE.md`) — this is a signal about the product, not
-  a config detail. The machine-level fact and its tree-wide consequence belong to root's
-  memory store; this entry exists because the product owns the consequence.
+- **Nothing FrostAura publishes is installed on the founder's Mac**, so "live to every installed
+  user" describes nobody there; the evidence and its tree-wide consequence are root's
+  ([`../../../../memory/plugin-roster-drift.md`](../../../../memory/plugin-roster-drift.md)).
+  **Dogfooding is a stated kill criterion for this program** (`../CLAUDE.md`) — which is why the
+  product carries the consequence rather than only the machine that fails to consume it.
 - **The repository and the running service may disagree and nothing here can tell you.**
   v13 removed the `tasks_*` / `memory_*` / `evolve_*` tools; whether the hosted image was ever
   rebuilt and redeployed is unverifiable from the repo — [`questions.md`](questions.md) §1. If

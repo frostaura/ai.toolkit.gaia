@@ -37,8 +37,8 @@ decide. The Woolworths exposure has its own home and is not restated here:
 
 4. **`ref: main` or tags for plugin refs?** Floating installs are dangerous for a public user
    base: a breaking change reaches every fetching install at push time, with no version a user
-   can pin to and no tag to roll back to. Nothing past `v8.0.0` has ever been tagged. Owner:
-   founder. Decided either way, the README should say which.
+   can pin to and — because the release path creates no tags at all ([`state.md`](state.md)) —
+   nothing to roll back to. Owner: founder. Decided either way, the README should say which.
 
 5. **Should the integration be wired into any plugin at all?** If yes, it wants its own opt-in
    plugin rather than the context layer — that was the v13.0.0 reasoning, and the unpushed
