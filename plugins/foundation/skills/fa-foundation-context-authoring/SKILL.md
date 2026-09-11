@@ -61,10 +61,10 @@ Do not use this skill when:
 `MEMORY.md` is a **pure index, and it is derived — never authored.** Content lives in a `memory/` directory beside it, one topic file per concern, so a reader lists the index, skims frontmatter, and deep-reads only what the task needs. Every line of the index is computed from those topic files: the heading from the scope's path, each title from the topic's `# H1`, each hook from its `description:`, the order from its `type:`. You write topic files and then run the generator; you do not write `MEMORY.md`.
 
 ```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/context-audit.py --fix-index [--scope <your directory>]
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/context-audit.py --fix-index --scope <your directory>
 ```
 
-It refuses to regenerate a store whose topics have malformed frontmatter, and refuses when `memory/` holds no topic at all rather than truncating the index to a bare heading. Only `*.md` topics live in `memory/` — anything else there is `MEMORY-STORE-DEBRIS`.
+Carry `--scope` every time, not only in a fan-out: unscoped, one run regenerates every index in the tree, including ones a sibling agent is still editing. **Write that same scoped command into the instruction file's `## Upkeep` section** — the section is where the next agent reads it from, so an unscoped one there outlives every brief that got it right, and the audit reports it as `UPKEEP-UNSCOPED`. It refuses to regenerate a store whose topics have malformed frontmatter — a `last_verified` in the future included — and refuses when `memory/` holds no topic at all rather than truncating the index to a bare heading. It applies the same refusals when *creating* a missing index, and runs every per-topic check before it writes one. Only `*.md` topics live in `memory/` — anything else there is `MEMORY-STORE-DEBRIS`.
 
 ```markdown
 # MEMORY — packages/ingest

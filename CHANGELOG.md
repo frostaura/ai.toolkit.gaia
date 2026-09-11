@@ -4,6 +4,27 @@ All notable changes to the Gaia plugins are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions are lockstep across all plugins. Plugin sources track `ref: main`; the `version` field in each `plugin.json` is the update trigger, and changes reach users when pushed to GitHub.
 
+## [14.3.0] - 2026-09-11
+
+A fourth pass over the audit, and every item in it is a check that existed but could not fire, or fired on the wrong text. Nothing here is a new idea; all of it is the previous three releases actually working.
+
+### Added
+
+- **`UPKEEP-UNSCOPED`** — an instruction file whose directory carries a `memory/` store must state the regeneration command *scoped to its own directory* in its `## Upkeep` section (`--fix-index --scope .` at the root). `--scope` existed to stop a fan-out agent rewriting a sibling's index mid-flight, but the command the next agent actually copies is the one written in that section, so an unscoped one there outlived every brief that got it right. The expected scope moves with `--root`, exactly like the memory-topic `name` slug.
+
+### Changed
+
+- **A missing index now runs every per-topic check before one is created.** The missing-index branch returned before the topic loop, so a store with no `MEMORY.md` got exactly one finding and none of the checks over its topics — and `--fix-index` then derived an index from files nothing had validated, carrying a non-kebab-case filename straight into every link built from it. The store is now checked first and the index decided last: defects are reported on the same run that creates the index, and a store that cannot pass them keeps `MEMORY-INDEX-MISSING`.
+- **A future `last_verified` blocks index *creation* as well as regeneration.** It is raised by the topic parser, which is what a `--fix-index` write is gated on, rather than in the per-topic loop that runs after. Raised later, the one defect that reads as freshly verified for as long as its date says was blocked from repairing an existing index and sailed straight into a brand-new one.
+- **`SCOPE-EMPTY` is reported per `--scope`**, not once for the whole run. A run naming three scopes where only the third is a typo reported nothing at all, because the total was non-zero — the mis-aimed argument was invisible in exactly the run it mattered in.
+- **`MEMORY-TOPIC-LONG` is measured over the body**, as the spec says ("60 lines and 6,000 characters of body"). Counting the six frontmatter lines and the blank after them made the real ceiling 53 lines of content, so a topic that obeyed the written rule was reported for breaking it.
+- **`--scope` is written as required, not optional, in `fa-foundation-context-authoring`, `fa-foundation-memory-maintenance` and `fa-foundation-session-close`**, and the authoring skill now says to put that same scoped command in the instruction file's `## Upkeep` section.
+
+### Fixed
+
+- **A loose artefact at a repository root is no longer reported twice.** The stray-artifact surfaces are deduplicated by path: `--scope .` at a root — now the form the Upkeep rule asks for — made the root its own scope, so every check ran over it once as the root and again as a scope.
+- **`POSSIBLE-STATE-IN-INSTRUCTIONS` no longer exempts a whole line for mentioning `MEMORY.md`.** The state-word branch tested `"MEMORY.md" not in line`, so `**Status:** currently blocked — see MEMORY.md` — a status assertion that happens to route — was silently exempt, which is the exact defect the check exists to catch. Both exemptions now work on the *residue*: the routing reference and every quoted or italic span are stripped, and what is left is tested, so a rule that *names* a state word ("anything with a 'currently' goes in the memory store") stays exempt. The date branch runs on the full residue with no quote stripping, because a date is state under any reading.
+
 ## [14.2.0] - 2026-09-11
 
 A third pass over the same machinery, all of it additive: the audit now proves a remote exists instead of trusting the URL string, sweeps the *whole* instruction layer rather than only the instruction file, and refuses three more ways a memory store can silently stop being derivable.

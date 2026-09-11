@@ -28,10 +28,11 @@ repository with no registry is not in violation of anything.
 
 Naming `--scope` also narrows the memory-store checks and `--fix-index` to
 those directories, so parallel agents can each regenerate their own indexes
-without rewriting a sibling's mid-flight. A `--scope` that matches no memory
-store is reported (`SCOPE-EMPTY`) rather than silently printing CLEAN over a
-subtree nothing opened, and one outside `--root` is an argument error, because
-every path in the output — and every `--fix-index` write — is root-relative.
+without rewriting a sibling's mid-flight. Each `--scope` that matches no memory
+store is reported on its own (`SCOPE-EMPTY`) rather than silently printing CLEAN
+over a subtree nothing opened, and one outside `--root` is an argument error,
+because every path in the output — and every `--fix-index` write — is
+root-relative.
 
 **Running on a subtree root is safe and supported.** Point `--root` at one
 repository inside a larger tree and only that repository is read or written:
@@ -574,6 +575,14 @@ def read_topics(memdir):
     match, because every comparison is against LF output — the store sits
     permanently MEMORY-INDEX-STALE while every individual file looks correct. It
     is a `problems` entry, which also blocks regeneration until it is fixed.
+
+    A `last_verified` in the future is a `problems` entry for the same reason,
+    and it has to be raised *here* rather than in the per-topic loop: `problems`
+    is what a `--fix-index` write is gated on, and gating happens for a missing
+    index as well as a stale one. Raised later, a future stamp blocked the
+    regeneration of an existing index but not the *creation* of a new one — so
+    the one defect that reads as freshly verified for as long as its date says
+    could be carried straight into a brand-new index.
     """
     topics, problems, debris = [], [], []
     for p in sorted(memdir.iterdir()):
@@ -606,6 +615,10 @@ def read_topics(memdir):
             problems.append((p, reason))
             continue
         name, desc, ttype, verified = parsed
+        if verified > dt.date.today():
+            problems.append((p, f"last_verified {verified} is in the future — "
+                                f"nothing was verified tomorrow; correct the stamp"))
+            continue
         lines = body.split("\n")
         title = None
         for line in lines[6:]:
@@ -669,7 +682,11 @@ def check_memory_freshness(root, max_age, out, fix_index=False,
     render_index() produces from those files."""
     today = dt.date.today()
     seen_names = {}
-    stores_seen = 0
+    # Counted per scope, not in one total. A run naming three scopes where two
+    # hold stores and the third is a typo used to report nothing at all,
+    # because the total was non-zero — the mis-aimed argument was invisible in
+    # exactly the run it mattered in.
+    scope_hits = {sc: 0 for sc in scopes}
     for dirpath, filenames in walk(root):
         memdir = dirpath / "memory"
         # A topic store with no index beside it is a store all the same. Keying
@@ -679,26 +696,26 @@ def check_memory_freshness(root, max_age, out, fix_index=False,
             continue
         if not in_scope(root, dirpath, scopes):
             continue
-        stores_seen += 1
+        for sc in scopes:
+            if dirpath == sc or sc in dirpath.parents:
+                scope_hits[sc] += 1
         f = dirpath / "MEMORY.md"
         r = rel(root, f)
-        if "MEMORY.md" not in filenames:
-            topics, problems, debris = read_topics(memdir)
-            if fix_index and topics and not problems:
-                f.write_text(render_index(root, dirpath, topics), encoding="utf-8")
-                out.append(("MEMORY-INDEX-REWRITTEN", r,
-                            "index was missing; created from the topic files' "
-                            "frontmatter"))
-            else:
-                out.append(("MEMORY-INDEX-MISSING", r,
-                            "memory/ exists with no MEMORY.md beside it — the store is "
-                            "invisible to a reader entering the scope; run --fix-index "
-                            "to derive one (every topic must parse first)"))
-            continue
-        try:
-            text = f.read_text(encoding="utf-8", errors="replace")
-        except OSError:
-            continue
+        # A missing index is decided at the *end* of this block, not here. The
+        # earlier shape returned from this point, so a store with no index got
+        # exactly one finding and none of the per-topic checks — and a
+        # --fix-index run then created an index out of files nothing had
+        # validated, carrying a non-kebab-case filename straight into every
+        # link derived from it. Now the topics are checked on the same run that
+        # creates the index, and a store that cannot pass those checks reports
+        # them *and* keeps MEMORY-INDEX-MISSING.
+        index_missing = "MEMORY.md" not in filenames
+        text = ""
+        if not index_missing:
+            try:
+                text = f.read_text(encoding="utf-8", errors="replace")
+            except OSError:
+                continue
         if not memdir.is_dir():
             # Legacy monolith: still enforce the stamp, and flag for migration.
             m = re.search(r"_Last verified:\s*(\d{4}-\d{2}-\d{2})", text[:800])
@@ -731,7 +748,7 @@ def check_memory_freshness(root, max_age, out, fix_index=False,
             # files, and the reader is sent to rewrite something that is not
             # wrong.
             hint = ("" if any(k in reason for k in
-                              ("CRLF", "byte-order", "unreadable"))
+                              ("CRLF", "byte-order", "unreadable", "in the future"))
                     else " — the block is exactly six lines: '---', name, "
                          "description, type, last_verified, '---'")
             out.append(("MEMORY-FRONTMATTER", rel(root, p), reason + hint))
@@ -795,7 +812,12 @@ def check_memory_freshness(root, max_age, out, fix_index=False,
                             "topic files carry no `## Upkeep` section — the write "
                             "protocol is their upkeep; a delete-when condition is the "
                             "topic's last sentence"))
-            n_lines = len(t["text"].rstrip("\n").split("\n"))
+            # Measured over the *body*, which is what the size rule is about:
+            # "60 lines and 6,000 characters of body". Measuring `text` counted
+            # the six frontmatter lines and the blank after them, so the real
+            # ceiling was 53 lines of content and a 54-line topic was reported
+            # as a 61-line one — a rule nobody could satisfy by reading it.
+            n_lines = len(t["body"].strip("\n").split("\n"))
             if n_lines > TOPIC_MAX_LINES:
                 out.append(("MEMORY-TOPIC-LONG", prel,
                             f"{n_lines} lines (max ~{TOPIC_MAX_LINES}) — this is "
@@ -809,21 +831,30 @@ def check_memory_freshness(root, max_age, out, fix_index=False,
             age = (today - t["verified"]).days
             if age > max_age:
                 out.append(("STALE-MEMORY", prel, f"last verified {age} days ago"))
-            if t["verified"] > today:
-                out.append(("MEMORY-FRONTMATTER", prel,
-                            f"last_verified {t['verified']} is in the future — "
-                            f"nothing was verified tomorrow; correct the stamp"))
-                # Blocks regeneration with every other malformed-frontmatter
-                # case. A future stamp is the one defect that silently survives
-                # a --fix-index run and then reads as freshly verified for as
-                # long as the date says, which is exactly backwards for a store
-                # whose whole purpose is to be trusted about its own age.
-                problems.append((t["path"], "future last_verified"))
+            # A future `last_verified` is raised by read_topics() as a
+            # `problems` entry, so it never reaches this loop and blocks both
+            # regeneration and creation of an index.
             for m in VOLATILE_COUNT.finditer(
                     strip_code(t["body"]) + "\n" + t["description"]):
                 out.append(("MEMORY-VOLATILE-COUNT", prel,
                             f"{m.group(0)!r} — record the topology, not the "
                             f"integer; the audit re-measures counts"))
+        if index_missing:
+            # Every topic above has now been checked, so a created index never
+            # derives from unvalidated files — and `problems` (a malformed
+            # block, CRLF, a BOM, a future `last_verified`) blocks creation
+            # exactly as it blocks regeneration.
+            if fix_index and topics and not problems:
+                f.write_text(render_index(root, dirpath, topics), encoding="utf-8")
+                out.append(("MEMORY-INDEX-REWRITTEN", r,
+                            "index was missing; created from the topic files' "
+                            "frontmatter"))
+            else:
+                out.append(("MEMORY-INDEX-MISSING", r,
+                            "memory/ exists with no MEMORY.md beside it — the store is "
+                            "invisible to a reader entering the scope; run --fix-index "
+                            "to derive one (every topic must parse first)"))
+            continue
         # 2. The index must be exactly what the topic files derive to.
         expected_index = render_index(root, dirpath, topics)
         # Compare CRLF-normalised: a `\r\n` index is a line-ending defect, not a
@@ -855,15 +886,18 @@ def check_memory_freshness(root, max_age, out, fix_index=False,
                 out.append(("MEMORY-INDEX-STALE", r,
                             f"index differs from what the topic files derive to "
                             f"(first difference at line {first + 1}) — {why}"))
-    if scopes and stores_seen == 0:
+    for sc, hits in scope_hits.items():
+        if hits:
+            continue
         # A --scope that matches nothing is indistinguishable, in the output,
         # from a scope that is perfectly clean: the run prints CLEAN over a
         # subtree it never opened. A typo, a renamed directory or a stale
-        # fan-out brief all land here.
-        out.append(("SCOPE-EMPTY", ", ".join(rel(root, sc) for sc in scopes),
-                    "no memory store lies inside the given --scope — the run "
-                    "reported on nothing; check the path before trusting a "
-                    "CLEAN result"))
+        # fan-out brief all land here — and each one is named separately, so a
+        # run whose other scopes are fine still surfaces the one that is not.
+        out.append(("SCOPE-EMPTY", rel(root, sc),
+                    "no memory store lies inside this --scope — the run reported "
+                    "on nothing here; check the path before trusting a CLEAN "
+                    "result"))
 
 
 MEMORY_REF = re.compile(r"\[[^\]]*\]\([^)]*MEMORY\.md[^)]*\)|\bMEMORY\.md\b")
@@ -913,15 +947,27 @@ def check_split(root, out):
 
 
 def _scan_instruction_lines(root, f, lines, out):
-    """The date / state-word scan itself, over one instruction-layer file."""
+    """The date / state-word scan itself, over one instruction-layer file.
+
+    Both exemptions work on the *residue*, never by skipping a line. Testing
+    `"MEMORY.md" not in line` exempted every state word on any line that
+    mentioned that filename — including a line that mentioned it in passing and
+    then asserted a status, which is the exact defect the check exists to
+    catch. What earns the exemption is the routing reference itself and a state
+    word the rule *names* rather than asserts: a rule quotes or italicises it
+    ("anything with a 'currently' goes in the memory store", *what is currently
+    true*). So the reference and every quoted or italic span are stripped, and
+    what is left is what gets tested. The date branch runs on the full residue
+    with no quote stripping at all, because a date is state under any reading.
+    """
     for i, line in enumerate(lines, 1):
         if line.lstrip().startswith(("|", ">")):
             continue
         bare = re.sub(r"`[^`]*`", "", line)
         # Strip the routing reference itself, not the line that carries it.
         bare = MEMORY_REF.sub("", bare)
-        hit = DATE_TOKEN.search(bare) or \
-            ("MEMORY.md" not in line and STATE_TOKENS.search(bare))
+        unquoted = re.sub(r'"[^"]*"|\*[^*]+\*|\u201c[^\u201d]*\u201d', "", bare)
+        hit = DATE_TOKEN.search(bare) or STATE_TOKENS.search(unquoted)
         if hit:
             out.append(("POSSIBLE-STATE-IN-INSTRUCTIONS",
                         f"{rel(root, f)}:{i}", line.strip()[:100]))
@@ -954,6 +1000,28 @@ def check_upkeep(root, out):
                         "no '## Upkeep' section — the standing duty to keep the "
                         "instruction file / MEMORY.md / skills current is not "
                         "stated here"))
+            continue
+        # A scope that carries a memory store must tell its agents how to
+        # regenerate the index *scoped to itself*. An unscoped `--fix-index` in
+        # an Upkeep section is a live instruction to rewrite every sibling's
+        # index too, which is precisely what --scope exists to prevent in a
+        # fan-out; the section is where the next agent reads the command from,
+        # so an unscoped one there outlives every brief that got it right.
+        if (dirpath / "memory").is_dir():
+            section = re.split(r"^##+ Upkeep", text, maxsplit=1, flags=re.M)[1]
+            own = Path(dirpath).relative_to(root).as_posix()
+            if "--fix-index" not in section:
+                out.append(("UPKEEP-UNSCOPED", rel(root, f),
+                            f"the Upkeep section names no regeneration command — a "
+                            f"scope with a memory/ store must give "
+                            f"`--fix-index --scope {own}`"))
+            elif not re.search(r"--fix-index\s+--scope\s+" + re.escape(own)
+                               + r"(?![\w./-])", section):
+                out.append(("UPKEEP-UNSCOPED", rel(root, f),
+                            f"the Upkeep section's `--fix-index` is not scoped to "
+                            f"this directory — it must read "
+                            f"`--fix-index --scope {own}`, or a fan-out agent "
+                            f"reading it rewrites every sibling index too"))
 
 
 # Supporting material a skill set may carry, which is not itself a skill.
@@ -1135,11 +1203,23 @@ def check_stray_artifacts(root, scopes, out, include_vendored=False,
                 flag(p, f"loose {ext} artefact outside a .tmp/ — put it in "
                         f"{d.name}/.tmp/ or promote it and delete it")
 
-    top_level(root)
+    # Deduplicated by path. `--scope .` at a repository root — now the form the
+    # Upkeep rule asks for — makes the root its own scope, and every loose
+    # artefact at that root was reported twice.
+    seen = set()
+
+    def once(d, images=True):
+        key = str(Path(d).resolve())
+        if key in seen:
+            return
+        seen.add(key)
+        top_level(d, images)
+
+    once(root)
     for scope in scopes:
-        top_level(scope)
+        once(scope)
         for p in sub_scopes(scope, group_dirs):
-            top_level(p, images=False)
+            once(p, images=False)
 
     for dirpath, filenames in walk(root, include_vendored):
         parts = dirpath.relative_to(root).parts
