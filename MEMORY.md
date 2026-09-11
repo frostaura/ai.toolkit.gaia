@@ -1,6 +1,6 @@
 # MEMORY — Labs/projects/ai.toolkit.gaia
 
-- [Current state](memory/state.md) — origin/main still serves v13; the entire v14 line sits unpushed — breaking, ahead-only, no deletions — and carries the still-unexplained MCP re-wiring with it. Lockstep intact at 14.1.0 across every version site. Never tagged past v8.
+- [Current state](memory/state.md) — origin/main still serves v13; the entire v14 line sits unpushed — breaking, ahead-only, no deletions — and carries the still-unexplained MCP re-wiring with it. Lockstep intact at 14.2.0 across every version site. Never tagged past v8.
 - [Live decisions — product shape](memory/decisions.md) — The server's task/memory/evolve tools were removed rather than deprecated, so the completion contract is now enforced by nothing but the skills; plugins are server-independent; fa.integrations folded in whole, keeping REST alongside MCP.
 - [Live decisions — distribution, versioning and the catalog](memory/decisions-distribution.md) — Public distribution is Labs' one standing stealth exception; plugin refs float on ref:main not tags, so a breaking change lands on users at push time; versions move in lockstep; the README is deliberately not a catalog.
 - [Gotchas](memory/gotchas.md) — MSBuildEnableWorkloadResolver=false is mandatory on this volume; the MCP session mode silently governs whether header credentials resolve; Woolworths returns HTTP 200 for every kind of failure; a green dotnet test before v13 meant nothing.

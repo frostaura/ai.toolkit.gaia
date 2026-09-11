@@ -1,6 +1,6 @@
 ---
 name: ai-toolkit-gaia-state
-description: "origin/main still serves v13; the entire v14 line sits unpushed — breaking, ahead-only, no deletions — and carries the still-unexplained MCP re-wiring with it. Lockstep intact at 14.1.0 across every version site. Never tagged past v8."
+description: "origin/main still serves v13; the entire v14 line sits unpushed — breaking, ahead-only, no deletions — and carries the still-unexplained MCP re-wiring with it. Lockstep intact at 14.2.0 across every version site. Never tagged past v8."
 type: state
 last_verified: 2026-09-11
 ---
@@ -20,9 +20,10 @@ topology; a plain `git push` fast-forwards. Waiting in that range:
   regenerated from its `memory/` topic files, with new `MEMORY-*` findings and `--fix-index`
   in `context-audit.py`, and every skill and reference that said "re-cut the index hook"
   rewritten to say edit the topics and regenerate — a consuming repo's hand-authored index
-  reports stale until it is regenerated once. `14.1.0` hardens that regenerator: `--scope`
-  narrows it, and it now refuses an empty store and a CRLF topic instead of destroying an
-  index. Both reach every floating install in the single push that ships either.
+  reports stale until it is regenerated once. `14.1.0` and `14.2.0` harden the regenerator and
+  widen the audit — `--scope`, a created-not-ignored missing index, blocked regeneration on bad
+  frontmatter, the instruction-layer scan reaching skills and agent definitions, and a remote
+  proved by `ls-remote` rather than trusted. One push ships all of it at once.
 - **The `foundation` MCP re-wiring**, from 2026-08-24 and still carrying **no recorded
   rationale**: an `mcpServers` block wiring `fa-gaia-remote` to
   `https://gaia.frostaura.net/mcp`, reversing the v13.0.0 decision that no plugin declares
@@ -32,10 +33,9 @@ topology; a plain `git push` fast-forwards. Waiting in that range:
   `foundation` in the same instant.
 Pushing is the founder's call — and now one call over all of it, not three.
 
-**Version lockstep is intact at 14.1.0.** Verified 2026-09-11: all six `plugin.json` files,
-the plugin rows in both marketplace manifests and the README badge agree. `metadata.version`
-in the manifests tracks the catalog's shape and deliberately does not move with a plugin
-([`decisions-distribution.md`](decisions-distribution.md)).
+**Version lockstep is intact at 14.2.0.** Verified 2026-09-11 across all six `plugin.json`
+files, all three plugin rows in both manifests and the README badge. `metadata.version` tracks
+the catalog's shape and deliberately does not move ([`decisions-distribution.md`](decisions-distribution.md)).
 
 **Nothing past v8 was ever tagged.** The newest tag is `v8.0.0`; v9 onward ship by moving
 `main` alone, and no step in the release path creates a tag.
