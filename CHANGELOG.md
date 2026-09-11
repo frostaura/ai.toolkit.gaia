@@ -4,6 +4,33 @@ All notable changes to the Gaia plugins are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions are lockstep across all plugins. Plugin sources track `ref: main`; the `version` field in each `plugin.json` is the update trigger, and changes reach users when pushed to GitHub.
 
+## [14.2.0] - 2026-09-11
+
+A third pass over the same machinery, all of it additive: the audit now proves a remote exists instead of trusting the URL string, sweeps the *whole* instruction layer rather than only the instruction file, and refuses three more ways a memory store can silently stop being derivable.
+
+### Added
+
+- **`GIT-REMOTE-MISSING` and `GIT-REMOTE-UNREACHABLE`** — a configured remote is a local string that nothing validates, and repositories have been recorded as "ahead-only, safe to push" against remotes that did not exist. Each remote is now probed with `git ls-remote --exit-code <remote> HEAD` on a 20-second timeout, and the result is *classified*: a credential refusal, an unreachable host and a "repository not found" are the same non-zero exit, and conflating them either invents a lost repository or hides one. An SSH GitHub remote that refuses this machine's key is probed again over its HTTPS twin before anything is concluded, so "the key is missing but the repository is there" and "there is nothing to push to" are reported as the different facts they are.
+- **`--no-remote-probe`** — skips that probe, the script's only network call, while keeping every other repo-durability check. For offline runs and for CI that must not depend on a remote answering.
+- **`REGISTRY-DUPLICATE-ID`** — the on-disk map is now keyed by `(owning group, name)` rather than by name alone. Keyed by name, a project id repeated under two grouping directories silently overwrote itself: the audit reported one row where two directories existed, and the collision — which is itself a finding, because a memory topic's `name` slug is derived from the directory name — was the one thing that could never surface.
+- **`MEMORY-INDEX-MISSING`** — a `memory/` store with no `MEMORY.md` beside it. The store was invisible to a reader entering the scope and, because the memory checks keyed on the index file, invisible to the audit too: deleting the index also deleted every check over the topics it was derived from. `--fix-index` now creates a missing index as well as repairing a stale one.
+- **`SCOPE-EMPTY`** — every `--scope` given matched no memory store. A scope that matches nothing is indistinguishable in the output from a scope that is clean, so a typo, a renamed directory or a stale fan-out brief made the run print CLEAN over a subtree it never opened. A `--scope` outside `--root` is now an argument error rather than a finding, because every path in the output and every `--fix-index` write is root-relative.
+- **`MEMORY-TOPIC-FILENAME`** — a topic *filename* that is not kebab-case, reported separately from `MEMORY-TOPIC-NAME`. Folded together, the message read as "your `name:` key disagrees with the slug", and the obvious fix was to bend the key to match the broken filename — backwards, since the filename is what every derived index link is built from.
+
+### Changed
+
+- **`POSSIBLE-STATE-IN-INSTRUCTIONS` now sweeps the whole instruction layer**, not only the instruction file: every `SKILL.md`, every skills-directory `README.md` and every agent definition under a `.claude/` or `.github/` root, with the same date and state-word tokens. A skill fires with the same authority as the instruction file and rots at the same speed — a `SKILL.md` that says "currently on v3" misleads every session it triggers in, and the third context artifact was exempt from this check entirely.
+- **A UTF-8 BOM is now named as a BOM**, and the six-line-block recital is no longer appended to the BOM, CRLF and unreadable reasons. A BOM makes line 1 read as `﻿---`, so the parser reported "no opening '---' on line 1" against a file whose first line is visibly `---` in every editor — an unfalsifiable finding decorated with advice to rewrite a block that was already correct.
+- **A future `last_verified` blocks regeneration**, like every other malformed-frontmatter case. It was the one defect that survived a `--fix-index` run and then read as freshly verified for as long as the date said, which is exactly backwards for a store whose purpose is to be trusted about its own age.
+- **The index title escapes `(` and `)` as well as `[` and `]`.** An unescaped `)` closes the link target early, so the rendered index points at a truncated path and the rest of the title leaks out as literal text.
+- **The type vocabulary is written in index order everywhere** — `alert`, `state`, `decision`, `gotcha`, `question`, `watch`, `kill-record`, `evidence`, `log`, `reference` — in `references/context-cascade.md`, `fa-foundation-context-authoring` and the `fa-foundation-optimize-directory-tree` branch brief, which listed it in three different orders while the regenerator sorted by one.
+- **`fa-engineering-deploy-chain` records activation state in a `memory/` topic and regenerates the index**, instead of writing a row into `MEMORY.md`. Since 14.0.0 a hand-added row is discarded by the next regeneration, so the skill was teaching users to write a record that disappears.
+
+### Fixed
+
+- **`MEMORY-VOLATILE-COUNT` no longer fires on a version string.** `\d[\d,]*` matched the "0," in "14.1.0, unpushed" and reported a *version* as a volatile count — a false positive in the one sentence shape the rule most wants written. The pattern now matches a count with thousands separators and nothing else.
+- **Running on a subtree root is documented as supported and guarded.** Point `--root` at one repository inside a larger tree and only that repository is read or written; the registry check is opt-in, and no `--scope` outside the root can be named. The one thing that moves with `--root` is the memory-topic `name` slug, which is derived from the scope's path relative to it.
+
 ## [14.1.0] - 2026-09-11
 
 Hardening for the derived-index machinery shipped in 14.0.0, all of it additive: a regenerator that refuses the cases where it would destroy an index rather than repair one, and four new findings for the ways a store silently stops being derivable.

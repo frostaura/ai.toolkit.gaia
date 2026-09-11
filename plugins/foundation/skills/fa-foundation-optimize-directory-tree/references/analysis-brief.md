@@ -110,7 +110,7 @@ last_verified: YYYY-MM-DD
 
 **`type:` is one of exactly ten values, always singular.** The *file* may be `decisions.md`; the *type* is `decision`. A plural defeats every filter that reads it:
 
-`state` · `decision` · `gotcha` · `question` · `watch` · `kill-record` · `alert` · `log` · `evidence` · `reference`
+`alert` · `state` · `decision` · `gotcha` · `question` · `watch` · `kill-record` · `evidence` · `log` · `reference`
 
 Nothing outside that list is valid. Do not coin an eleventh — if no type fits, the concern is probably not a topic.
 

@@ -31,7 +31,7 @@ Do not use this skill when:
 - the repository's own CI workflow file, read directly — the deploy step's `env:` block and the build steps' `tags:` lines
 - the exact secret names that workflow references, transcribed rather than assumed
 - access to the container registry and the deployment orchestrator, with authority to issue fresh credentials
-- the repository's `MEMORY.md`, which records which secrets are set and whether the deployment target exists
+- the repository's memory store, whose deployment topic records which secrets are set and whether the deployment target exists
 - the branch the deploy job is gated on
 
 ## Owned outputs
@@ -40,7 +40,7 @@ Do not use this skill when:
 - a deployment target that exists, with an identifier that was read rather than guessed
 - an image namespace that matches on both sides of the chain
 - one observed end-to-end run on the gating branch, with the redeploy step — not the build step — as the evidence
-- a `MEMORY.md` entry recording activation state, never secret values
+- a memory topic recording activation state, never secret values, with the index regenerated from it
 
 ## Decision tree
 
@@ -59,7 +59,7 @@ Do not use this skill when:
 4. Set every secret the workflow names, in one pass, from freshly issued values — a full set on this repository, whatever a sibling already has.
 5. Push to the branch the deploy job is gated on and watch the run through to the deploy step.
 6. Confirm the redeploy happened by inspecting the running environment: the served image digest or build timestamp must be newer than the commit you just pushed.
-7. Record activation state in the repository's `MEMORY.md` — which secrets are set, whether the target exists, and the date of the observed redeploy.
+7. Record activation state in the repository's memory store — which secrets are set, whether the target exists, and the date of the observed redeploy. **Write it into that scope's `memory/` topic, then regenerate the index**; `MEMORY.md` is derived from the topic files and a hand-added row is discarded by the next regeneration.
 
 ## The traps, in the order they bite
 
@@ -90,15 +90,16 @@ Do not use this skill when:
 - do not call a repository deploy-ready because its workflow contains a deploy job
 - do not set an identifier secret to a guessed or placeholder value to unblock a pipeline
 - do not paste a secret value into a file, a commit, a log, an issue, or an agent transcript
+- do not hand-write a row into `MEMORY.md`; edit the `memory/` topic and regenerate the index, or the record vanishes on the next run
 - do not treat green build jobs as evidence that anything deployed
 - do not deploy an image built before the last code fix; check the image is newer than `HEAD`
-- do not record secret values in `MEMORY.md` — record only which names are set
+- do not record secret values in the memory store — record only which names are set
 
 ## Handoff and downstream impact
 
 - tell testing which environment is now live and which commit it is serving
 - tell release that deploy-readiness is an observed fact with a date, not an inference from the workflow file
-- tell the next agent, through `MEMORY.md`, which secrets are set and whether the target exists
+- tell the next agent, through the memory topic, which secrets are set and whether the target exists
 - tell architecture when activation exposed a chain the repository's documented deploy story does not match
 
 ## Examples
@@ -114,7 +115,7 @@ Do not use this skill when:
 - the pushed image namespace and the pulled image namespace are the same string
 - one real push to the gating branch was watched through the deploy step
 - the running environment serves an image newer than the commit that triggered it
-- `MEMORY.md` records activation state, and no secret value appears anywhere in the repository
+- a `memory/` topic records activation state and the index was regenerated from it, and no secret value appears anywhere in the repository
 
 ## References
 

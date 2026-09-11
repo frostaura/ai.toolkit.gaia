@@ -47,7 +47,7 @@ Do not use this skill when:
 
 ## Core workflow
 
-1. Run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/context-audit.py --scope <dir> --registry <path to the registry file> --no-git` and read `REGISTRY-PHANTOM`, `REGISTRY-UNLISTED` and `REGISTRY-CONTRADICTION` (registered as retired, yet present on disk). **`--registry` is not optional here:** the check is opt-in, because a repository with no central registry is not in violation of anything — omit the flag and the script prints a clean run over a registry it never opened.
+1. Run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/context-audit.py --scope <dir> --registry <path to the registry file> --no-git` and read `REGISTRY-PHANTOM`, `REGISTRY-UNLISTED`, `REGISTRY-CONTRADICTION` (registered as retired, yet present on disk) and `REGISTRY-DUPLICATE-ID` (the same id under two owners — ids are unique across a tree, and a memory topic's `name` slug is derived from the directory name, so the two stores collide as well). **`--registry` is not optional here:** the check is opt-in, because a repository with no central registry is not in violation of anything — omit the flag and the script prints a clean run over a registry it never opened.
 2. Do the forward pass by hand only to interpret a finding: for every registry entry, confirm its directory exists.
 3. Do the reverse pass the same way: list every directory under every parent that holds scopes, and flag anything unregistered.
 4. Cross-check every *other* registry that names the same scopes — the script reads only the one it anchors on, so this step is manual by nature.

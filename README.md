@@ -9,7 +9,7 @@
 ---
 
 <p align="center">
-  <a href="./CHANGELOG.md"><img src="https://img.shields.io/badge/Version-14.1.0-purple.svg" alt="Version 14.1.0" /></a>
+  <a href="./CHANGELOG.md"><img src="https://img.shields.io/badge/Version-14.2.0-purple.svg" alt="Version 14.2.0" /></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" /></a>
   <a href="https://github.com/features/copilot"><img src="https://img.shields.io/badge/GitHub-Copilot-blue.svg" alt="GitHub Copilot" /></a>
   <a href="https://www.claude.com/product/claude-code"><img src="https://img.shields.io/badge/Claude-Code-orange.svg" alt="Claude Code" /></a>

@@ -8,7 +8,8 @@ judgement, so agent attention is spent on the ones that do.
 Usage:  python3 context-audit.py [--root PATH] [--scope NAME ...]
                                  [--group-dir NAME ...] [--instruction-file NAME]
                                  [--registry PATH] [--max-age DAYS]
-                                 [--no-git] [--all] [--fix-index]
+                                 [--no-git] [--no-remote-probe] [--all]
+                                 [--fix-index]
 
 A *scope* is a directory carrying its own context pair — an instruction file
 (`CLAUDE.md`, or `AGENTS.md` where that is the repository's convention) beside a
@@ -27,7 +28,18 @@ repository with no registry is not in violation of anything.
 
 Naming `--scope` also narrows the memory-store checks and `--fix-index` to
 those directories, so parallel agents can each regenerate their own indexes
-without rewriting a sibling's mid-flight.
+without rewriting a sibling's mid-flight. A `--scope` that matches no memory
+store is reported (`SCOPE-EMPTY`) rather than silently printing CLEAN over a
+subtree nothing opened, and one outside `--root` is an argument error, because
+every path in the output — and every `--fix-index` write — is root-relative.
+
+**Running on a subtree root is safe and supported.** Point `--root` at one
+repository inside a larger tree and only that repository is read or written:
+nothing walks upward, the registry check is opt-in so a subtree does not invent
+phantom rows, and no scope outside the root can be named. The one thing that
+moves with `--root` is the memory-topic `name` slug, which is derived from the
+scope's path relative to the root — so audit a store at the root it was
+authored for rather than renaming its topics to satisfy a narrower run.
 
 Exit code 0 = clean, 1 = findings. Findings are advisory, not policy.
 Spec: ../references/context-cascade.md
@@ -61,6 +73,10 @@ def set_instruction_file(name):
 # with a repeatable `--group-dir`. Hard-coding one of them is how this script
 # used to print CLEAN over every directory a `packages/`-shaped tree holds.
 GROUP_DIRS = ("projects",)
+# The roots under which the *rest* of the instruction layer lives — skills and
+# agent definitions. `.github/` is the mirror some repositories keep for a
+# second tooling ecosystem, and drift lands in the mirror first.
+INSTRUCTION_DIRS = (".claude", ".github")
 SKIP_DIRS = {".git", "node_modules", "worktrees", "bin", "obj", "dist",
              "build", ".venv", "venv", "__pycache__", ".tmp", ".pio",
              "libdeps"}
@@ -347,19 +363,36 @@ def check_registry(root, registry_path, scopes, out, group_dirs=GROUP_DIRS):
     # directory is never a row. Seeding unconditionally would just trade one
     # false-finding class for another: REGISTRY-UNLISTED against `packages`
     # itself, and one against every mid-level scope of a two-level tree.
+    #
+    # Keyed by (owning group, name), never by name alone. A dict keyed on the
+    # bare name lets a project id repeated under two grouping directories
+    # silently shadow itself: the second write overwrites the first, the audit
+    # reports one row where two directories exist, and the collision — which is
+    # itself a finding — is the one thing that can never surface. Ids are
+    # required to be unique across the tree, and the memory-topic `name` slug
+    # depends on it.
     for scope in scopes:
         if not sub_scopes(scope, group_dirs) and scope.name not in group_dirs:
-            on_disk[scope.name] = rel(root, scope)
+            on_disk[(rel(root, scope.parent), scope.name)] = rel(root, scope)
     for scope in scopes:
         for p in sub_scopes(scope, group_dirs):
-            on_disk[p.name] = rel(root, p)
-    for name, where in sorted(on_disk.items()):
+            on_disk[(rel(root, p.parent), p.name)] = rel(root, p)
+    seen = {}
+    for (_owner, name), where in sorted(on_disk.items()):
+        if name in seen:
+            out.append(("REGISTRY-DUPLICATE-ID", where,
+                        f"the same id already exists at {seen[name]} — ids are "
+                        f"unique across the tree, and a memory topic's `name` "
+                        f"slug is derived from it, so the two stores collide too"))
+        seen.setdefault(name, where)
+    for (_owner, name), where in sorted(on_disk.items()):
         if name not in listed:
             out.append(("REGISTRY-UNLISTED", where,
                         "exists on disk, absent from the registry"))
         if name in retired_names:
             out.append(("REGISTRY-CONTRADICTION", name,
                         "listed as retired but the directory exists"))
+    on_disk_names = {name for (_owner, name) in on_disk}
     # Registry entries are recognised by their backticked name appearing in a
     # bullet that also carries a `/` slug or a `—` gloss. Both dotted namespaced
     # IDs (`org.product`) and bare brand slugs (`some-product`) must be caught —
@@ -372,7 +405,7 @@ def check_registry(root, registry_path, scopes, out, group_dirs=GROUP_DIRS):
         if names:
             entries.add(names[0])
     for name in sorted(entries):
-        if name not in on_disk and name not in retired_names:
+        if name not in on_disk_names and name not in retired_names:
             out.append(("REGISTRY-PHANTOM", name,
                         "named in the registry, no directory on disk"))
 
@@ -491,11 +524,17 @@ TOPIC_NAME = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 # count: these go stale inside the session that writes them. Advisory — a
 # count that is itself the hazard ("deletes 21 tracked files") is legitimate,
 # and this regex is deliberately narrow so it never fires on that.
+# `\d[\d,]*` also matched the "0," inside "14.1.0, unpushed" and reported a
+# *version string* as a volatile count — a false positive in the one class of
+# sentence the rule most wants written. `\d+(?:,\d{3})*` is a count with
+# thousands separators and nothing else; the `(?<![\d.])` guard stops a match
+# starting mid-number.
 VOLATILE_COUNT = re.compile(
-    r"\b\d[\d,]*\s+(?:uncommitted|dirty|unpushed|untracked)\b"
-    r"|\b\d[\d,]*\s+commits?\s+(?:ahead|behind)\b"
-    r"|\b(?:ahead|behind)\s+(?:by\s+)?\d[\d,]*\b"
-    r"|\b\d[\d,]*\s+ahead\b|\b\d[\d,]*\s+behind\b", re.I)
+    r"(?<![\d.])\d+(?:,\d{3})*\s+(?:uncommitted|dirty|unpushed|untracked)\b"
+    r"|(?<![\d.])\d+(?:,\d{3})*\s+commits?\s+(?:ahead|behind)\b"
+    r"|\b(?:ahead|behind)\s+(?:by\s+)?\d+(?:,\d{3})*\b"
+    r"|(?<![\d.])\d+(?:,\d{3})*\s+ahead\b"
+    r"|(?<![\d.])\d+(?:,\d{3})*\s+behind\b", re.I)
 H1 = re.compile(r"^#\s+(.+?)\s*$")
 
 
@@ -548,6 +587,15 @@ def read_topics(memdir):
         except OSError:
             problems.append((p, "unreadable"))
             continue
+        if raw.startswith(b"\xef\xbb\xbf"):
+            # Named, not merely reported as a parse failure. A BOM makes line 1
+            # read as `﻿---`, so the frontmatter parser says "no opening
+            # '---' on line 1" against a file whose first line is visibly `---`
+            # in every editor — an unfalsifiable finding until the cause is
+            # spelled out.
+            problems.append((p, "a UTF-8 byte-order mark precedes the opening "
+                                "'---'; save the file without a BOM"))
+            continue
         if b"\r\n" in raw:
             problems.append((p, "CRLF line endings — the store is LF-only, and a "
                                 "CRLF topic can never match the regenerated index"))
@@ -586,10 +634,15 @@ def render_index(root, scope, topics):
                                             t["path"].name))
     lines = [index_heading(root, scope), ""]
     for t in ordered:
-        # Escape, never strip: a heading like `Red — [gaia] do not push` is
-        # about a thing actually called `[gaia]`, and silently deleting the
-        # brackets makes the index title disagree with the topic's own H1.
-        title = (t["title"] or t["path"].stem).replace("[", "\\[").replace("]", "\\]")
+        # Escape, never strip: a heading like `Red — [gaia] do not push (v13)`
+        # is about things actually called `[gaia]` and `(v13)`, and silently
+        # deleting the punctuation makes the index title disagree with the
+        # topic's own H1. Parentheses matter as much as brackets — an unescaped
+        # `)` closes the link target early, so the rendered index points at a
+        # truncated path and the rest of the title leaks out as literal text.
+        title = t["title"] or t["path"].stem
+        for ch in "[]()":
+            title = title.replace(ch, "\\" + ch)
         lines.append(f"- [{title}](memory/{t['path'].name}) — {t['description']}")
     return "\n".join(lines) + "\n"
 
@@ -616,14 +669,32 @@ def check_memory_freshness(root, max_age, out, fix_index=False,
     render_index() produces from those files."""
     today = dt.date.today()
     seen_names = {}
+    stores_seen = 0
     for dirpath, filenames in walk(root):
-        if "MEMORY.md" not in filenames:
+        memdir = dirpath / "memory"
+        # A topic store with no index beside it is a store all the same. Keying
+        # this loop on `MEMORY.md` alone meant deleting the index also deleted
+        # every check over the topics it was derived from.
+        if "MEMORY.md" not in filenames and not memdir.is_dir():
             continue
         if not in_scope(root, dirpath, scopes):
             continue
+        stores_seen += 1
         f = dirpath / "MEMORY.md"
         r = rel(root, f)
-        memdir = dirpath / "memory"
+        if "MEMORY.md" not in filenames:
+            topics, problems, debris = read_topics(memdir)
+            if fix_index and topics and not problems:
+                f.write_text(render_index(root, dirpath, topics), encoding="utf-8")
+                out.append(("MEMORY-INDEX-REWRITTEN", r,
+                            "index was missing; created from the topic files' "
+                            "frontmatter"))
+            else:
+                out.append(("MEMORY-INDEX-MISSING", r,
+                            "memory/ exists with no MEMORY.md beside it — the store is "
+                            "invisible to a reader entering the scope; run --fix-index "
+                            "to derive one (every topic must parse first)"))
+            continue
         try:
             text = f.read_text(encoding="utf-8", errors="replace")
         except OSError:
@@ -654,9 +725,16 @@ def check_memory_freshness(root, max_age, out, fix_index=False,
                         "will not truncate the existing one to a bare heading"))
             continue
         for p, reason in problems:
-            out.append(("MEMORY-FRONTMATTER", rel(root, p),
-                        f"{reason} — the block is exactly six lines: '---', "
-                        f"name, description, type, last_verified, '---'"))
+            # The six-line recital is the fix for a *malformed block*. Appended
+            # to "CRLF line endings" or "a UTF-8 byte-order mark" it contradicts
+            # the finding it decorates — the block is already correct in those
+            # files, and the reader is sent to rewrite something that is not
+            # wrong.
+            hint = ("" if any(k in reason for k in
+                              ("CRLF", "byte-order", "unreadable"))
+                    else " — the block is exactly six lines: '---', name, "
+                         "description, type, last_verified, '---'")
+            out.append(("MEMORY-FRONTMATTER", rel(root, p), reason + hint))
         # 1. Every topic file: known type, name shape, heading, size, freshness.
         slug = scope_slug(root, dirpath, group_dirs)
         for t in topics:
@@ -666,10 +744,24 @@ def check_memory_freshness(root, max_age, out, fix_index=False,
                             f"type: {t['type']!r} is outside the vocabulary "
                             f"({', '.join(TOPIC_TYPE_ORDER)})"))
             expected = f"{slug}-{t['path'].stem}"
-            if not TOPIC_NAME.match(t["name"]) or t["name"] != expected:
+            # Three distinct defects, three distinct messages. Folded together,
+            # a topic called `Gotchas Build.md` reported only that its `name:`
+            # disagreed with a slug derived from that same filename — so the
+            # obvious fix was to rename the key to match the broken filename,
+            # which is backwards. The filename is the thing to repair, and the
+            # derived index link is what breaks if it is not.
+            if not TOPIC_NAME.match(t["path"].stem):
+                out.append(("MEMORY-TOPIC-FILENAME", prel,
+                            f"topic filename {t['path'].name!r} is not kebab-case — "
+                            f"lowercase letters, digits and dashes only, or the "
+                            f"derived index link carries spaces or case"))
+            elif not TOPIC_NAME.match(t["name"]):
+                out.append(("MEMORY-TOPIC-NAME", prel,
+                            f"name: {t['name']!r} is not kebab-case"))
+            elif t["name"] != expected:
                 out.append(("MEMORY-TOPIC-NAME", prel,
                             f"name: {t['name']!r} — expected {expected!r} "
-                            f"(<scope slug>-<file stem>, kebab-case)"))
+                            f"(<scope slug>-<file stem>)"))
             if t["name"] in seen_names:
                 out.append(("MEMORY-TOPIC-NAME", prel,
                             f"name: {t['name']!r} is also used by {seen_names[t['name']]}"))
@@ -719,7 +811,14 @@ def check_memory_freshness(root, max_age, out, fix_index=False,
                 out.append(("STALE-MEMORY", prel, f"last verified {age} days ago"))
             if t["verified"] > today:
                 out.append(("MEMORY-FRONTMATTER", prel,
-                            f"last_verified {t['verified']} is in the future"))
+                            f"last_verified {t['verified']} is in the future — "
+                            f"nothing was verified tomorrow; correct the stamp"))
+                # Blocks regeneration with every other malformed-frontmatter
+                # case. A future stamp is the one defect that silently survives
+                # a --fix-index run and then reads as freshly verified for as
+                # long as the date says, which is exactly backwards for a store
+                # whose whole purpose is to be trusted about its own age.
+                problems.append((t["path"], "future last_verified"))
             for m in VOLATILE_COUNT.finditer(
                     strip_code(t["body"]) + "\n" + t["description"]):
                 out.append(("MEMORY-VOLATILE-COUNT", prel,
@@ -756,6 +855,15 @@ def check_memory_freshness(root, max_age, out, fix_index=False,
                 out.append(("MEMORY-INDEX-STALE", r,
                             f"index differs from what the topic files derive to "
                             f"(first difference at line {first + 1}) — {why}"))
+    if scopes and stores_seen == 0:
+        # A --scope that matches nothing is indistinguishable, in the output,
+        # from a scope that is perfectly clean: the run prints CLEAN over a
+        # subtree it never opened. A typo, a renamed directory or a stale
+        # fan-out brief all land here.
+        out.append(("SCOPE-EMPTY", ", ".join(rel(root, sc) for sc in scopes),
+                    "no memory store lies inside the given --scope — the run "
+                    "reported on nothing; check the path before trusting a "
+                    "CLEAN result"))
 
 
 MEMORY_REF = re.compile(r"\[[^\]]*\]\([^)]*MEMORY\.md[^)]*\)|\bMEMORY\.md\b")
@@ -772,26 +880,51 @@ def check_split(root, out):
     mention of that filename. One tree's root instruction file carried exactly
     that for a month. So: the state-word branch is exempted, the date branch
     never is.
+
+    **The instruction layer is not just the instruction file.** A skill and an
+    agent definition fire with the same authority and rot at the same speed — a
+    `SKILL.md` that says "currently on v3" misleads every session it triggers
+    in, and until this check walked them the whole third artifact was exempt.
+    So the scan covers the instruction file, every `SKILL.md`, every skills
+    directory `README.md` index, and every agent definition under a skills /
+    agents root. Vendored trees are excluded by `walk()` unless `--all`.
     """
     for dirpath, filenames in walk(root):
+        targets = []
         f = instruction_file(dirpath, filenames)
-        if f is None:
-            continue
-        try:
-            lines = f.read_text(encoding="utf-8", errors="replace").splitlines()
-        except OSError:
-            continue
-        for i, line in enumerate(lines, 1):
-            if line.lstrip().startswith(("|", ">")):
+        if f is not None:
+            targets.append(f)
+        # `.claude/…` (and the `.github/` mirror) at any of the three depths a
+        # skill or agent definition can sit at: the root itself, `skills/` and
+        # `agents/` beneath it, and an individual skill directory below that.
+        if dirpath.name in INSTRUCTION_DIRS \
+                or dirpath.parent.name in INSTRUCTION_DIRS \
+                or dirpath.parent.parent.name in INSTRUCTION_DIRS:
+            targets += [dirpath / fn for fn in filenames
+                        if fn in ("SKILL.md", "README.md")
+                        or (dirpath.name == "agents" and fn.endswith(".md"))]
+        for target in targets:
+            try:
+                lines = target.read_text(encoding="utf-8",
+                                         errors="replace").splitlines()
+            except OSError:
                 continue
-            bare = re.sub(r"`[^`]*`", "", line)
-            # Strip the routing reference itself, not the line that carries it.
-            bare = MEMORY_REF.sub("", bare)
-            hit = DATE_TOKEN.search(bare) or \
-                ("MEMORY.md" not in line and STATE_TOKENS.search(bare))
-            if hit:
-                out.append(("POSSIBLE-STATE-IN-INSTRUCTIONS",
-                            f"{rel(root, f)}:{i}", line.strip()[:100]))
+            _scan_instruction_lines(root, target, lines, out)
+
+
+def _scan_instruction_lines(root, f, lines, out):
+    """The date / state-word scan itself, over one instruction-layer file."""
+    for i, line in enumerate(lines, 1):
+        if line.lstrip().startswith(("|", ">")):
+            continue
+        bare = re.sub(r"`[^`]*`", "", line)
+        # Strip the routing reference itself, not the line that carries it.
+        bare = MEMORY_REF.sub("", bare)
+        hit = DATE_TOKEN.search(bare) or \
+            ("MEMORY.md" not in line and STATE_TOKENS.search(bare))
+        if hit:
+            out.append(("POSSIBLE-STATE-IN-INSTRUCTIONS",
+                        f"{rel(root, f)}:{i}", line.strip()[:100]))
 
 
 def check_cloud_dupes(root, out):
@@ -1076,16 +1209,92 @@ def _repos(root, scopes, group_dirs=GROUP_DIRS):
             yield p
 
 
+def _probe_remote(repo, remote, url, timeout=20):
+    """`git ls-remote --exit-code <remote> HEAD`, classified.
+
+    Returns (code, detail) or None when the remote answered. A configured
+    remote is not a repository: the URL is a local string that nothing
+    validates, and repositories have been recorded as "ahead-only, safe to
+    push" against remotes that did not exist. `ls-remote` is the only
+    read-only call that proves the far end is there.
+
+    The classification matters more than the probe. "Refused this machine's
+    credentials" and "this repository does not exist" are the same non-zero
+    exit, and conflating them either invents a lost repository or hides one.
+    """
+    import subprocess
+    try:
+        r = subprocess.run(["git", "-C", str(repo), "ls-remote", "--exit-code",
+                            remote, "HEAD"], capture_output=True, text=True,
+                           timeout=timeout)
+    except (subprocess.TimeoutExpired, OSError):
+        return ("GIT-REMOTE-UNREACHABLE",
+                f"remote {remote} did not answer within {timeout} s — network or "
+                f"auth; re-run before trusting any push claim")
+    if r.returncode == 0:
+        return None
+    err = (r.stderr or "").lower()
+    if "permission denied" in err or "publickey" in err or "authentication" in err:
+        # An SSH remote refused for want of a key says nothing about whether
+        # the repository exists. GitHub answers the HTTPS twin of the same URL
+        # with whatever credentials this machine has, so ask that before
+        # concluding anything.
+        m = re.match(r"git@github\.com:([^/]+/[^/]+?)(?:\.git)?$", url or "")
+        twin = f"https://github.com/{m.group(1)}.git" if m else None
+        twin_err = ""
+        if twin:
+            try:
+                t = subprocess.run(["git", "-C", str(repo), "ls-remote",
+                                    "--exit-code", twin, "HEAD"],
+                                   capture_output=True, text=True, timeout=timeout)
+                twin_err = (t.stderr or "").lower() if t.returncode else "ok"
+            except (subprocess.TimeoutExpired, OSError):
+                twin_err = ""
+        if twin_err == "ok":
+            return ("GIT-REMOTE-UNREACHABLE",
+                    f"remote {remote} ({url}) refused this machine's SSH key, but the "
+                    f"repository exists — {twin} answers; switch the remote to HTTPS "
+                    f"or add a key")
+        if "not found" in twin_err or "does not appear" in twin_err:
+            return ("GIT-REMOTE-MISSING",
+                    f"remote {remote} ({url}) refused this machine's SSH key AND its "
+                    f"HTTPS twin {twin} answers 'repository not found' for this "
+                    f"machine's credentials — the repository does not exist (or is "
+                    f"private and unauthorised); nowhere to push from here")
+        return ("GIT-REMOTE-UNREACHABLE",
+                f"remote {remote} ({url}) refused this machine's credentials — no "
+                f"usable SSH key or token here; whether the repository exists is "
+                f"unknown from this host")
+    if "could not resolve" in err or "could not read" in err \
+            or "connection" in err or "timed out" in err:
+        return ("GIT-REMOTE-UNREACHABLE",
+                f"remote {remote} ({url}) could not be reached — network or host "
+                f"problem, not evidence about the repository")
+    if "not found" in err or "does not appear" in err:
+        return ("GIT-REMOTE-MISSING",
+                f"remote {remote} ({url}) answered 'repository not found' for this "
+                f"machine's credentials — deleted, never created, or private and "
+                f"unauthorised here. Either way the tracking ref is a dead local ref "
+                f"and this repository has nowhere to push from this host")
+    last = err.strip().splitlines()[-1][:80] if err.strip() else "no output"
+    return ("GIT-REMOTE-UNREACHABLE",
+            f"remote {remote} ({url}) could not be read: {last}")
+
+
 def check_git_health(root, scopes, out, destructive_threshold=8,
-                     group_dirs=GROUP_DIRS):
+                     group_dirs=GROUP_DIRS, probe_remotes=True):
     """Repo-durability checks. Every one of these has fired for real.
 
     LOCK-DEBRIS      stale .git/*.lock silently blocks every commit
+    GIT-REMOTE-*     a configured remote that is missing or unanswerable
     GIT-DIVERGED     local branch has commits the remote does not AND vice versa
                      — a plain push is rejected and --force destroys the remote
     GIT-UNPUSHED     work that exists on exactly one machine
     GIT-DESTRUCTIVE  an unpushed commit that deletes many tracked files
     GIT-DIRTY        uncommitted working tree
+
+    `probe_remotes=False` (`--no-remote-probe`) keeps everything but the network
+    call, for offline runs and for CI that must not depend on reachability.
     """
     for repo in _repos(root, scopes, group_dirs):
         r = rel(root, repo)
@@ -1098,8 +1307,13 @@ def check_git_health(root, scopes, out, destructive_threshold=8,
         if dirty:
             out.append(("GIT-DIRTY", r, f"{len(dirty.splitlines())} uncommitted path(s)"))
         upstream = _git(repo, "rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}")
+        remotes = (_git(repo, "remote") or "").split()
+        for remote in (remotes if probe_remotes else []):
+            finding = _probe_remote(repo, remote, _git(repo, "remote", "get-url", remote))
+            if finding:
+                out.append((finding[0], r, finding[1]))
         if not upstream:
-            if _git(repo, "remote"):
+            if remotes:
                 out.append(("GIT-NO-UPSTREAM", r,
                             "remote configured but the branch tracks nothing — never pushed"))
             else:
@@ -1152,6 +1366,11 @@ def main():
     ap.add_argument("--max-age", type=int, default=60)
     ap.add_argument("--no-git", action="store_true",
                     help="skip the repo-durability checks (git subprocess calls)")
+    ap.add_argument("--no-remote-probe", action="store_true",
+                    help="skip the `git ls-remote` reachability probe, which is the "
+                         "only network call this script makes, while keeping every "
+                         "other repo-durability check. Use it offline, or in CI that "
+                         "must not depend on a remote answering")
     ap.add_argument("--all", action="store_true",
                     help="also check vendored/imported trees "
                          "(" + ", ".join(sorted(VENDORED_DIRS)) + ")")
@@ -1172,6 +1391,13 @@ def main():
 
     out = []
     scopes = resolve_scopes(root, args.scope, out, args.all)
+    # A scope outside the root is a caller error, not a finding: every path in
+    # the output is rendered relative to the root, and `--fix-index` would
+    # rewrite an index in a tree this run never claimed to be auditing. Fail
+    # loudly at the argument, before anything is written.
+    for sc in scopes:
+        if sc != root and root not in sc.parents:
+            ap.error(f"--scope {sc} is not inside the root {root}")
     check_pairs(root, scopes, out, group_dirs)
     if args.registry:
         check_registry(root, args.registry, scopes, out, group_dirs)
@@ -1189,7 +1415,8 @@ def main():
     check_scratch(root, out, args.all)
     check_stray_artifacts(root, scopes, out, args.all, group_dirs)
     if not args.no_git:
-        check_git_health(root, scopes, out, group_dirs=group_dirs)
+        check_git_health(root, scopes, out, group_dirs=group_dirs,
+                         probe_remotes=not args.no_remote_probe)
         check_tmp_tracked(root, scopes, out, group_dirs)
 
     if not out:

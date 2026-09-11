@@ -1,7 +1,7 @@
 {
     "name": "foundation",
     "description": "Gaia's context layer: the instruction-and-memory cascade that lets an agent understand a whole tree rather than the one file it was pointed at. Provides the whole-tree entry point that establishes, re-derives and sweeps that layer across an existing directory tree, plus single-scope context authoring, memory-store maintenance, registry reconciliation, repository-durability checks, session close-out, and the house rules for authoring new skills, agents and plans — together with the context, repo-durability and skills auditor agents. Memory, plans and lessons are files in the consuming repository — they version with the code and there is no hosted store to sync. Required by the engineering and product plugins.",
-    "version": "14.1.0",
+    "version": "14.2.0",
     "author": {
         "name": "FrostAura Technologies",
         "email": "support-plugins-foundation@frostaura.net"

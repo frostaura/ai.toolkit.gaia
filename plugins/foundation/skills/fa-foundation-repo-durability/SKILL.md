@@ -68,6 +68,8 @@ Each probe is a command, the question it answers, and what the bad answer looks 
 
 **5. Reflog, when a branch looks wrong — `git reflog show <branch>`.** Answers: how did the branch pointer get here? Bad answer: `branch: Reset to <sha>` or `reset: moving to` in recent history — a label was moved instead of merged, which is the usual cause of an unexplained divergence.
 
+**5b. The remote actually exists — `git ls-remote --exit-code <remote> HEAD`.** Answers: is there anywhere to push at all? A configured remote is a local string that nothing validates, so a tracking ref, an ahead-count and a clean `git remote -v` are all consistent with a remote that was deleted, renamed or never created. Bad answer: `repository not found` — the tracking ref is a dead local ref and the work is as undurable as if there were no remote. Classify before concluding: a credential refusal is a fact about *this host*, not about the repository, and an SSH GitHub remote that refuses this machine's key should be probed again over its HTTPS twin before anything is recorded. `context-audit.py` runs this as `GIT-REMOTE-MISSING` / `GIT-REMOTE-UNREACHABLE`, and `--no-remote-probe` skips it when offline.
+
 **6. Remote visibility — `git remote -v`, plus the scope's own record of public or private.** Answers: who can read what a push publishes? Bad answer: a remote whose visibility nobody recorded, or a public remote about to receive work that was meant to stay unreleased.
 
 ### Why `--force` is always wrong on a diverged branch
