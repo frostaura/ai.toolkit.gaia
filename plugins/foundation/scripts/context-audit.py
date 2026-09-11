@@ -949,7 +949,7 @@ def check_split(root, out):
 def _scan_instruction_lines(root, f, lines, out):
     """The date / state-word scan itself, over one instruction-layer file.
 
-    Both exemptions work on the *residue*, never by skipping a line. Testing
+    The exemptions work on the *residue*, never by skipping a line. Testing
     `"MEMORY.md" not in line` exempted every state word on any line that
     mentioned that filename — including a line that mentioned it in passing and
     then asserted a status, which is the exact defect the check exists to
@@ -961,7 +961,12 @@ def _scan_instruction_lines(root, f, lines, out):
     with no quote stripping at all, because a date is state under any reading.
     """
     for i, line in enumerate(lines, 1):
-        if line.lstrip().startswith(("|", ">")):
+        # Table rows and blockquotes are scanned like any other line — a status
+        # parked in a table cell or quoted into a callout is still a status, and
+        # skipping those two shapes exempted the places policy text most often
+        # puts a date. Only a table's separator row is skipped, because it is
+        # punctuation rather than prose.
+        if re.match(r"^\s*\|[\s:|-]+\|\s*$", line):
             continue
         bare = re.sub(r"`[^`]*`", "", line)
         # Strip the routing reference itself, not the line that carries it.
@@ -1015,8 +1020,12 @@ def check_upkeep(root, out):
                             f"the Upkeep section names no regeneration command — a "
                             f"scope with a memory/ store must give "
                             f"`--fix-index --scope {own}`"))
-            elif not re.search(r"--fix-index\s+--scope\s+" + re.escape(own)
-                               + r"(?![\w./-])", section):
+            # `--scope` is matched anywhere in the section, not only immediately
+            # after `--fix-index`: `--scope X --fix-index` is the same command,
+            # and a trailing slash on the path is the same scope. Requiring one
+            # spelling reported a correctly scoped section as unscoped.
+            elif not re.search(r"--scope\s+" + re.escape(own) + r"/?(?![\w.-])",
+                               section):
                 out.append(("UPKEEP-UNSCOPED", rel(root, f),
                             f"the Upkeep section's `--fix-index` is not scoped to "
                             f"this directory — it must read "

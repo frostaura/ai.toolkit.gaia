@@ -12,7 +12,7 @@
         {
             "name": "foundation",
             "description": "Gaia's context layer: the instruction-and-memory cascade that lets an agent understand a whole tree rather than the one file it was pointed at. Provides the whole-tree entry point that establishes, re-derives and sweeps that layer across an existing directory tree, plus single-scope context authoring, memory-store maintenance, registry reconciliation, repository-durability checks, session close-out, and the house rules for authoring new skills, agents and plans — together with the context, repo-durability and skills auditor agents. Memory, plans and lessons are files in the consuming repository — they version with the code and there is no hosted store to sync. Required by the engineering and product plugins.",
-            "version": "14.3.0",
+            "version": "14.3.1",
             "category": "foundational-ai-contribution-toolset",
             "tags": [
                 "foundation",
@@ -31,7 +31,7 @@
         {
             "name": "engineering",
             "description": "Gaia's spec-driven software delivery lifecycle: intake, architecture, planning, implementation, testing, and release. Provides stage playbooks (architecture documentation, default tech stack, execution planning, engineering delivery, UI engineering, formal testing, and end-to-end process orchestration) plus the specialist agents (intake coordinator, solutions architect, implementation planner, software engineer, tester, release engineer) that take a goal from request to validated, released software through enforced QA and release gates.",
-            "version": "14.3.0",
+            "version": "14.3.1",
             "category": "software-delivery-toolset",
             "tags": [
                 "engineering",
@@ -50,7 +50,7 @@
         {
             "name": "product",
             "description": "A money-gated lifecycle for taking consumer one-off / in-app-purchase products from idea to validated bet through launch and live-ops. Provides 10 stage playbooks (discovery, ideation, monetization design, validation, vertical-slice/MVP, production hardening, compliance, soft-launch, GTM launch, live-ops, and portfolio retrospective) plus a shared money-gate and unit-economics discipline, orchestrated by a coordinator and specialist, reviewer, and synthesizer agents that fan out, adversarially review, and synthesize each stage against net-of-fee economics.",
-            "version": "14.3.0",
+            "version": "14.3.1",
             "category": "product-discovery-toolset",
             "tags": [
                 "product",

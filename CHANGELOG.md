@@ -4,6 +4,15 @@ All notable changes to the Gaia plugins are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions are lockstep across all plugins. Plugin sources track `ref: main`; the `version` field in each `plugin.json` is the update trigger, and changes reach users when pushed to GitHub.
 
+## [14.3.1] - 2026-09-11
+
+Two checks that were reporting on the wrong text. No new finding codes, no contract change.
+
+### Fixed
+
+- **The instruction-layer scan no longer skips table rows and blockquotes.** Any line starting `|` or `>` was dropped before the date and state-word tests — which exempted exactly the two shapes policy prose most often puts a status in: a rule table whose cells carry "shipped 2026-01-02", and a callout quoting a current condition. Only a table's *separator* row is skipped now, because it is punctuation rather than prose. Expect this to surface findings in files that were previously reported clean; they were never scanned.
+- **`UPKEEP-UNSCOPED` accepts every spelling of the same command.** It required `--fix-index` immediately followed by `--scope <own>` with no trailing slash, so a section reading `--scope Labs/projects --fix-index`, or `--scope Labs/projects/`, was reported as unscoped while being correctly scoped. `--scope <own>` is now matched anywhere in the Upkeep section, with an optional trailing slash.
+
 ## [14.3.0] - 2026-09-11
 
 A fourth pass over the audit, and every item in it is a check that existed but could not fire, or fired on the wrong text. Nothing here is a new idea; all of it is the previous three releases actually working.
