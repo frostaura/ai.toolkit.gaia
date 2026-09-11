@@ -52,18 +52,18 @@ Do not use this skill when:
 
 ## Core workflow
 
-1. Run the mechanical pass first: `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/context-audit.py --scope <dir> --scope <dir> …`. It takes seconds and removes the entire class of findings that need no judgement.
+1. Run the mechanical pass first: `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/context-audit.py --scope <dir> --scope <dir> …`. It takes seconds and removes the entire class of findings that need no judgement. `MEMORY-INDEX-STALE` is the cheapest of them: every `MEMORY.md` is derived from its `memory/` topic files, so the fix is `--fix-index`, never an edit to the index.
 2. Read the previous pass's record and note its date. This sweep verifies those claims; it does not re-derive them from scratch.
 3. Partition the repository into disjoint scopes and fan out one agent per scope, all launched concurrently, under the rules below.
 4. While the branches run, resolve the judgement-required findings yourself, with whole files open.
-5. Wait for the fan-out to fully drain, then re-run the script — a mid-flight run reports the sweep's own noise.
+5. Wait for the fan-out to fully drain, then re-run the script with `--fix-index` so every index the branches' topic edits invalidated is regenerated in one place — a mid-flight run reports the sweep's own noise, and a mid-flight `--fix-index` regenerates indexes the branches are still editing.
 6. Reconcile the parent scope last, once, from the merged branch reports, pruning as you go.
 7. Empty the sweep's scratch and confirm every branch emptied its own; the report goes to whoever asked for it, never into the repository.
 
 ## Fan-out rules for a disjoint-scope sweep
 
 - **The script is a locator, not an assessor.** It hands you a file and a line number; what that line *should* say is decided with the whole file open. `POSSIBLE-STATE-IN-INSTRUCTIONS` is the sharp case — a locked rule ("releases are cut from `main`, always") and a status line ("currently on v3, dormant since March") are the same shape to a regex. **A pass that drives that class to zero has almost certainly deleted binding rules.** The count going down is not the goal; the count is not a score at all. Expect to close a healthy sweep with findings deliberately left standing, each with its reason recorded so the next sweep does not re-litigate it.
-- **One agent per scope, and never two agents inside the same subtree.** Two agents editing one `MEMORY.md` overwrite each other: last writer wins, the other's findings vanish, and nothing in either report says so. Draw the boundaries first, write them down, and confirm every pair is disjoint before launching. Batch several small or empty scopes into a single agent rather than splitting one busy scope across two.
+- **One agent per scope, and never two agents inside the same subtree.** Two agents editing one scope's topic files overwrite each other: last writer wins, the other's findings vanish, and nothing in either report says so. Draw the boundaries first, write them down, and confirm every pair is disjoint before launching. Batch several small or empty scopes into a single agent rather than splitting one busy scope across two.
 - **Launch them concurrently.** A fan-out run sequentially costs what doing it yourself costs and returns none of the advantage; the parallelism *is* the reason to fan out at all.
 - **Brief the two things the standing definitions deliberately leave open**: state that the job is *verification, not rewrite*, and name the previous pass's date. Without both, agents rewrite files that were already correct and you cannot tell a real change from churn.
 - **Never hand agents a git posture that contradicts their own definitions.** If the definitions say auditors commit context edits locally, never push, and never rewrite history, then a blanket "no git write commands" line in the brief splits the sweep — some branches commit, others leave the human owner a dirty tree to untangle by hand.
@@ -93,7 +93,7 @@ Do not use this skill when:
 ## Handoff and downstream impact
 
 - give the human owner the sweep report in the reply, plus the findings deliberately left standing and why
-- give scope maintainers the specific claims their `MEMORY.md` must now carry or drop
+- give scope maintainers the specific claims their memory topics must now carry or drop
 - give skill maintainers the list of skills the sweep found stale, for `fa-foundation-create-skill`
 - give agent maintainers any brief-versus-definition contradiction the sweep exposed, for `fa-foundation-create-agent`
 

@@ -26,14 +26,14 @@ Do not use this skill when:
 ## Required inputs
 
 - the list of scopes whose reality this session changed
-- each of those scopes' instruction file, `MEMORY.md` index and every `memory/` topic file, read end to end
+- each of those scopes' instruction file and every `memory/` topic file, read end to end
 - every decision made this session, and the reason behind each one
 - the full contents of the session's `.tmp/`
 - an honest split between what you actually inspected and what you merely edited
 
 ## Owned outputs
 
-- updated `memory/` topic files and re-cut index hooks at every touched scope
+- updated `memory/` topic files at every touched scope, with each `MEMORY.md` regenerated from them
 - instruction-file edits, but only where a rule changed
 - local skills added, fixed or deleted where the *method* changed
 - an empty `.tmp/`, with everything durable promoted first
@@ -52,12 +52,12 @@ Do not use this skill when:
 ## Core workflow
 
 1. Open every context file in each touched scope end to end — index, topics, instruction file. **Do not search them.** A close-out decides what to delete and what to merge as much as what to add, and neither is visible in a grep hit.
-2. Update the memory store first; this is the step that is never optional. Rewrite the `state` topic if reality moved and re-cut its index hook so the new signal shows in the index. Record every decision in the `decision` topic **with its rationale** — a decision stored without its *why* gets reversed by the next agent, who sees only its cost and none of the reasoning that paid for it. Anything that bit you goes in a `gotcha` topic; a red do-not-do-this gets an `alert` topic near the top of the index.
-3. Prune. Resolved questions become decisions or disappear; dead concerns lose their topic file *and* their index line; topic files stay under ~60 lines. Memory is not a changelog and never grows without bound.
+2. Update the memory store first; this is the step that is never optional. Rewrite the `state` topic if reality moved, and re-cut its `description:` — that line *is* the index hook, capped at 240 characters, so the new signal shows in the index once it is regenerated. Record every decision in the `decision` topic **with its rationale** — a decision stored without its *why* gets reversed by the next agent, who sees only its cost and none of the reasoning that paid for it. Anything that bit you goes in a `gotcha` topic; a red do-not-do-this gets an `alert` topic near the top of the index.
+3. Prune. Resolved questions become decisions or disappear; dead concerns lose their topic file, and the index regeneration drops the line; topic files stay under **60 lines and 6,000 characters**. Memory is not a changelog and never grows without bound.
 4. Restamp `last_verified` only on topics whose claims you actually inspected this session. Editing a file is not verifying it, and the two are indistinguishable from the outside once the stamp moves.
 5. Edit the instruction file only if a rule changed. If you found yourself explaining the same non-obvious rule twice this session, that rule belongs there.
 6. Put three questions to the local skills: did one describe a workflow you just discovered is wrong (fix or delete it — a stale skill fires with authority and misleads), did you hit a repeatable procedural trap (that is a skill, not a `gotcha`), did you repeat a multi-step workflow nothing covers (only then add one).
-7. Empty `.tmp/` per the section below, run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/context-audit.py` over the touched scopes, then make the edits durable: **commit** the context edits inside a repository, separately from any product change, with a message naming them as context maintenance. **Never push** — that is the human owner's call in every case. And never `reset`, `rebase`, `checkout` a tracked path, `clean`, `stash` or `restore` to tidy a dirty tree: each of those silently destroys uncommitted work that exists on exactly one disk with no reflog entry to recover it from. Scopes outside a repository have no undo at all — prefer surgical edits to rewrites there.
+7. Regenerate every touched index — `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/context-audit.py --fix-index` — because `MEMORY.md` is derived from the topic files and is never hand-written; a hand-cut index line is reported as `MEMORY-INDEX-STALE`. Empty `.tmp/` per the section below, re-run the same script without `--fix-index` over the touched scopes, then make the edits durable: **commit** the context edits inside a repository, separately from any product change, with a message naming them as context maintenance. **Never push** — that is the human owner's call in every case. And never `reset`, `rebase`, `checkout` a tracked path, `clean`, `stash` or `restore` to tidy a dirty tree: each of those silently destroys uncommitted work that exists on exactly one disk with no reflog entry to recover it from. Scopes outside a repository have no undo at all — prefer surgical edits to rewrites there.
 
 ## Scratch discipline and the session report
 
@@ -86,7 +86,7 @@ Two scratch rules that only bite later: `.tmp/` belongs in every repository's `.
 - do not restamp `last_verified` for a topic you edited but did not verify
 - do not record a status you inferred rather than inspected
 - do not describe a directory's file inventory from inside a file you are adding to that directory — the count is wrong before you save it
-- do not grow a `MEMORY.md` by appending; rewrite the section instead
+- do not edit a `MEMORY.md` by hand at all, least of all by appending to it; edit the topic files and regenerate
 - do not write the session report into the repository, least of all as a dated file in a reference directory
 - do not push, and do not reset, rebase, checkout a tracked path, clean, stash or restore to tidy up
 - do not decide a file needs no change without having read it
@@ -109,7 +109,7 @@ Two scratch rules that only bite later: `.tmp/` belongs in every repository's `.
 ## Completion checklist
 
 - every touched scope's memory store reflects reality, and every decision carries its rationale
-- index hooks re-cut wherever the signal moved; dead topics and their index lines deleted
+- every `description:` re-cut wherever the signal moved, dead topics deleted, and every touched index regenerated rather than hand-edited
 - `last_verified` restamped only where inspection actually happened
 - the instruction file changed only if a rule changed
 - local skills fixed, deleted or added wherever the method moved

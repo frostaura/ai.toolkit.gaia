@@ -8,7 +8,7 @@ Use this reference when deciding which foundation skill or agent owns a change, 
 
 | Skill | Primary ownership |
 |---|---|
-| `fa-foundation-memory-maintenance` | The memory store — `MEMORY.md` indexes, `memory/` topic files, frontmatter shape, `last_verified` stamps, pruning and promotion |
+| `fa-foundation-memory-maintenance` | The memory store — `memory/` topic files, their frontmatter shape and `last_verified` stamps, pruning and promotion, and regenerating the derived `MEMORY.md` index from them |
 | `fa-foundation-context-authoring` | Instruction files (`CLAUDE.md` / `AGENTS.md`) at one scope: the cascade delta, the state-vs-instruction split, upkeep sections |
 | `fa-foundation-create-skill` | `SKILL.md` definitions — naming, description quality, scope sections, references, reuse-versus-new decisions |
 | `fa-foundation-create-agent` | Agent definition files — role contracts, tool scopes, delegation rules, overlap control |

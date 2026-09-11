@@ -78,31 +78,35 @@ These govern every claim you write, in every mode. Slop here does not look like 
 
 You write memory files in almost every mode, and **this brief is the only place you will ever see their format.** You do not read the calling skill, and a link from here into the plugin's own reference layer does not resolve from inside the tree you are working in — so the contract is stated below in full and verbatim. It is exact rather than stylistic: a mechanical check enforces every constant here, and a file that misses one is a finding against the layer this run just built.
 
-**`MEMORY.md` is a pure index and carries no prose of its own.** Its entire content is one `# ` heading plus one hook line per topic file in the `memory/` directory beside it. A sentence, a paragraph or a section anywhere in the index is index drift:
+**`MEMORY.md` is a pure index, and it is *derived* from the topic files — you never write it by hand.** Its entire content is one `# ` heading plus one line per topic file in the `memory/` directory beside it, and every part of every line is computed: the heading from the scope's path, each title from the topic's `# H1`, each hook from the topic's `description:`, the order from the topic's `type:`. Write the topic files, then have the caller regenerate the index; a hand-written index is reported as `MEMORY-INDEX-STALE` the moment it differs by a byte.
 
 ```markdown
-# MEMORY — <scope name>
+# MEMORY — <scope path relative to the tree root>
 
-- [Current state](memory/state.md) — one-line hook that carries the actual signal
-- [Live decisions](memory/decisions.md) — the decisions an agent must not relitigate
+- [Red — there is no safe blanket push here](memory/alerts.md) — the description of alerts.md, verbatim
+- [Current state](memory/state.md) — the description of state.md, verbatim
 ```
 
-Each line is exactly `- [Label](memory/<file>.md) — hook`, with an em dash. **The hook is the signal, not a label:** "deploy decided, unpushed range still local, kill clock void once live" is a hook; "notes about deployment" is a label. A reader who stops at the index must still leave informed. Index links and topic files must agree in **both** directions — an indexed file that does not exist and an existing file that is not indexed are both defects.
+Entries are ordered by type — `alert`, `state`, `decision`, `gotcha`, `question`, `watch`, `kill-record`, `evidence`, `log`, `reference` — with a type's canonical file (`decisions.md`) before its split siblings (`decisions-sync.md`), then alphabetically. **The hook is the signal, not a label:** "deploy decided, unpushed range still local, kill clock void once live" is a hook; "notes about deployment" is a label. A reader who stops at the index must still leave informed — so that sentence belongs in the topic's `description:`, which is the only place it can be written.
 
 **Every topic file opens with exactly this six-line frontmatter block** — the four keys, in this order, with **no extras** — so that `head -7` of any topic returns the complete relevance signal plus the first body line:
 
 ```markdown
 ---
-name: <scope>-<topic>
-description: "one line — enough to judge relevance without opening the body"
+name: <scope slug>-<file stem>
+description: "one line, at most 240 characters — the index hook"
 type: state
 last_verified: YYYY-MM-DD
 ---
 
-# <Topic heading>
+# <Topic heading — becomes the index title>
 ```
 
-`name` is globally unique kebab-case. `description` is one line, and no key may be empty. `last_verified` must parse as a real `YYYY-MM-DD` date. A fifth key, a reordered key, or anything other than the closing `---` on line six fails the check.
+`name` is exactly `<scope slug>-<file stem>`, kebab-case: the scope's own directory name lowercased with dots, underscores and spaces as dashes, a *grouping* directory prefixed by its parent's slug, the tree root `root`. So `packages/ingest/memory/gotchas.md` is `ingest-gotchas`. Anything else is `MEMORY-TOPIC-NAME`.
+
+`description` is one line and **at most 240 characters** — it *is* the index hook, so it carries the signal and never summarises the body; past the cap the topic is two topics, or the description is narrating (`MEMORY-DESCRIPTION-LONG`). `last_verified` must parse as a real `YYYY-MM-DD` date and must not be in the future. A fifth key, a reordered key, or anything other than the closing `---` on line six fails the check.
+
+**The first body line is a `# Heading`** — the index title is taken from it (`MEMORY-TOPIC-NO-HEADING`) — and an `alert`'s heading begins `Red — `, so the hazard reads as one at a glance (`MEMORY-ALERT-HEADING`).
 
 **`type:` is one of exactly ten values, always singular.** The *file* may be `decisions.md`; the *type* is `decision`. A plural defeats every filter that reads it:
 
@@ -110,9 +114,9 @@ last_verified: YYYY-MM-DD
 
 Nothing outside that list is valid. Do not coin an eleventh — if no type fits, the concern is probably not a topic.
 
-**Keep a topic file under ~60 lines.** Past that it is almost always two topics wearing one filename. But **split on the real seam, never at the line count**: a topic split to satisfy the cap produces two halves nobody can name, and each half's index hook degrades into a label. A long file with genuinely one concern is one topic that needs *pruning*, not splitting. Where you do split, each half states its own remit and names its sibling, from both sides.
+**Keep a topic file under 60 lines *and* 6,000 characters of body.** Past either it is almost always two topics wearing one filename — the line cap alone was met by files of paragraph-long lines, which is what the character cap closes. But **split on the real seam, never at the line count**: a topic split to satisfy the cap produces two halves nobody can name, and each half's index hook degrades into a label. A long file with genuinely one concern is one topic that needs *pruning*, not splitting. Where you do split, each half states its own remit and names its sibling, from both sides.
 
-**Write protocol.** New concern → a new topic file plus one index line. Changed concern → edit the topic, restamp its `last_verified`, and re-cut the index hook if the signal moved. Dead concern → delete the file *and* its index line. Relative links inside a topic file resolve from `memory/`, one level below the scope — prefix them `../`.
+**Write protocol.** New concern → a new topic file. Changed concern → edit the topic and restamp its `last_verified`, re-cutting its `description:` if the signal moved. Dead concern → delete the file. In every case the index is regenerated afterwards, never edited; topic files carry no `## Upkeep` section of their own. Relative links inside a topic file resolve from `memory/`, one level below the scope — prefix them `../`.
 
 **Every instruction file you write ends with the canonical `## Upkeep` clause, emitted in full at every level** — never a pointer to another level's copy, because the reader who most needs it entered at this depth and will never open the other file. `<children>` is the only token to substitute (`every project below`, `every package here`, `every child scope`); at a scope with no children, drop that clause:
 
@@ -121,7 +125,7 @@ Nothing outside that list is valid. Do not coin an eleventh — if no type fits,
 
 This file, `MEMORY.md`, its `memory/` topic store, and the skills that fire at this level are kept current **as changes land**, not in a later cleanup pass. `MEMORY.md` is required here exactly as this file is, and it cascades downward on identical terms — <children> carries its own pair too, and an instruction file with no `MEMORY.md` beside it is a defect, not a shortcut: the rules are stated and reality is left unstated, so the next agent infers status instead of reading it. Both files, or neither.
 
-- **Memory — always.** Update the topic files at the end of any session that shipped, decided, discovered, abandoned or unblocked something; re-cut the index hooks whose signal moved; restamp `last_verified:` only for what you actually re-inspected. Record decisions *with their why* — a decision without its rationale is reversed by the next agent, who sees only its cost.
+- **Memory — always.** Update the topic files at the end of any session that shipped, decided, discovered, abandoned or unblocked something; re-cut the `description:` of any topic whose signal moved, then regenerate `MEMORY.md` from the topic files rather than editing it; restamp `last_verified:` only for what you actually re-inspected. Record decisions *with their why* — a decision without its rationale is reversed by the next agent, who sees only its cost.
 - **This file — only when a rule changed.** A new convention, command or invariant earns an edit. A status change does not; it belongs in the memory store.
 - **Skills — when *how* the work is done changed.** Fix or delete a skill whose commands or thresholds no longer exist; a stale skill is worse than a missing one because it fires with authority. A procedure that would be correct in a repository with nothing to do with this tree belongs upstream in a plugin, never forked into this tree.
 - **Scratch — always.** Empty `.tmp/` before the session ends, promoting anything that still mattered first.

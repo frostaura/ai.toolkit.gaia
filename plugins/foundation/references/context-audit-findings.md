@@ -1,6 +1,6 @@
 # Context Audit — Finding Codes
 
-`python3 ${CLAUDE_PLUGIN_ROOT}/scripts/context-audit.py` mechanically checks the context layer described in [`context-cascade.md`](context-cascade.md). It sweeps the scopes it is given as `--scope` arguments (never a hard-coded list), takes `--max-age DAYS` for memory freshness and `--no-git` to skip the repository checks, and exits `0` clean / `1` with findings.
+`python3 ${CLAUDE_PLUGIN_ROOT}/scripts/context-audit.py` mechanically checks the context layer described in [`context-cascade.md`](context-cascade.md). It sweeps the scopes it is given as `--scope` arguments (never a hard-coded list), takes `--max-age DAYS` for memory freshness, `--no-git` to skip the repository checks and `--fix-index` to regenerate every stale `MEMORY.md` from its topic files, and exits `0` clean / `1` with findings.
 
 **Two rules make it safe to use.**
 
@@ -42,12 +42,19 @@ Read `GIT-DIVERGED` and `GIT-DESTRUCTIVE-UNPUSHED` first in any run — they are
 | `MEMORY-UNMIGRATED` | A monolithic `MEMORY.md` with no `memory/` directory | Split it into the topic store | No |
 | `NO-VERIFIED-STAMP` | An unmigrated `MEMORY.md` carries no verified date | Migrate it; the stamp moves into topic frontmatter | No |
 | `STALE-MEMORY` | A topic's `last_verified` is older than `--max-age` | Re-verify by inspection, then restamp. **Never restamp what you merely edited** | Yes |
-| `MEMORY-INDEX-DRIFT` | Non-index content inside the index | Move the prose into a topic file; the index is heading plus hook lines only | No |
-| `MEMORY-LINK-BROKEN` | The index links a topic that is not on disk | Restore the topic or drop the index line | No |
-| `MEMORY-ORPHAN-TOPIC` | A topic file exists that nothing indexes | Index it or delete it — an unindexed topic is never read | Yes |
-| `MEMORY-FRONTMATTER` | The six-line block is malformed | Rewrite it: `---`, `name`, `description`, `type`, `last_verified`, `---` — four keys, in that order, no extras | No |
+| `MEMORY-INDEX-STALE` | The index differs from what the topic files derive to | Re-run with `--fix-index`. The index is generated — never hand-edit it, and never resolve this by editing `MEMORY.md` | No |
+| `MEMORY-INDEX-REWRITTEN` | `--fix-index` regenerated a stale index | Informational. Review the diff and commit it with the topic edits that caused it | No |
+| `MEMORY-LINK-BROKEN` | The index links a topic that is not on disk | A symptom of a stale index: restore the topic, or regenerate | No |
+| `MEMORY-ORPHAN-TOPIC` | A topic file exists that nothing indexes | A symptom of a stale index: regenerate to index it, or delete the topic if its concern is dead | Yes |
+| `MEMORY-FRONTMATTER` | The six-line block is malformed, or `last_verified` is in the future | Rewrite it: `---`, `name`, `description`, `type`, `last_verified`, `---` — four keys, in that order, no extras. `--fix-index` refuses to regenerate a store holding one of these | No |
 | `MEMORY-TOPIC-TYPE` | `type:` is outside the ten-value vocabulary | Use the singular form from the closed list; plurals defeat every filter | No |
+| `MEMORY-TOPIC-NAME` | `name:` is not `<scope slug>-<file stem>`, or collides with another topic's | Rename it to match. The slug is the scope's directory name kebab-cased, a grouping directory prefixed by its parent, the root `root`. **The slug depends on where `--root` points:** a repository nested inside a larger tree is `my-repo-state` when the tree is audited and `root-state` when that repository is audited alone, so audit it at the root its store was authored for rather than renaming to satisfy the narrower run | No |
+| `MEMORY-TOPIC-NO-HEADING` | A topic's first body line is not a `# Heading` | Add one — the index title is derived from it, and without it the index falls back to the filename | No |
+| `MEMORY-ALERT-HEADING` | An `alert` topic's heading does not begin `Red — ` | Prefix it, so the hazard reads as a hazard in the index | No |
+| `MEMORY-DESCRIPTION-LONG` | A `description:` exceeds 240 characters | It **is** the index hook: cut it to the signal, or split the topic. A description that needs more room is narrating the body | Yes |
 | `MEMORY-TOPIC-LONG` | A topic file has outgrown ~60 lines | Split it, or prune what stopped being true | Yes |
+| `MEMORY-TOPIC-HEAVY` | A topic's body exceeds 6,000 characters | The line cap is being met with paragraph-long lines. Split on the real seam, or prune | Yes |
+| `MEMORY-VOLATILE-COUNT` | A git-shaped integer in a topic's prose | Replace it with the topology. Advisory: a count that is *itself* the hazard ("deletes 21 tracked files") is legitimate and stays | Yes |
 
 ## Instruction-vs-state split
 

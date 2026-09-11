@@ -53,41 +53,56 @@ A tree carrying none of this yet acquires the cascade in one pass rather than a 
 
 `MEMORY.md` is a **pure index**; the content lives in a `memory/` directory beside it, one topic file per concern. This mirrors how agent memory systems themselves work: list the index, skim each topic's frontmatter, deep-read only what the task needs.
 
-**The index** contains nothing but the scope heading and one line per topic:
+**The index is derived, never authored.** Every line of `MEMORY.md` is computed from the topic files: the heading from the scope's path, each entry's title from the topic's `# H1`, its hook from the topic's `description:`, and the order from the topic's `type:`. Nothing in the index is written by hand, so a hook cannot disagree with the body it points at — the defect that produced a 1,500-character index line contradicting itself in one repository. After editing topic files, regenerate the index:
 
-```markdown
-# MEMORY — <scope name>
-
-- [Current state](memory/state.md) — one-line hook that carries the actual signal
-- [Live decisions](memory/decisions.md) — the decisions an agent must not relitigate, lead phrases inline
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/context-audit.py --no-git --fix-index
 ```
 
-The hook is not a label — it carries the state signal itself ("deploy decided, unpushed range still local, kill clock void once live"), so a reader who stops at the index still leaves informed. Zero other content: a sentence in the index is index drift, and the audit flags it.
+The result is exactly this and nothing else:
 
-**Topic files** open with exactly this frontmatter — six lines, so `head -7` of any topic file returns the complete relevance signal plus the first body line:
+```markdown
+# MEMORY — packages/ingest
+
+- [Red — there is no safe blanket push here](memory/alerts.md) — diverged fork; a plain push is rejected and --force destroys the remote …
+- [Current state](memory/state.md) — the description of state.md, verbatim
+- [Live decisions](memory/decisions.md) — the description of decisions.md, verbatim
+```
+
+The heading is `# MEMORY — <path of the scope relative to the repository root>`; the root's own index uses the repository directory's name. Entries are ordered by type — `alert`, `state`, `decision`, `gotcha`, `question`, `watch`, `kill-record`, `evidence`, `log`, `reference` — with the canonical file of a type (`decisions.md`) before its split siblings (`decisions-sync.md`), then alphabetically. The audit reports `MEMORY-INDEX-STALE` whenever the file on disk differs from that derivation by a byte, and `--fix-index` rewrites it.
+
+**Topic files** open with exactly this frontmatter — six lines, so `head -7` of any topic file returns the complete relevance signal plus the heading:
 
 ```markdown
 ---
-name: <scope>-<topic>
-description: "one line — enough to judge relevance without opening the body"
+name: <scope slug>-<file stem>
+description: "one line, at most 240 characters — the index hook, enough to judge relevance without opening the body"
 type: state
 last_verified: YYYY-MM-DD
 ---
 
-# <Topic heading>
+# <Topic heading — becomes the index title>
 
 body…
 ```
 
-`name` is globally unique kebab-case. `type` is one of exactly ten values, always singular — the *file* may be `decisions.md`, the *type* is `decision`, and a plural defeats any tooling that filters on type: `state` (the scope's current state), `decision` (live decisions with their *why*), `gotcha`, `question` (open questions, naming the owner), `watch` (known drift and unpaid debts), `kill-record`, `alert` (red do-not-do-this items — indexed near the top), `log` (dated session logs), `evidence` (assembled facts for a pending human-owner call), `reference`.
+- **`name`** is `<scope slug>-<file stem>`, kebab-case, and unique by construction. The scope slug is the scope's own directory name lowercased, with dots, underscores and spaces as dashes (`fa-reel`, `my-service`, `ingest`); a *grouping* directory is prefixed by its parent (`repo-packages`), because a tree usually has several and a bare `packages-state` collides once per scope; the repository root is `root`. So `packages/ingest/memory/gotchas.md` is `ingest-gotchas`. The audit reports `MEMORY-TOPIC-NAME` on anything else, and on any duplicate.
+- **`description`** is the index hook, and it is the *signal*, not a summary: what a reader who stops at the index must leave knowing ("diverged fork, plain push rejected, force-push destroys the remote"). Hard ceiling **240 characters** (`MEMORY-DESCRIPTION-LONG`). If the signal does not fit, the topic is two topics or the description is narrating the body.
+- **`type`** is one of exactly ten, always singular — the *file* may be `decisions.md`, the *type* is `decision`, and a plural defeats any tooling that filters on type: `state` (the scope's current state), `decision` (live decisions with their *why*), `gotcha`, `question` (open questions, naming the owner), `watch` (known drift and unpaid debts), `kill-record`, `alert` (red do-not-do-this items — sorted to the top and read at every level passed through), `log` (a dated session index pruned to pointers, never a changelog), `evidence` (assembled facts for a pending human-owner call), `reference`.
+- **`last_verified`** moves only when the topic's claims were re-established by inspection in that session — editing is not verifying. A date in the future is a `MEMORY-FRONTMATTER` finding.
+- **The heading** is the first body line and is what the index shows as the title (`MEMORY-TOPIC-NO-HEADING`). `alert` topics begin theirs with `Red — ` so the hazard reads as one at a glance (`MEMORY-ALERT-HEADING`).
+
+**Size.** A topic file stays under **60 lines *and* 6,000 characters of body** (`MEMORY-TOPIC-LONG`, `MEMORY-TOPIC-HEAVY`). The line rule alone was met with 22 KB files of paragraph-long lines; the character rule closes that. Past either, it is two topics — split by concern (`decisions-sync.md`, `gotchas-build.md`), never by date. A small scope may carry just `state.md` and one or two others; **never pad to a canonical set** — a `watch.md` whose only content is "the schema has never been exercised" is a line in `state.md`, not a file.
+
+**One home per fact.** A fact lives in exactly one topic file, at the lowest scope that owns it; every other mention is a link. Promote *up* when a fact holds across siblings (a grouping-wide trap goes in the grouping's topic, referenced from below), and point *down* when a higher scope must carry a hazard a reader needs on entry: a root or grouping `alert` is a short pointer — what, why it is red, where the detail lives — of at most ~15 lines, never a copy of the child's topic. Copies begin disagreeing on the next edit; one sweep found the same repository described as pushed in one scope and unpushed in two others.
 
 **Read protocol.** Entering a scope: read its index and every index above it — indexes cascade exactly as the instruction file does. Then `head -7` any topic whose hook looks relevant; deep-read only those that are. `alert` topics are read always, at every level passed through.
 
-**Write protocol.** New concern → new topic file plus one index line. Changed concern → edit the topic file, restamp its `last_verified`, and re-cut the index hook if the signal moved. Dead concern → delete the file and its index line. Relative links inside a topic file resolve from `memory/`, one level below the scope — prefix `../`.
+**Write protocol.** New concern → new topic file, then regenerate the index. Changed concern → edit the topic file, restamp its `last_verified` if you verified it, and regenerate. Dead concern → delete the file and regenerate. **Never hand-edit the index**; a hand-cut hook is the next `MEMORY-INDEX-STALE`. Relative links inside a topic file resolve from `memory/`, one level below the scope — prefix `../`. Topic files carry no `## Upkeep` section — the write protocol *is* their upkeep, and a "delete this topic once X" condition is the topic's last sentence.
 
-Keep a topic file under ~60 lines; past that it is probably two topics. A small scope may carry just `state.md` and one or two others — never pad to a canonical set. Delete anything that stops being true: memory is not a changelog and never grows without bound.
+Delete anything that stops being true: memory is not a changelog and never grows without bound.
 
-**Do not record volatile integers in prose.** Ahead-counts, behind-counts, dirty-path counts and commit totals go stale *inside the session that writes them* — the context commit that closes the session moves them, so the recording agent invalidates its own sentence before it finishes, sometimes with arithmetic that no longer closes. The audit re-measures every one of these in seconds and is the single source; a number copied into a topic file is a second source that starts disagreeing with it immediately.
+**Do not record volatile integers in prose.** Ahead-counts, behind-counts, dirty-path counts and commit totals go stale *inside the session that writes them* — the context commit that closes the session moves them, so the recording agent invalidates its own sentence before it finishes, sometimes with arithmetic that no longer closes. The audit re-measures every one of these in seconds and is the single source; a number copied into a topic file is a second source that starts disagreeing with it immediately. It flags the git-shaped ones as `MEMORY-VOLATILE-COUNT`, advisory because a count that is *itself* the hazard is legitimate.
 
 **Record the topology, not the integer.** "Safe to push — ahead-only, no deletions in the range" · "diverged fork; a plain push is rejected and `--force` destroys the remote" · "no remote at all, exists on one machine" · "a large uncommitted body that has never been `git add`ed, so `git clean` deletes it with no reflog" — these stay true across sessions and carry the signal a reader actually needs. A number is worth writing down only when it is **itself the hazard and does not move**: "the unpushed range deletes 21 named tracked files" is a fact about what a commit *does*; "3 ahead" is a fact about where a branch pointer *currently sits*. If a count is worth quoting at all, say when it was measured and that it must be re-measured before it is acted on.
 
@@ -95,8 +110,8 @@ Keep a topic file under ~60 lines; past that it is probably two topics. A small 
 
 1. **Read up the chain before acting.** Root → grouping directory → scope. Later files narrow earlier ones; they never silently contradict them. A real contradiction is a bug — fix it, don't route around it.
 2. **Write only the delta.** Never restate a parent's content. Link to it. Duplication is how a tree drifts against itself.
-3. **Update the memory store at the end of any session that changed reality** — shipped, decided, discovered, abandoned. Edit the topic files, re-cut the index hooks that moved, and restamp `last_verified` only where you actually checked, not merely edited.
-4. **Prune.** Resolved questions move into `decision` topics or disappear. Cleared watch items disappear, with their index lines. Delete topic files whose concern died.
+3. **Update the memory store at the end of any session that changed reality** — shipped, decided, discovered, abandoned. Edit the topic files, regenerate the index with `--fix-index`, and restamp `last_verified` only where you actually checked, not merely edited.
+4. **Prune.** Resolved questions move into `decision` topics or disappear. Cleared watch items disappear. Keep each topic file under 60 lines and 6,000 characters; delete topic files whose concern died, and let the index regeneration drop their lines.
 5. **Promote up, don't duplicate sideways.** A fact that matters across a whole grouping belongs in that level's topic file, referenced by the scopes below — not copy-pasted into each.
 6. **Facts beat inference.** Establish state by inspection (`git log`, manifests, tests) before recording it. Never record a status you did not verify. Git claims specifically — committed, pushed, backed up, deploy-ready — decay faster than anything else here and are never repeated from a context file without re-running the command behind them.
 7. **Maintain the skills alongside the pair.** If a session changed *how* the work is done, the local skills are as stale as an unupdated `MEMORY.md` would be. Fix or delete them in the same session.
@@ -105,7 +120,7 @@ Keep a topic file under ~60 lines; past that it is probably two topics. A small 
 
 ## Automation
 
-Everything here that does not require judgement is enforced mechanically by `${CLAUDE_PLUGIN_ROOT}/scripts/context-audit.py` — run it rather than checking by hand. Its finding codes, what each means, and which ones need a human read: [`context-audit-findings.md`](context-audit-findings.md).
+Everything here that does not require judgement is enforced mechanically by `${CLAUDE_PLUGIN_ROOT}/scripts/context-audit.py` — run it rather than checking by hand, and `--fix-index` regenerates every stale `MEMORY.md` from its topic files. Its finding codes, what each means, and which ones need a human read: [`context-audit-findings.md`](context-audit-findings.md).
 
 ## Precedence
 

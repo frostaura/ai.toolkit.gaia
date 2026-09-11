@@ -31,7 +31,7 @@ The same discipline governs sections *inside* a template. An emitted heading wit
 
 ## What is deliberately not in this file
 
-Frontmatter shape and key order, the `MEMORY.md` index discipline, the closed `type:` vocabulary, the read and write protocols, the topic line cap, and the topology-over-integers rule are canonical in [the context cascade](../../../references/context-cascade.md) and are **not repeated here**. This file supplies what that document does not: filled-in *shapes* for the four instruction levels, and a worked *body* for each memory archetype. Finding codes referenced below are defined in [the context audit findings](../../../references/context-audit-findings.md).
+Frontmatter shape and key order, the derived-`MEMORY.md` index discipline, the closed `type:` vocabulary, the read and write protocols, the topic size caps, and the topology-over-integers rule are canonical in [the context cascade](../../../references/context-cascade.md) and are **not repeated here**. This file supplies what that document does not: filled-in *shapes* for the four instruction levels, and a worked *body* for each memory archetype. Finding codes referenced below are defined in [the context audit findings](../../../references/context-audit-findings.md).
 
 ---
 
@@ -52,7 +52,7 @@ The canonical text, with `<children>` the only token to substitute (`every proje
 
 This file, `MEMORY.md`, its `memory/` topic store, and the skills that fire at this level are kept current **as changes land**, not in a later cleanup pass. `MEMORY.md` is required here exactly as this file is, and it cascades downward on identical terms — <children> carries its own pair too, and an instruction file with no `MEMORY.md` beside it is a defect, not a shortcut: the rules are stated and reality is left unstated, so the next agent infers status instead of reading it. Both files, or neither.
 
-- **Memory — always.** Update the topic files at the end of any session that shipped, decided, discovered, abandoned or unblocked something; re-cut the index hooks whose signal moved; restamp `last_verified:` only for what you actually re-inspected. Record decisions *with their why* — a decision without its rationale is reversed by the next agent, who sees only its cost.
+- **Memory — always.** Update the topic files at the end of any session that shipped, decided, discovered, abandoned or unblocked something; re-cut the `description:` of any topic whose signal moved, then regenerate `MEMORY.md` from the topic files rather than editing it; restamp `last_verified:` only for what you actually re-inspected. Record decisions *with their why* — a decision without its rationale is reversed by the next agent, who sees only its cost.
 - **This file — only when a rule changed.** A new convention, command or invariant earns an edit. A status change does not; it belongs in the memory store.
 - **Skills — when *how* the work is done changed.** Fix or delete a skill whose commands or thresholds no longer exist; a stale skill is worse than a missing one because it fires with authority. A procedure that would be correct in a repository with nothing to do with this tree belongs upstream in a plugin, never forked into this tree.
 - **Scratch — always.** Empty `.tmp/` before the session ends, promoting anything that still mattered first.
@@ -506,7 +506,7 @@ Three rules bind all four rows.
 
 ## Memory bodies — one worked archetype each
 
-What follows is the **body** of a topic file. Frontmatter, the index, the `type:` vocabulary and the line cap are in [the context cascade](../../../references/context-cascade.md) and are not repeated. Examples use a placeholder tree with an `api`, a `web` and an `ingest` project.
+What follows is the **body** of a topic file. Frontmatter, the derived index, the `type:` vocabulary and the size caps are in [the context cascade](../../../references/context-cascade.md) and are not repeated. Examples use a placeholder tree with an `api`, a `web` and an `ingest` project.
 
 Six devices recur across the archetypes and are worth naming once, because each closes a specific failure:
 
@@ -612,7 +612,7 @@ Not `alert` (nothing breaks on the next action) and not `question` (nobody has t
 1. **Is `ingest` retired or paused?** Owner: `unassigned`. Blocks: whether its dependencies are maintained, and whether it appears in the registry as live. Cheapest resolution: one sentence from whoever last worked on it.
 2. **Does the registry keep identity lines once `<manifest>` gains a description field?** Owner: `unassigned`. Not urgent; becomes urgent the first time the two disagree.
 
-Where no human is named, the owner field is written literally as `unassigned` and the index hook says so. **Never synthesize a name** — an invented owner reads as an assignment, and the real person never learns they have one.
+Where no human is named, the owner field is written literally as `unassigned` and the topic's `description:` — which is what the index shows — says so. **Never synthesize a name** — an invented owner reads as an assignment, and the real person never learns they have one.
 
 *Distinct from `watch.md`: these need a ruling from a person. A watch item needs work, not a decision.*
 ```
@@ -641,6 +641,6 @@ And record the retirement **before** deleting anything. A record written afterwa
 
 Canonical basenames for the recurring five — `state.md`, `decisions.md`, `gotchas.md`, `watch.md`, `questions.md`. A **concern-named** basename where the topic is one specific thing rather than a category. `<parent>-<facet>.md` for a split child.
 
-**Split on the real seam, never at the line count.** A topic split to satisfy the line cap produces two halves nobody can name, and the index hook for each becomes a label instead of a signal. If a file is long and has only one concern, it is one topic that needs pruning — deletion is the expected outcome of maintenance, not an exceptional one.
+**Split on the real seam, never at the size cap.** A topic split to satisfy the line or character cap produces two halves nobody can name, and each half's `description:` — its index hook — degrades into a label instead of a signal. If a file is long and has only one concern, it is one topic that needs pruning — deletion is the expected outcome of maintenance, not an exceptional one.
 
 **Promote up; never duplicate sideways.** A fact that matters across a whole grouping belongs in that level's topic and is referenced from the children — not copy-pasted into each. The reciprocal rule is what makes an apparent duplication legitimate: the parent records the *pattern* and the decision, the child records the *instance* and the evidence, and each names the other. Anything else is two copies waiting to disagree.

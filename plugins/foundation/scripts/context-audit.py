@@ -8,7 +8,7 @@ judgement, so agent attention is spent on the ones that do.
 Usage:  python3 context-audit.py [--root PATH] [--scope NAME ...]
                                  [--group-dir NAME ...] [--instruction-file NAME]
                                  [--registry PATH] [--max-age DAYS]
-                                 [--no-git] [--all]
+                                 [--no-git] [--all] [--fix-index]
 
 A *scope* is a directory carrying its own context pair — an instruction file
 (`CLAUDE.md`, or `AGENTS.md` where that is the repository's convention) beside a
@@ -391,7 +391,6 @@ def check_links(root, out, include_vendored=False):
                     out.append(("BROKEN-LINK", rel(root, f), target))
 
 
-MEM_INDEX_LINE = re.compile(r"- \[[^\]]+\]\(memory/[^)]+\.md\) — .+")
 # The four required frontmatter keys, in order, with no extras — six lines total,
 # so `head -7` of any topic file yields the complete relevance signal plus the
 # first body line. This is deliberately a line-by-line parse and not one regex:
@@ -404,7 +403,8 @@ MEM_FM_KV = re.compile(r"^([A-Za-z_][A-Za-z0-9_-]*):[ \t]*(.*)$")
 def parse_topic_frontmatter(body):
     """Validate a memory topic file's six-line frontmatter block.
 
-    Returns ((type, last_verified_date), None) on success, or (None, reason).
+    Returns ((name, description, type, last_verified_date), None) on success,
+    or (None, reason).
     Spec: ../references/context-cascade.md, "Memory layout — the topic store".
     """
     lines = body.split("\n")
@@ -432,24 +432,131 @@ def parse_topic_frontmatter(body):
         verified = dt.date.fromisoformat(raw)
     except ValueError:
         return None, f"`last_verified: {raw}` does not parse as a YYYY-MM-DD date"
-    return (values["type"].strip("\"'"), verified), None
+    return (values["name"].strip("\"'"), values["description"].strip("\"'"),
+            values["type"].strip("\"'"), verified), None
 
 
 # The closed vocabulary from the cascade spec. Singular, always — the *file* may
 # be `decisions.md`, the *type* is `decision`. Plural types are the common typo
 # and they defeat any tooling that filters on type.
-TOPIC_TYPES = {"state", "decision", "gotcha", "question", "watch",
-               "kill-record", "alert", "log", "evidence", "reference"}
+# The order here is the index order: alerts first because they are read at every
+# level passed through, then the scope's own state, then everything an agent
+# must not relitigate, then the traps, then what is open, then the debts, then
+# the record-keeping types.
+TOPIC_TYPE_ORDER = ("alert", "state", "decision", "gotcha", "question", "watch",
+                    "kill-record", "evidence", "log", "reference")
+TOPIC_TYPES = set(TOPIC_TYPE_ORDER)
+# The canonical basename for each recurring type. Within a type, the canonical
+# file sorts ahead of its split siblings (`decisions.md` before
+# `decisions-sync.md`), so the index reads in the order a person would write it.
+CANONICAL_STEMS = {"state", "decisions", "gotchas", "questions", "watch",
+                   "kill-records", "alerts", "log", "evidence", "reference"}
 # Past this a topic file is almost always two topics wearing one filename.
 TOPIC_MAX_LINES = 60
+# The line rule alone is gameable: a 57-line file can carry 22 KB because every
+# line is a paragraph. Sixty lines of ~100 characters is the envelope the line
+# rule always meant, so the body is capped in characters too.
+TOPIC_MAX_CHARS = 6000
+# The description is the index hook. It has to fit on one line of an index a
+# reader skims; past this it is a summary of the body, not a relevance signal.
+DESCRIPTION_MAX_CHARS = 240
+TOPIC_NAME = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+# Volatile git-shaped integers. The spec says record the topology, not the
+# count: these go stale inside the session that writes them. Advisory — a
+# count that is itself the hazard ("deletes 21 tracked files") is legitimate,
+# and this regex is deliberately narrow so it never fires on that.
+VOLATILE_COUNT = re.compile(
+    r"\b\d[\d,]*\s+(?:uncommitted|dirty|unpushed|untracked)\b"
+    r"|\b\d[\d,]*\s+commits?\s+(?:ahead|behind)\b"
+    r"|\b(?:ahead|behind)\s+(?:by\s+)?\d[\d,]*\b"
+    r"|\b\d[\d,]*\s+ahead\b|\b\d[\d,]*\s+behind\b", re.I)
+H1 = re.compile(r"^#\s+(.+?)\s*$")
 
 
-def check_memory_freshness(root, max_age, out):
-    """Memory is a topic store: MEMORY.md is a pure index; state lives in
-    memory/*.md topic files whose first 6 lines are frontmatter
+def scope_slug(root, scope, group_dirs=GROUP_DIRS):
+    """The `name:` prefix a scope's topic files carry.
+
+    The root is `root`. Otherwise the scope's own directory name, lowercased,
+    with dots, underscores and spaces turned into dashes — except that a
+    *grouping* directory is prefixed by its parent's slug, because a tree
+    usually has several and `projects-state` would collide once per scope.
+    """
+    if scope == root:
+        return "root"
+    own = scope.name.lower().replace(".", "-").replace("_", "-").replace(" ", "-")
+    if scope.name in group_dirs and scope.parent != root:
+        return f"{scope_slug(root, scope.parent, group_dirs)}-{own}"
+    return own
+
+
+def index_heading(root, scope):
+    """`# MEMORY — <scope path relative to the root>`; the root uses its own
+    directory name, which is the only name it has."""
+    rel_path = Path(scope).relative_to(root)
+    return f"# MEMORY — {root.name if str(rel_path) == '.' else rel_path.as_posix()}"
+
+
+def read_topics(memdir):
+    """Parse every topic file in a memory/ directory.
+
+    Returns (topics, problems): topics is a list of dicts for files whose
+    frontmatter parsed; problems is a list of (file, reason) for those that
+    did not. Order is by filename.
+    """
+    topics, problems = [], []
+    for p in sorted(memdir.glob("*.md")):
+        try:
+            body = p.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            problems.append((p, "unreadable"))
+            continue
+        parsed, reason = parse_topic_frontmatter(body)
+        if not parsed:
+            problems.append((p, reason))
+            continue
+        name, desc, ttype, verified = parsed
+        lines = body.split("\n")
+        title = None
+        for line in lines[6:]:
+            if not line.strip():
+                continue
+            m = H1.match(line)
+            title = m.group(1) if m else None
+            break
+        topics.append({"path": p, "name": name, "description": desc,
+                       "type": ttype, "verified": verified, "title": title,
+                       "body": "\n".join(lines[6:]), "text": body})
+    return topics, problems
+
+
+def render_index(root, scope, topics):
+    """The one correct MEMORY.md for a scope, derived from its topic files.
+
+    Title = the topic's H1; hook = its `description`; order = type rank, then
+    canonical-file-first, then filename. Nothing in the index is authored by
+    hand, so a hook cannot drift from the body it points at, and the whole file
+    is regenerable with --fix-index.
+    """
+    rank = {t: i for i, t in enumerate(TOPIC_TYPE_ORDER)}
+    ordered = sorted(topics, key=lambda t: (rank.get(t["type"], len(rank)),
+                                            0 if t["path"].stem in CANONICAL_STEMS else 1,
+                                            t["path"].name))
+    lines = [index_heading(root, scope), ""]
+    for t in ordered:
+        title = (t["title"] or t["path"].stem).replace("[", "").replace("]", "")
+        lines.append(f"- [{title}](memory/{t['path'].name}) — {t['description']}")
+    return "\n".join(lines) + "\n"
+
+
+def check_memory_freshness(root, max_age, out, fix_index=False,
+                           group_dirs=GROUP_DIRS):
+    """Memory is a topic store: MEMORY.md is a pure index *derived* from the
+    memory/*.md topic files, whose first 6 lines are frontmatter
     (name / description / type / last_verified). head -7 of any topic file
-    must be enough to judge relevance."""
+    must be enough to judge relevance, and the index must equal exactly what
+    render_index() produces from those files."""
     today = dt.date.today()
+    seen_names = {}
     for dirpath, filenames in walk(root):
         if "MEMORY.md" not in filenames:
             continue
@@ -473,47 +580,86 @@ def check_memory_freshness(root, max_age, out):
                         "monolithic MEMORY.md — split into the memory/ topic store "
                         "(spec: ../references/context-cascade.md)"))
             continue
-        # 1. The index must be pure: heading + index lines only.
-        for line in text.splitlines():
-            if not line.strip() or line.startswith("# "):
-                continue
-            if not MEM_INDEX_LINE.fullmatch(line):
-                out.append(("MEMORY-INDEX-DRIFT", r,
-                            f"non-index content in the index: {line.strip()[:80]!r}"))
-                break
-        # 2. Index links and topic files must agree in both directions.
-        linked = set(re.findall(r"\((memory/[^)]+\.md)\)", text))
-        on_disk = {f"memory/{p.name}" for p in memdir.glob("*.md")}
-        for miss in sorted(linked - on_disk):
-            out.append(("MEMORY-LINK-BROKEN", r, f"index links {miss}, not on disk"))
-        for orph in sorted(on_disk - linked):
-            out.append(("MEMORY-ORPHAN-TOPIC", r, f"{orph} exists but is not indexed"))
-        # 3. Every topic file: valid frontmatter, a known type, freshness, length.
-        for p in sorted(memdir.glob("*.md")):
-            prel = rel(root, p)
-            try:
-                body = p.read_text(encoding="utf-8", errors="replace")
-            except OSError:
-                continue
-            n_lines = len(body.rstrip("\n").split("\n"))
+        topics, problems = read_topics(memdir)
+        for p, reason in problems:
+            out.append(("MEMORY-FRONTMATTER", rel(root, p),
+                        f"{reason} — the block is exactly six lines: '---', "
+                        f"name, description, type, last_verified, '---'"))
+        # 1. Every topic file: known type, name shape, heading, size, freshness.
+        slug = scope_slug(root, dirpath, group_dirs)
+        for t in topics:
+            prel = rel(root, t["path"])
+            if t["type"] not in TOPIC_TYPES:
+                out.append(("MEMORY-TOPIC-TYPE", prel,
+                            f"type: {t['type']!r} is outside the vocabulary "
+                            f"({', '.join(TOPIC_TYPE_ORDER)})"))
+            expected = f"{slug}-{t['path'].stem}"
+            if not TOPIC_NAME.match(t["name"]) or t["name"] != expected:
+                out.append(("MEMORY-TOPIC-NAME", prel,
+                            f"name: {t['name']!r} — expected {expected!r} "
+                            f"(<scope slug>-<file stem>, kebab-case)"))
+            if t["name"] in seen_names:
+                out.append(("MEMORY-TOPIC-NAME", prel,
+                            f"name: {t['name']!r} is also used by {seen_names[t['name']]}"))
+            seen_names.setdefault(t["name"], prel)
+            if not t["title"]:
+                out.append(("MEMORY-TOPIC-NO-HEADING", prel,
+                            "the first body line is not a `# Heading` — the index "
+                            "title is derived from it"))
+            elif t["type"] == "alert" and not t["title"].startswith("Red — "):
+                out.append(("MEMORY-ALERT-HEADING", prel,
+                            f"an alert's heading begins `Red — ` so the hazard reads "
+                            f"as one in the index; got {t['title'][:50]!r}"))
+            if len(t["description"]) > DESCRIPTION_MAX_CHARS:
+                out.append(("MEMORY-DESCRIPTION-LONG", prel,
+                            f"description is {len(t['description'])} chars (max "
+                            f"{DESCRIPTION_MAX_CHARS}) — it is the index hook, one "
+                            f"line of signal, not a summary of the body"))
+            n_lines = len(t["text"].rstrip("\n").split("\n"))
             if n_lines > TOPIC_MAX_LINES:
                 out.append(("MEMORY-TOPIC-LONG", prel,
                             f"{n_lines} lines (max ~{TOPIC_MAX_LINES}) — this is "
                             f"probably two topics; split it or prune it"))
-            parsed, reason = parse_topic_frontmatter(body)
-            if not parsed:
-                out.append(("MEMORY-FRONTMATTER", prel,
-                            f"{reason} — the block is exactly six lines: '---', "
-                            f"name, description, type, last_verified, '---'"))
-                continue
-            topic_type, verified = parsed
-            if topic_type not in TOPIC_TYPES:
-                out.append(("MEMORY-TOPIC-TYPE", prel,
-                            f"type: {topic_type!r} is outside the vocabulary "
-                            f"({', '.join(sorted(TOPIC_TYPES))})"))
-            age = (today - verified).days
+            n_chars = len(t["body"])
+            if n_chars > TOPIC_MAX_CHARS:
+                out.append(("MEMORY-TOPIC-HEAVY", prel,
+                            f"body is {n_chars} chars (max {TOPIC_MAX_CHARS}) — "
+                            f"the line rule is being met with paragraphs; split "
+                            f"it or prune it"))
+            age = (today - t["verified"]).days
             if age > max_age:
                 out.append(("STALE-MEMORY", prel, f"last verified {age} days ago"))
+            if t["verified"] > today:
+                out.append(("MEMORY-FRONTMATTER", prel,
+                            f"last_verified {t['verified']} is in the future"))
+            for m in VOLATILE_COUNT.finditer(strip_code(t["body"])):
+                out.append(("MEMORY-VOLATILE-COUNT", prel,
+                            f"{m.group(0)!r} — record the topology, not the "
+                            f"integer; the audit re-measures counts"))
+        # 2. The index must be exactly what the topic files derive to.
+        expected_index = render_index(root, dirpath, topics)
+        if text != expected_index:
+            linked = set(re.findall(r"\((memory/[^)]+\.md)\)", text))
+            on_disk = {f"memory/{p.name}" for p in memdir.glob("*.md")}
+            for miss in sorted(linked - on_disk):
+                out.append(("MEMORY-LINK-BROKEN", r, f"index links {miss}, not on disk"))
+            for orph in sorted(on_disk - linked):
+                out.append(("MEMORY-ORPHAN-TOPIC", r, f"{orph} exists but is not indexed"))
+            if fix_index and not problems:
+                f.write_text(expected_index, encoding="utf-8")
+                out.append(("MEMORY-INDEX-REWRITTEN", r,
+                            "regenerated from the topic files' frontmatter"))
+            else:
+                why = ("cannot regenerate while a topic has malformed frontmatter"
+                       if problems else
+                       "run with --fix-index to regenerate it")
+                exp_lines = expected_index.splitlines()
+                got_lines = text.splitlines()
+                first = next((i for i, (a, b) in enumerate(zip(got_lines, exp_lines))
+                              if a != b), min(len(got_lines), len(exp_lines)))
+                out.append(("MEMORY-INDEX-STALE", r,
+                            f"index differs from what the topic files derive to "
+                            f"(first difference at line {first + 1}) — {why}"))
 
 
 MEMORY_REF = re.compile(r"\[[^\]]*\]\([^)]*MEMORY\.md[^)]*\)|\bMEMORY\.md\b")
@@ -910,6 +1056,11 @@ def main():
     ap.add_argument("--all", action="store_true",
                     help="also check vendored/imported trees "
                          "(" + ", ".join(sorted(VENDORED_DIRS)) + ")")
+    ap.add_argument("--fix-index", action="store_true",
+                    help="rewrite every MEMORY.md that differs from what its "
+                         "memory/ topic files derive to (title = the topic's H1, "
+                         "hook = its description, order = type rank). The index "
+                         "is generated, never hand-written")
     args = ap.parse_args()
     root = Path(args.root).resolve() if args.root else Path.cwd().resolve()
     if not root.is_dir():
@@ -924,7 +1075,7 @@ def main():
     if args.registry:
         check_registry(root, args.registry, scopes, out, group_dirs)
     check_links(root, out, args.all)
-    check_memory_freshness(root, args.max_age, out)
+    check_memory_freshness(root, args.max_age, out, args.fix_index, group_dirs)
     check_split(root, out)
     check_cloud_dupes(root, out)
     check_upkeep(root, out)

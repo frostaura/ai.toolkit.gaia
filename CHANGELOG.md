@@ -4,6 +4,31 @@ All notable changes to the Gaia plugins are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions are lockstep across all plugins. Plugin sources track `ref: main`; the `version` field in each `plugin.json` is the update trigger, and changes reach users when pushed to GitHub.
 
+## [14.0.0] - 2026-09-11
+
+### Changed — BREAKING
+
+- **`MEMORY.md` is now derived from the topic files, not written by hand.** Every line of an index is computed: the heading from the scope's path relative to the audited root, each entry's title from the topic's `# H1`, its hook from the topic's `description:`, and the order from the topic's `type:` — `alert`, `state`, `decision`, `gotcha`, `question`, `watch`, `kill-record`, `evidence`, `log`, `reference`, with a type's canonical file (`decisions.md`) before its split siblings (`decisions-sync.md`), then alphabetically. `context-audit.py` reports any byte of difference as **`MEMORY-INDEX-STALE`**, and the new **`--fix-index`** flag rewrites every stale index in place (**`MEMORY-INDEX-REWRITTEN`**). This is why the release is major: an existing store whose index was authored by hand almost certainly fires the new finding until `--fix-index` is run once, and a hook that disagrees with the body it points at will be replaced by the body's own `description:`. The failure it closes is a real one — a hand-cut hook and its topic drift apart on the next edit, and nothing mechanical could see it before.
+- **`MEMORY-INDEX-DRIFT` is retired**, replaced by `MEMORY-INDEX-STALE`. Prose in an index was only ever a symptom of the index being hand-written. `MEMORY-LINK-BROKEN` and `MEMORY-ORPHAN-TOPIC` remain, now reported as symptoms of a stale index rather than as defects to fix by editing it.
+- **Topic `name:` must equal `<scope slug>-<file stem>`** (**`MEMORY-TOPIC-NAME`**), where the slug is the scope's own directory name lowercased with dots, underscores and spaces turned into dashes, a *grouping* directory (`--group-dir`, default `projects`) prefixed by its parent's slug, and the audited root `root`. Names are then unique by construction; a duplicate is reported too. Note that the slug follows `--root`: a repository nested inside a larger tree is `my-repo-state` when the tree is audited and `root-state` when that repository is audited alone.
+- **A topic's first body line must be a `# Heading`** (**`MEMORY-TOPIC-NO-HEADING`**) — the index title is taken from it — and an `alert`'s heading must begin `Red — ` (**`MEMORY-ALERT-HEADING`**) so the hazard reads as one in the index.
+- **`description:` is capped at 240 characters** (**`MEMORY-DESCRIPTION-LONG`**). It *is* the index hook now, so it must carry the signal rather than summarise the body; past the cap the topic is two topics, or the description is narrating.
+
+### Added
+
+- **A character cap on topic bodies: 6,000** (**`MEMORY-TOPIC-HEAVY`**), alongside the existing 60-line cap. The line rule alone was being met by files of paragraph-long lines — one 57-line topic carried 22 KB.
+- **`MEMORY-VOLATILE-COUNT`** — advisory, for git-shaped integers in a topic's prose (`3 commits ahead`, `12 uncommitted`). These go stale inside the session that writes them, because the closing context commit moves them. Advisory rather than blocking, because a count that is *itself* the hazard ("the unpushed range deletes 21 tracked files") is legitimate and stays.
+- **`last_verified` in the future** is now a `MEMORY-FRONTMATTER` finding.
+
+### Changed
+
+- **Every skill, reference and agent that touched the index now says the same thing**: edit the topic files — `description` is the hook, at most 240 characters; body under 60 lines and 6,000 characters — then regenerate with `--fix-index`, and never hand-edit `MEMORY.md`. `fa-foundation-memory-maintenance`, `fa-foundation-session-close`, `fa-foundation-context-authoring`, `fa-foundation-context-audit`, `fa-foundation-optimize-directory-tree` (with `context-templates.md` and the branch `analysis-brief.md`), `fa-foundation-context-auditor`, `references/context-cascade.md`, `references/context-audit-findings.md` and the foundation ownership table. No skill's `description:` trigger changed, because none of the trigger conditions did.
+- **Prose rules stated where the tooling cannot enforce them**: one home per fact, with an upward `alert` written as a pointer of at most ~15 lines rather than a copy; never pad a small store to a canonical set of topic files; topic files carry no `## Upkeep` section, because the write protocol is their upkeep; a `log` topic is a pointer index, never a changelog.
+
+### Migration
+
+Run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/context-audit.py --fix-index` once per tree. It regenerates every index from the topic files and reports what it rewrote; it refuses to regenerate a store holding malformed frontmatter, so fix `MEMORY-FRONTMATTER` first. Everything else is a rename or a trim: `MEMORY-TOPIC-NAME` wants the scope slug in front of the file stem, `MEMORY-TOPIC-NO-HEADING` wants an `# H1` as the first body line, and `MEMORY-DESCRIPTION-LONG` wants the hook cut to its signal.
+
 ## [13.0.0] - 2026-08-21
 
 ### Removed — BREAKING

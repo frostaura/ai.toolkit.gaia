@@ -1,6 +1,6 @@
 ---
 name: fa-foundation-context-authoring
-description: Provides cascade-aware authoring for a scope's instruction file (CLAUDE.md or AGENTS.md) and its MEMORY.md topic store, keeping timeless rules strictly separate from dated state and holding every scope to its own delta over its parent. Use it by reading every context file in the scope end to end first, sorting each sentence into instruction or memory with the date/status/version test, then writing MEMORY.md as a pure index over frontmattered memory/ topic files. Use it when creating, rewriting or restructuring either file at a single scope whose surrounding cascade already exists, when a nested scope restates content it already inherits, when an instruction file has started asserting status, versions or progress, or when a memory store has no memory/ directory, carries malformed topic frontmatter, or has prose sitting in the index.
+description: Provides cascade-aware authoring for a scope's instruction file (CLAUDE.md or AGENTS.md) and its MEMORY.md topic store, keeping timeless rules strictly separate from dated state and holding every scope to its own delta over its parent. Use it by reading every context file in the scope end to end first, sorting each sentence into instruction or memory with the date/status/version test, then writing frontmattered memory/ topic files and generating MEMORY.md from them rather than hand-writing it. Use it when creating, rewriting or restructuring either file at a single scope whose surrounding cascade already exists, when a nested scope restates content it already inherits, when an instruction file has started asserting status, versions or progress, or when a memory store has no memory/ directory, carries malformed topic frontmatter, or has a hand-written index instead of one generated from its topic files.
 license: MIT
 ---
 
@@ -15,7 +15,7 @@ Use this skill when:
 - creating or rewriting a scope's instruction file or `MEMORY.md`
 - an instruction file has started asserting dates, statuses, versions or progress
 - a nested scope restates rules it already inherits from a parent
-- a memory store is a single prose file rather than an index over `memory/` topics, or the audit reports index drift, malformed frontmatter or an invalid `type`
+- a memory store is a single prose file rather than an index over `memory/` topics, or the audit reports a stale index, malformed frontmatter or an invalid `type`
 
 Do not use this skill when:
 
@@ -34,7 +34,7 @@ Do not use this skill when:
 ## Owned outputs
 
 - an instruction file that is timeless: mandate, architecture, conventions, commands, prohibitions
-- a `MEMORY.md` that is a pure index, plus `memory/` topic files with valid frontmatter
+- `memory/` topic files with valid frontmatter, and a `MEMORY.md` generated from them
 - content moved to the correct side of the split, with the wrong-side copy deleted
 - a scope that states only its own delta and links upward for everything else
 
@@ -53,34 +53,40 @@ Do not use this skill when:
 3. Apply the refinement that settles the hard cases. A *structural inventory* is not state — "this scope owns these packages", "the API exposes these pillars", "the stack is .NET, EF Core and PostgreSQL" are facts about the shape of the thing and belong in the instruction file, because routing and navigation depend on them. What does not belong is *condition*: patch-level pins, progress, phase, dormancy, dates, counts that move on the next commit, credentials. The test is not "could this ever change" — everything can. It is "does an agent need this to find its way around, or to know how things are going right now?" **Navigation is instruction; condition is memory.**
 4. Compute the delta against the parents and delete everything inherited.
 5. Write the instruction file in this shape: what this is, in two or three sharp sentences · architecture and key concepts · conventions and non-obvious rules · how to build, test and run · where its docs live · what an agent must never do here.
-6. Write the memory store to the topic-store shape below — index first, then one topic file per concern.
+6. Write the memory store to the topic-store shape below — one topic file per concern, then generate the index from them.
 7. Run `${CLAUDE_PLUGIN_ROOT}/scripts/context-audit.py` and clear every mechanical finding before handing off.
 
 ## The topic-store shape
 
-`MEMORY.md` is a **pure index**. Content lives in a `memory/` directory beside it, one topic file per concern, so a reader lists the index, skims frontmatter, and deep-reads only what the task needs. The index carries the scope heading and one line per topic — **nothing else**:
+`MEMORY.md` is a **pure index, and it is derived — never authored.** Content lives in a `memory/` directory beside it, one topic file per concern, so a reader lists the index, skims frontmatter, and deep-reads only what the task needs. Every line of the index is computed from those topic files: the heading from the scope's path, each title from the topic's `# H1`, each hook from its `description:`, the order from its `type:`. You write topic files and then run the generator; you do not write `MEMORY.md`.
 
-```markdown
-# MEMORY — <scope name>
-
-- [Current state](memory/state.md) — one-line hook that carries the actual signal
-- [Live decisions](memory/decisions.md) — the decisions an agent must not relitigate
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/context-audit.py --fix-index
 ```
 
-**The hook is not a label; it carries the signal itself.** "Deployment notes" is a wasted line. "Deploy decided, unpushed range still local, kill clock void once live" leaves a reader informed even if they stop at the index. A sentence of prose anywhere else in the index is index drift, and the audit flags it.
+```markdown
+# MEMORY — packages/ingest
 
-Every topic file opens with exactly this block — four keys, in this order, no extras — so `head -7` returns the complete relevance signal plus the first body line:
+- [Red — there is no safe blanket push here](memory/alerts.md) — the description of alerts.md, verbatim
+- [Current state](memory/state.md) — the description of state.md, verbatim
+```
+
+The heading is the scope's path relative to the repository root; the root's own index uses the repository directory's name. Order is by type — `alert`, `state`, `decision`, `gotcha`, `question`, `watch`, `kill-record`, `evidence`, `log`, `reference` — canonical file before its split siblings, then alphabetical. Any byte of difference between the file on disk and that derivation is `MEMORY-INDEX-STALE`, and the fix is always to regenerate, never to edit the index.
+
+Every topic file opens with exactly this block — four keys, in this order, no extras — so `head -7` returns the complete relevance signal plus the heading:
 
 ```markdown
 ---
-name: <scope>-<topic>
-description: "one line — enough to judge relevance without opening the body"
+name: <scope slug>-<file stem>
+description: "one line, at most 240 characters — the index hook"
 type: state
 last_verified: YYYY-MM-DD
 ---
+
+# <Topic heading — becomes the index title>
 ```
 
-`name` is globally unique kebab-case. `type` is one of exactly ten values, **always singular** — the file may be `decisions.md`, the type is `decision`, and a plural silently defeats any tooling that filters on type: `state` · `decision` (recorded with its *why*, or the next agent reverses it on cost alone) · `gotcha` · `question` (naming its owner) · `watch` · `kill-record` · `alert` (read at every level passed through, so index these near the top) · `log` · `evidence` · `reference`. Keep a topic under ~60 lines; past that it is two topics. Restamp `last_verified` only for what you actually inspected, never for what you merely edited. Relative links inside a topic resolve from `memory/`, one level below the scope — prefix `../`.
+`name` is `<scope slug>-<file stem>`: the scope's directory name kebab-cased, a grouping directory prefixed by its parent, the repository root `root` — so `packages/ingest/memory/gotchas.md` is `ingest-gotchas`. **`description` is the index hook, and it carries the signal, not a label** — "deployment notes" is a wasted line; "deploy decided, unpushed range still local, kill clock void once live" leaves a reader informed even if they stop at the index. It is capped at **240 characters**: past that it is narrating the body, or the topic is two topics. **The first body line is a `# Heading`**, because the index title comes from it, and an `alert`'s heading begins `Red — `. `type` is one of exactly ten values, **always singular** — the file may be `decisions.md`, the type is `decision`, and a plural silently defeats any tooling that filters on type: `state` · `decision` (recorded with its *why*, or the next agent reverses it on cost alone) · `gotcha` · `question` (naming its owner) · `watch` · `kill-record` · `alert` (read at every level passed through, and sorted to the top) · `log` (a pointer index, never a changelog) · `evidence` · `reference`. Keep a topic under **60 lines and 6,000 characters**; past either it is two topics. Restamp `last_verified` only for what you actually inspected, never for what you merely edited, and never date it in the future. Topic files carry no `## Upkeep` section. Relative links inside a topic resolve from `memory/`, one level below the scope — prefix `../`.
 
 **Never describe a directory's file inventory from inside a file you are adding to that directory.** One pass wrote "this directory contains exactly one file" into four `MEMORY.md` files it was in the act of adding to those directories — false before the write completed. Describe dormancy and last real activity instead of file counts and mtimes, and warn explicitly when a context file's own mtime must not be read as scope activity.
 
@@ -90,7 +96,7 @@ last_verified: YYYY-MM-DD
 | --- | --- | --- | --- |
 | status found in an instruction file | move the sentence into a `memory/` topic, delete the original | author | re-read the whole file for siblings of it |
 | scope restates a parent | delete the restatement and link upward | author | fix the parent instead, if the parent is what is wrong |
-| `MEMORY.md` is prose, not an index | split into `memory/` topics, cut a hook per topic | author | audit sibling scopes for the same shape |
+| `MEMORY.md` is prose, not an index | split it into `memory/` topics, put each hook in that topic's `description:`, then regenerate the index | author | audit sibling scopes for the same shape |
 | invalid `type` or malformed frontmatter | rewrite the four-key block; singularize the type | author | re-run the context audit |
 | a fact cannot be verified now | omit it, or record it as a `question` with an owner | author | escalate to the human owner |
 
@@ -118,7 +124,7 @@ last_verified: YYYY-MM-DD
 - no date, status, version, "currently" or "we decided" survives in the instruction file
 - structural inventory stayed put; condition moved to memory
 - nothing in this scope restates a parent
-- `MEMORY.md` is an index only, every hook carries signal rather than a label, and every topic file has the four-key frontmatter, a singular `type` and an honest `last_verified`
+- `MEMORY.md` was generated rather than written, every `description:` carries signal rather than a label inside 240 characters, and every topic file has the four-key frontmatter, an `# H1`, a singular `type` and an honest `last_verified`
 - the context audit runs clean, or every remaining finding is a deliberate judgement call
 
 ## References
