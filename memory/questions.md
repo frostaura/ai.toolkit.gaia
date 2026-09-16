@@ -2,7 +2,7 @@
 name: ai-toolkit-gaia-questions
 description: "Founder-owned and unresolved: one repo ships two unrelated products; placement reads as Technologies, not Labs; floating ref:main installs vs tags; and nothing in the repo can say whether the hosted service was ever redeployed."
 type: question
-last_verified: 2026-09-11
+last_verified: 2026-09-16
 ---
 
 # Open questions
@@ -15,10 +15,11 @@ decide. The Woolworths exposure has its own home and is not restated here:
 1. **Is the hosted service running a v13 image?** Owner: founder — he holds the Docker Hub
    and Portainer access, and nothing in this repository can answer it. CI builds and pushes
    the image on every merge to `main` but **contains no deploy step**, so redeploy is a manual
-   act outside the repo. Until someone checks the running `tools/list`, the correct posture is
-   that the version is *unknown*, not that it is stale. The evidence trail is in
-   [`state.md`](state.md); the consequence if it was never redeployed is in
-   [`watch.md`](watch.md).
+   act outside the repo (re-read 2026-09-16: two jobs, `test` and `build-and-push`, and nothing
+   else). Until someone checks the running `tools/list`, the correct posture is that the version
+   is *unknown*, not that it is stale — and note the obvious shortcut does **not** work: the
+   server advertises `13.0.0` on `initialize` from source, so a freshly built v14.3.1 image would
+   report `13.0.0` too ([`watch.md`](watch.md)). Only the tool set distinguishes them.
 
 2. **This repository ships two unrelated products.** A developer-delivery plugin suite and a
    grocery integration gateway share a repo, a CHANGELOG, a version line and a hostname — and
@@ -32,8 +33,10 @@ decide. The Woolworths exposure has its own home and is not restated here:
    distributed, multi-ecosystem developer product with a live hosted service, CI/CD, a support
    address and no research character left. A credential-handling gateway is an operations
    concern. It is also the only Labs program with a granted stealth exception — the signature
-   of something that already graduated. Owner: founder; parent-controlled, so this program
-   recommends and does not move itself.
+   of something that already graduated. **Strengthened 2026-09-16:** it is now demonstrably in
+   live use on the founder's own desktop surface ([`watch.md`](watch.md)), which retires the
+   last argument that it had not graduated in practice. Owner: founder; parent-controlled, so
+   this program recommends and does not move itself.
 
 4. **`ref: main` or tags for plugin refs?** Floating installs are dangerous for a public user
    base: a breaking change reaches every fetching install at push time, with no version a user

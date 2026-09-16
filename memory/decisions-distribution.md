@@ -2,7 +2,7 @@
 name: ai-toolkit-gaia-decisions-distribution
 description: "Public distribution is Labs' one standing stealth exception; plugin refs float on ref:main not tags, so a breaking change lands on users at push time; versions move in lockstep; the README is deliberately not a catalog."
 type: decision
-last_verified: 2026-09-11
+last_verified: 2026-09-16
 ---
 
 # Live decisions — distribution, versioning and the catalog
@@ -12,7 +12,9 @@ last_verified: 2026-09-11
   everything shipped from here — a skill edit is a production change.
 - **Plugin sources are pinned to `ref: main`, not to a tag** — a conscious choice whose
   consequence is that installs float with `main`, so any breaking change to a skill or agent
-  contract reaches users the moment it is pushed. The `plugin.json` `version` field is what
+  contract reaches users the moment it is pushed. The `ref` is literal in
+  `.claude-plugin/marketplace.json`; `.github/plugin/marketplace.json` carries a bare relative
+  `source` path and no ref at all, so Copilot floats by default rather than by declaration. The `plugin.json` `version` field is what
   actually triggers a floating install to re-fetch, which is why bumps matter. Whether to
   move to tags is open — [`questions.md`](questions.md).
 - **Plugin versions move in lockstep across all three plugins**, and `metadata.version` in
@@ -21,7 +23,9 @@ last_verified: 2026-09-11
   descriptions changed, the agent-schema rewrite); minor when purely additive. A bump touches
   twelve sites — six `plugin.json` files plus all three plugin rows in each of the two
   marketplace manifests — and the README badge on top of those, with nothing in CI checking
-  that they agree ([`gotchas.md`](gotchas.md)).
+  that they agree ([`gotchas.md`](gotchas.md)). **The version the MCP server advertises to its
+  own clients is not in that lockstep and no decision records whether it should be**, which is
+  how it fell a major version behind ([`watch.md`](watch.md)).
 - **`"dependencies": ["foundation"]` stays in the two `plugin.json` copies and is
   deliberately not mirrored into the marketplace manifests.** The manifests are a discovery
   catalog, not a resolver; adding a field neither ecosystem resolves creates a fourth place
@@ -37,8 +41,9 @@ last_verified: 2026-09-11
   while doing it.
 - **`fa-foundation-optimize-directory-tree` ships with no agent definition of its own.**
   Founder rationale, verbatim: *"i dont want to commit to a process then llms get more clever
-  and the dated process just ties them down."* The method lives in an editable pasted brief
-  (`references/analysis-brief.md`) rather than a named role roster. Accepted cost: a brief can
+  and the dated process just ties them down."* The method lives in an editable pasted brief —
+  `skills/fa-foundation-optimize-directory-tree/references/analysis-brief.md`, relative to the
+  plugin root, *not* the shared `references/` tree — rather than a named role roster. Accepted cost: a brief can
   silently fail to arrive. Compensating controls: the version marker, the mandatory
   `files written` block, the positive write allow-list, and the explicit prohibition on
   dispatching `fa-foundation-context-auditor` in its place.

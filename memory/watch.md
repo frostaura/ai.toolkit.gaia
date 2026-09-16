@@ -1,55 +1,67 @@
 ---
 name: ai-toolkit-gaia-watch
-description: "No FrostAura plugin is installed on the founder's own Mac, so 'live to every installed user' currently describes nobody here; the repo's own audit script is blind to the plugin skills it ships; the playwright MCP is unpinned."
+description: "Dogfooded on the Claude desktop bundle at 13.0.0 and nowhere in the CLI; an unenumerated fourteenth version site leaves the MCP server advertising 13.0.0; the shipped audit script is blind to the plugin skills this repo ships."
 type: watch
-last_verified: 2026-09-11
+last_verified: 2026-09-16
 ---
 
 # Watch list
 
-**Dogfooding — the gap that matters most**
+**Dogfooding — two channels, and only one of them consumes the product**
 
-- **Nothing FrostAura publishes is installed on the founder's Mac**, so "live to every installed
-  user" describes nobody there; the evidence and its tree-wide consequence are root's
-  ([`../../../../memory/plugin-roster-drift.md`](../../../../memory/plugin-roster-drift.md)).
-  **Dogfooding is a stated kill criterion for this program** (`../CLAUDE.md`) — which is why the
-  product carries the consequence rather than only the machine that fails to consume it.
-- **The repository and the running service may disagree and nothing here can tell you.**
-  v13 removed the `tasks_*` / `memory_*` / `evolve_*` tools; whether the hosted image was ever
-  rebuilt and redeployed is unverifiable from the repo — [`questions.md`](questions.md) §1. If
-  it was not, the live service still advertises tools no shipped plugin calls. Practical risk
-  is low; the credibility cost of a service contradicting its own public repo is not.
+- **The product *is* dogfooded, on the Claude desktop surface, at `13.0.0`** (verified
+  2026-09-16). Desktop sessions materialise `foundation`, `engineering` and `product` per
+  session from a bundle reading `13.0.0`, author FrostAura Technologies, with the full
+  10 · 16 · 14 skill rosters and the three `foundation` auditor agents — exactly what
+  `origin/main` serves; this tree's own 2026-09-16 upkeep ran out of it. The **Claude Code
+  CLI** store holds no `frostaura` marketplace and no Gaia plugin, so on that channel every
+  `fa-*` name resolves to nothing. Tree-wide consequence, founder's options:
+  [`../../../../memory/plugin-roster-drift.md`](../../../../memory/plugin-roster-drift.md).
+  **The stated kill criterion is not tripping** (`../CLAUDE.md`), and "a skill edit ships to
+  every installed user" has a referent at last — one live install, at `13.0.0`, which a v14
+  push upgrades across a breaking boundary in one step.
+- **Repo and running service may disagree and nothing here can tell you** — v13 removed the
+  `tasks_*` / `memory_*` / `evolve_*` tools and no redeploy is verifiable from here
+  ([`questions.md`](questions.md) §1). Low practical risk; the credibility cost of a service
+  contradicting its own public repo is not.
 
 **Shipped defects in the product itself**
 
-- **`context-audit.py` cannot validate a single plugin skill this repo ships.**
-  `check_skill_indexes` only enters a `skills/` directory whose parent is `.claude` or
-  `.github`, and plugin skills live at `plugins/<name>/skills/` — so the
+- **There is a fourteenth version site, and it is the one that is wrong.**
+  `src/Gaia.Mcp.Server/Program.cs` sets the `Implementation.Version` the server advertises on
+  every MCP `initialize`, and it still reads `13.0.0` — last moved by the v13.0.0 release
+  commit, then left exactly where it was across the whole v14 line. Neither [`state.md`](state.md)'s release
+  loop nor `../docs/development.md`'s table names it. Two cheap exits, neither taken: fold it
+  into the release loop, or decide the server versions independently, which `../CLAUDE.md`
+  already holds as separate concerns. Until then, a reader checking "the version sites agree"
+  reads the surface as consistent while the service reports a major version behind.
+- **The shipped `context-audit.py` passes silently over what it cannot reach.**
+  `check_skill_indexes` enters a `skills/` directory only when its parent is `.claude` or
+  `.github`, and this repo's own plugin skills live at `plugins/<name>/skills/` — so the
   frontmatter↔directory-name check, the one invariant whose failure silently produces an
-  uninvokable skill, never runs on any of them. The substitute is the by-hand loop in
-  `../docs/development.md`; run it on every skill change.
-- **`--group-dir` still defaults to `projects`.** A caller who does not pass
-  `--group-dir packages` on a workspace monorepo gets CLEAN over directories the script never
-  entered. Silent pass by default is the worst failure mode an audit tool has.
+  uninvokable skill, never runs on any skill the product ships. `--group-dir` likewise still
+  defaults to `projects`, so a monorepo caller who does not pass `--group-dir packages` gets
+  CLEAN over directories the script never entered. Substitute for the first: the by-hand loop
+  in `../docs/development.md`, on every skill change.
 - **`fa-foundation-create-agent` and `fa-foundation-create-skill` still route global policy
-  into `AGENTS.md`** — both tell the author to put global workflow policy there rather than in
-  the instruction file, against the interop-pointer doctrine this repo applies to its own
+  into `AGENTS.md`** — against the interop-pointer doctrine this repo applies to its own
   `AGENTS.md`. Shipped to users, so it teaches the wrong thing.
 - **`npx @playwright/mcp@latest` is unpinned** in the engineering plugin's `plugin.json` (both
-  copies) — a live supply-chain and reproducibility exposure on every invocation.
-- **The Claude Desktop / claude.ai / Cowork install path in the README is documented by link,
-  not by click-path**, and has never been confirmed in the live product.
+  copies) — and the bundled `13.0.0` install carries the same unpinned argument, so the
+  supply-chain and reproducibility exposure is live on a real install, not only in source.
+- **The README's marketplace-add path for Claude Desktop / claude.ai / Cowork has never been
+  confirmed end to end.** Documented by repository URL plus a link to Anthropic's docs rather
+  than a click-path, deliberately. The plugins demonstrably *load and run* on that surface, but
+  from a session-local bundle — so the install mechanism is unconfirmed, not the surface.
 
 **Repository hygiene**
 
-- **v13 deliberately deleted 15 tracked files** — the 14 tasks/memory/evolve sources, models,
-  stores, validator and schema docs, plus this store's own resolved `do-not-push.md` alert.
-  Those deletions are in origin's history, so a range comparison against an older ref shows
-  them. **Expected and enumerated; never turn it into a restore.** The number is fixed by that
-  commit and does not move.
-- **This repo is public and its context layer is not written as if it were.** `CLAUDE.md`
-  names the owner; the decision topics name the parent organization's internal structure and a
-  killed internal project. The committed layers are already pushed, so this is now a
-  going-forward choice: genericize deliberately, or accept it deliberately.
+- **v13 deliberately deleted 15 tracked files** — tasks/memory/evolve sources, stores,
+  validator and schema docs, plus this store's resolved `do-not-push.md` alert. They sit in
+  origin's history, so a range comparison against an older ref shows them. **Expected and
+  enumerated; never turn it into a restore.**
+- **This repo is public and its context layer is not written as if it were** — `CLAUDE.md`
+  names the owner, the decision topics name the parent's internal structure and a killed
+  internal project, all already pushed. Genericize deliberately, or accept it deliberately.
 - **A 2 MB `README.icon.png` sits committed at repo root**, referenced by absolute GitHub raw
   URL anyway. History is permanent; removing it now only stops it growing.
