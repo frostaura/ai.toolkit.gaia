@@ -1,8 +1,8 @@
 ---
 name: ai-toolkit-gaia-decisions
-description: "The server's task/memory/evolve tools were removed rather than deprecated, so the completion contract is now enforced by nothing but the skills; plugins are server-independent; fa.integrations folded in whole, keeping REST alongside MCP."
+description: "The server's task/memory/evolve tools were removed rather than deprecated, so the completion contract is enforced by nothing but the skills; fa.integrations folded in whole, keeping REST alongside MCP; the MCP re-wiring shipped unratified."
 type: decision
-last_verified: 2026-09-11
+last_verified: 2026-09-16
 ---
 
 # Live decisions — product shape
@@ -22,12 +22,14 @@ last_verified: 2026-09-11
 - **No persistence at all, anywhere in the service.** Supersedes the older flat-JSON-over-EF
   decision, which is moot. The deviation from the mandated stack is now larger, not smaller,
   and is stated plainly in `CLAUDE.md` rather than hidden.
-- **`foundation` declared no MCP server** (v13.0.0): wiring the remaining Woolworths tools
-  into every `foundation` install would push a grocery integration onto people who installed
-  a context-layer plugin. If the server is ever wired again it should be opt-in and its own
-  plugin. **An unpushed commit reverses this with no recorded why**, and it now sits inside
-  the unpushed v14 range ([`state.md`](state.md)) — treat the reversal as unratified until the
-  founder says otherwise, and do not let a v14 push ratify it by accident.
+- **`foundation` declared no MCP server** (v13.0.0): wiring the remaining Woolworths tools into
+  every `foundation` install would push a grocery integration onto people who installed a
+  context-layer plugin. If the server is ever wired again it should be opt-in and its own plugin.
+  **A 2026-08-24 commit reverses this with no recorded why, and on 2026-09-16 it shipped** inside
+  the v14 push ([`state.md`](state.md)). It is therefore **published but still unratified** — the
+  release carried it rather than a decision doing so. Reverting it or recording the rationale is a
+  founder call ([`questions.md`](questions.md) §5); do not read "it is in the product" as "it was
+  decided".
 - **`fa.integrations` was migrated in whole and killed, not kept alongside** — one hosted
   service, one deploy chain, one place to add the next integration. The `IIntegration` seam
   moved with it, so adding a provider is still a class plus three registration lines.

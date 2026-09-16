@@ -12,22 +12,22 @@ parent-controlled under `decision-rights.md`; an agent recommends and escalates,
 decide. The Woolworths exposure has its own home and is not restated here:
 [`questions-woolworths.md`](questions-woolworths.md).
 
-1. **Is the hosted service running a v13 image?** Owner: founder — he holds the Docker Hub
-   and Portainer access, and nothing in this repository can answer it. CI builds and pushes
-   the image on every merge to `main` but **contains no deploy step**, so redeploy is a manual
-   act outside the repo (re-read 2026-09-16: two jobs, `test` and `build-and-push`, and nothing
-   else). Until someone checks the running `tools/list`, the correct posture is that the version
-   is *unknown*, not that it is stale — and note the obvious shortcut does **not** work: the
-   server advertises `13.0.0` on `initialize` from source, so a freshly built v14.3.1 image would
-   report `13.0.0` too ([`watch.md`](watch.md)). Only the tool set distinguishes them.
+1. **What image is the hosted service running?** Owner: founder — he holds the Docker Hub and
+   Portainer access, and nothing in this repository can answer it. CI builds and pushes the image
+   on every merge to `main` but **contains no deploy step** (re-read 2026-09-16: two jobs, `test`
+   and `build-and-push`), so the 2026-09-16 push built a v14 image and deployed nothing. Until
+   someone checks the running `tools/list`, the version is *unknown*, not stale — and the obvious
+   shortcut does **not** work: the server advertises `13.0.0` on `initialize` from source, so a
+   freshly built `14.3.1` image reports `13.0.0` too ([`watch.md`](watch.md)). Only the tool set
+   distinguishes them.
 
 2. **This repository ships two unrelated products.** A developer-delivery plugin suite and a
-   grocery integration gateway share a repo, a CHANGELOG, a version line and a hostname — and
-   since `foundation` stopped wiring the server, nothing else. Three honest exits: leave it
-   and say so in the README; split the server into its own repository; or reframe Gaia
-   deliberately as both. **The unpushed re-wiring quietly picks a fourth option** — coupling
-   them again without deciding — and now rides inside the v14 release, so the push that ships
-   v14 also ships this ([`state.md`](state.md)). Owner: founder.
+   grocery integration gateway share a repo, a CHANGELOG, a version line and a hostname. Three
+   honest exits: leave it and say so in the README; split the server into its own repository; or
+   reframe Gaia deliberately as both. **The 2026-09-16 v14 push picked a fourth option by
+   accident** — the `foundation` MCP re-wiring rode inside the release, so the two are coupled
+   again in the *published* product without anyone deciding it ([`state.md`](state.md)). Owner:
+   founder; this is now a question about what to do with a shipped coupling, not a pending one.
 
 3. **Placement still reads as `Technologies/`, not Labs.** This is a versioned, publicly
    distributed, multi-ecosystem developer product with a live hosted service, CI/CD, a support
@@ -43,6 +43,8 @@ decide. The Woolworths exposure has its own home and is not restated here:
    can pin to and — because the release path creates no tags at all ([`state.md`](state.md)) —
    nothing to roll back to. Owner: founder. Decided either way, the README should say which.
 
-5. **Should the integration be wired into any plugin at all?** If yes, it wants its own opt-in
-   plugin rather than the context layer — that was the v13.0.0 reasoning, and the unpushed
-   commit contradicts it without arguing with it. Owner: founder.
+5. **Should the integration be wired into any plugin at all?** It now is: the re-wiring commit
+   published in v14 on 2026-09-16, contradicting the v13.0.0 reasoning without ever arguing with
+   it. If the answer is yes it wants its own opt-in plugin rather than the context layer; if no,
+   the revert is a further release. Either way the README's "the plugins send nothing anywhere"
+   disclosure is currently untrue for `foundation`. Owner: founder.
